@@ -1,0 +1,63 @@
+/* =================================================================
+   Legal pages (Terms, Privacy Policy, Disclaimer)
+   ================================================================= */
+
+.terms-container {
+  background: var(--surface);
+  padding-bottom: 96px;
+}
+
+.terms-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 80px var(--gutter) 120px;
+  text-align: center;
+  background: radial-gradient(700px 320px at 85% -10%, rgba(124, 92, 255, 0.28), transparent 60%),
+    var(--navy-900);
+}
+
+.terms-hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  color: var(--white);
+}
+
+.terms-content {
+  position: relative;
+  max-width: 1100px;
+  margin: -72px auto 0;
+  padding: 56px 64px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+
+.terms-content h2 {
+  margin: 40px 0 14px;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+.terms-content h2:first-child {
+  margin-top: 0;
+}
+
+.terms-content p,
+.terms-content li {
+  font-size: 0.97rem;
+  line-height: 1.8;
+}
+
+.terms-content ul,
+.terms-content ol {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 720px) {
+  .terms-content {
+    margin: -72px var(--gutter) 0;
+    padding: 32px 22px;
+  }
+}

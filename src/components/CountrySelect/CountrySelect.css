@@ -1,0 +1,151 @@
+/* Dial-code picker used by both enquiry forms. Sized to sit beside a form
+   input, so the trigger stays narrow and only the flag and code show. */
+
+.country-select {
+  position: relative;
+  flex: 0 0 104px;
+}
+
+.country-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.country-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--blue-600);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  background: #fff;
+}
+
+.country-select-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.country-select-flag {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.country-select-dial {
+  font-variant-numeric: tabular-nums;
+}
+
+.country-select-caret {
+  width: 0;
+  height: 0;
+  margin-left: auto;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #667;
+}
+
+/* ---- dropdown ---- */
+
+.country-select-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  /* Wider than the trigger so full country names fit. */
+  width: 280px;
+  max-width: 78vw;
+  background: #fff;
+  border: 1px solid #e0e4ea;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(10, 35, 81, 0.16);
+  /* Above the modal overlay (3000) so it is not clipped inside the dialog. */
+  z-index: 3100;
+  overflow: hidden;
+}
+
+.country-select .country-select-search,
+.country-select .country-select-search:focus {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-bottom: 1px solid #eceff3;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 0.86rem;
+  color: #333;
+  outline: none;
+}
+
+.country-select .country-select-search::placeholder {
+  color: #9aa5b1;
+}
+
+.country-select-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.country-select-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.86rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.country-select-option.is-active {
+  background: #eef4ff;
+}
+
+.country-select-option.is-selected {
+  font-weight: 600;
+  color: #0a2351;
+}
+
+.country-select-name {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.country-select-code {
+  flex: 0 0 auto;
+  color: #78838f;
+  font-variant-numeric: tabular-nums;
+}
+
+.country-select-option.is-selected .country-select-code {
+  color: #0a2351;
+}
+
+.country-select-empty {
+  padding: 14px 12px;
+  font-size: 0.84rem;
+  color: #9aa5b1;
+  text-align: center;
+}
+
+/* An invalid phone field tints its dial trigger to match the input. */
+.contact-field-invalid .country-select-trigger,
+.modal-field-invalid .country-select-trigger {
+  border-color: #e4a0a0;
+  background: #fffafa;
+}

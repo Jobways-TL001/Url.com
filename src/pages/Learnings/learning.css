@@ -1,0 +1,285 @@
+/* =================================================================
+   AI Courses page
+   ================================================================= */
+
+/* ---------------- Jump links ---------------- */
+
+/* Pinned beneath the header while the course list scrolls past, with the
+   current course highlighted. */
+.course-jump {
+  position: sticky;
+  top: calc(var(--header-h, 80px) + 12px);
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  margin: -16px auto 48px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  box-shadow: var(--shadow);
+}
+
+.course-jump a {
+  padding: 9px 16px;
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+
+.course-jump a:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.course-jump a.is-active {
+  background: var(--blue-600);
+  color: var(--white);
+}
+
+/* ---------------- Course rows ---------------- */
+
+.course-list {
+  display: grid;
+  gap: 32px;
+}
+
+.course-row {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+  scroll-margin-top: calc(var(--header-h, 80px) + 96px);
+}
+
+.course-row:hover {
+  border-color: var(--blue-100);
+  box-shadow: var(--shadow);
+}
+
+/* Alternate the image side so a long list keeps its rhythm. */
+.course-row:nth-child(even) {
+  grid-template-columns: 1.15fr 0.85fr;
+}
+
+.course-row:nth-child(even) .course-row-media {
+  order: 2;
+}
+
+.course-row-media {
+  position: relative;
+  display: block;
+  min-height: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--navy-800);
+  overflow: hidden;
+}
+
+.course-row-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease);
+}
+
+.course-row:hover .course-row-media img {
+  transform: scale(1.04);
+}
+
+.course-row-tag {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--navy-900);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.course-row-body {
+  padding: 40px 44px;
+}
+
+.course-row-level {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue-600);
+}
+
+.course-row-body h3 {
+  margin: 8px 0 12px;
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+}
+
+.course-row-summary {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.course-row-subhead {
+  margin: 0 0 14px;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.course-row-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  font-size: 0.94rem;
+}
+
+.course-row-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.course-row-fee span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.course-row-fee strong {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.course-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 960px) {
+  .course-row,
+  .course-row:nth-child(even) {
+    grid-template-columns: 1fr;
+  }
+
+  .course-row:nth-child(even) .course-row-media {
+    order: 0;
+  }
+
+  .course-row-media {
+    aspect-ratio: 16 / 8;
+    min-height: 0;
+  }
+}
+
+/* Narrower screens: a full-width bar that scrolls sideways instead of
+   wrapping onto a second row. */
+@media (max-width: 1100px) {
+  .course-jump {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: auto;
+    overflow-x: auto;
+    margin: -24px calc(var(--gutter) * -1) 40px;
+    padding: 8px var(--gutter);
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    box-shadow: var(--shadow-sm);
+    scrollbar-width: none;
+  }
+
+  .course-jump::-webkit-scrollbar {
+    display: none;
+  }
+
+  .course-jump a {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .course-row-media {
+    aspect-ratio: 16 / 10;
+  }
+
+  .course-row-body {
+    padding: 28px 22px;
+  }
+
+  .course-row-list {
+    grid-template-columns: 1fr;
+  }
+
+  .course-row-actions,
+  .course-row-actions .btn {
+    width: 100%;
+  }
+
+  .course-row-actions .btn {
+    flex: 1;
+  }
+}
+
+/* ---------------- FAQ ---------------- */
+
+.learn-faq {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.learn-faq-intro {
+  position: sticky;
+  top: 120px;
+}
+
+.learn-faq-intro .section-head {
+  margin-bottom: 28px;
+}
+
+@media (max-width: 900px) {
+  .learn-faq {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .learn-faq-intro {
+    position: static;
+  }
+}

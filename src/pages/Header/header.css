@@ -1,0 +1,314 @@
+/* =================================================================
+   Header — sticky, so it never covers page content and pages need no
+   top offset to clear it.
+   ================================================================= */
+
+.header-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+}
+
+/* ---------------- Announcement bar ---------------- */
+
+.announcement-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 52px;
+  background: var(--navy-950);
+  color: #c4cee0;
+}
+
+.announcement-text {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.announcement-tag {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(46, 230, 193, 0.14);
+  color: var(--teal-400);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+
+.announcement-link {
+  color: var(--white);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.announcement-link:hover {
+  color: var(--teal-400);
+}
+
+.announcement-close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.announcement-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+}
+
+/* ---------------- Main bar ---------------- */
+
+.header {
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.header-scrolled .header {
+  border-bottom-color: var(--line);
+  box-shadow: 0 6px 24px -18px rgba(11, 18, 32, 0.35);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 76px;
+}
+
+.header-logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header-logo img {
+  height: 38px;
+  width: auto;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.header-links a {
+  position: relative;
+  display: block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+
+.header-links a:hover {
+  color: var(--ink);
+}
+
+.header-links a.is-active {
+  color: var(--blue-600);
+  font-weight: 600;
+}
+
+/* The underline grows from the centre on hover and stays for the current
+   page. */
+.header-links a::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--blue-600);
+  transform: scaleX(0);
+  transition: transform 0.25s var(--ease);
+}
+
+.header-links a:hover::after,
+.header-links a.is-active::after {
+  transform: scaleX(1);
+}
+
+.header-links a:not(.is-active):hover::after {
+  background: var(--line);
+}
+
+/* Reading progress along the bottom edge of the header. */
+.header {
+  position: relative;
+}
+
+.header-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue-600), var(--teal-400));
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+
+/* The bar slims down once the page is scrolled. */
+.header-inner {
+  transition: height 0.25s var(--ease);
+}
+
+.header-scrolled .header-inner {
+  height: 64px;
+}
+
+.header-logo img {
+  transition: height 0.25s var(--ease);
+}
+
+.header-scrolled .header-logo img {
+  height: 32px;
+}
+
+/* ---------------- Mobile toggle ---------------- */
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.nav-toggle .bar {
+  display: block;
+  height: 2px;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: transform 0.25s var(--ease), opacity 0.2s var(--ease);
+}
+
+.nav-toggle.is-open .bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-toggle.is-open .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle.is-open .bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 900px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .header-inner {
+    height: 68px;
+  }
+
+  .header-logo img {
+    height: 32px;
+  }
+
+  .header-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px var(--gutter) 24px;
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 24px 40px -24px rgba(11, 18, 32, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s var(--ease), transform 0.2s var(--ease),
+      visibility 0.2s;
+  }
+
+  .header-nav.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .header-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+
+  .header-links a {
+    padding: 14px 12px;
+    font-size: 1rem;
+  }
+
+  .header-links a.is-active {
+    background: var(--blue-50);
+  }
+
+  .header-links a::after {
+    display: none;
+  }
+
+  .header-cta {
+    min-height: 48px;
+  }
+
+  .header {
+    position: relative;
+  }
+}
+
+@media (max-width: 600px) {
+  .announcement-bar {
+    padding: 8px 44px 8px 16px;
+  }
+
+  .announcement-text {
+    font-size: 0.78rem;
+    text-align: left;
+  }
+}
