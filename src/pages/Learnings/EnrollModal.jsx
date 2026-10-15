@@ -8,7 +8,11 @@ import {
   COURSE_FEE,
 } from "../../constants/courses";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLock } from "@fortawesome/free-solid-svg-icons";
+import {
+  faLock,
+  faXmark,
+  faArrowRight,
+} from "@fortawesome/free-solid-svg-icons";
 import CountrySelect from "../../components/CountrySelect/CountrySelect";
 import {
   filters,
@@ -17,12 +21,15 @@ import {
   requiredPhone,
   composePhone,
 } from "../../utils/formValidation";
-// The enrolment panel is the enquiry modal with a different set of fields,
-// so it reuses that stylesheet rather than restating overlay, field, error
-// and button rules that would then have to be kept in step.
 import { saveEnrolment } from "../../utils/enrolmentSession";
+// The enrolment panel is the enquiry modal with a different set of fields,
+// so it reuses that dialog's focus handling and stylesheet rather than
+// restating overlay, field, error and button rules that would then have to
+// be kept in step.
+import { useDialogFocus, SuccessMark } from "../Modal/modal";
 import "../Modal/Modal.css";
 import "./enroll.css";
+import { COMPANY } from "../../constants/company";
 
 const EMPTY = {
   name: "",
@@ -45,7 +52,7 @@ const FIELD_VALIDATOR = {
 };
 
 // What the team receives. The structured answers are folded into the message
-// body because /api/send-email takes an enquiry shape — one endpoint, one set
+// body because /api/send-email takes an enquiry shape: one endpoint, one set
 // of anti-spam and header-safety rules, rather than a second one to maintain.
 function describeEnrollment(course, data) {
   return [
@@ -79,6 +86,10 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
   const [touched, setTouched] = useState({});
   const [status, setStatus] = useState(null); // null | "sending" | "ready" | "error"
   const formRef = useRef(null);
+  const dialogRef = useRef(null);
+  const continueRef = useRef(null);
+
+  useDialogFocus(isOpen, dialogRef);
 
   const sending = status === "sending";
 
@@ -115,6 +126,8 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
   useEffect(() => {
     if (status !== "ready") return undefined;
     setCountdown(REDIRECT_SECONDS);
+    // The form has been replaced by the confirmation: put focus on its button.
+    if (continueRef.current) continueRef.current.focus();
     const tick = setInterval(() => setCountdown((n) => Math.max(0, n - 1)), 1000);
     const go = setTimeout(() => navigate(paymentPath), REDIRECT_SECONDS * 1000);
     return () => {
@@ -127,7 +140,14 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (e) => {
-      if (e.key === "Escape" && status !== "sending" && status !== "ready") onClose();
+      if (
+        e.key === "Escape" &&
+        !e.defaultPrevented &&
+        status !== "sending" &&
+        status !== "ready"
+      ) {
+        onClose();
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -234,46 +254,81 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
   // opens clean.
   const errorFor = (field) => (touched[field] ? errors[field] : "");
   const fieldClass = (field) =>
-    `modal-field${errorFor(field) ? " modal-field-invalid" : ""}`;
+    `field modal-field${errorFor(field) ? " field-invalid modal-field-invalid" : ""}`;
+  const done = status === "ready";
 
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div
-        className={`modal-container modal-wide${status === "ready" ? " is-done" : ""}`}
+        ref={dialogRef}
+        tabIndex={-1}
+        className={`modal-container enroll-dialog${done ? " is-done" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="enroll-title"
+        aria-describedby={done ? undefined : "enroll-desc"}
+        aria-busy={sending || undefined}
       >
-        {status !== "ready" && (
+        {!done && (
           <button
+            type="button"
             className="modal-close"
             onClick={onClose}
             aria-label="Close"
             disabled={sending}
           >
-            &times;
+            <FontAwesomeIcon icon={faXmark} />
           </button>
         )}
 
-        {status === "ready" ? (
+        {/* "Step 1 of 2" plus a thin progress bar: each step is one
+            segment of the bar, labelled beneath. */}
+        <div className="enroll-steps">
+          <p className="enroll-step-count" aria-hidden="true">
+            Step {done ? 2 : 1} of 2
+          </p>
+          <ol className="enroll-progress" aria-label="Enrolment steps">
+            <li
+              className={done ? "is-done" : "is-current"}
+              aria-current={done ? undefined : "step"}
+            >
+              <span className="enroll-progress-label">Your details</span>
+              {done && <span className="visually-hidden"> (completed)</span>}
+            </li>
+            <li
+              className={done ? "is-current" : undefined}
+              aria-current={done ? "step" : undefined}
+            >
+              <span className="enroll-progress-label">Payment</span>
+            </li>
+          </ol>
+        </div>
+
+        {done ? (
           /* The details are saved; payment is the required next step, so
              confirm and move straight on to the payment page. */
-          <div className="enroll-done" role="status" aria-live="polite">
-            <div className="modal-success-icon" aria-hidden="true">
-              &#10003;
-            </div>
-            <h2 id="enroll-title">Details submitted successfully</h2>
+          <div className="modal-success enroll-done" role="status" aria-live="polite">
+            <SuccessMark />
+            <h2 id="enroll-title">Thanks, we've got your application</h2>
             <p>
-              Thank you, {formData.name.trim().split(/\s+/)[0] || "there"}. We
-              have your details for {course.title}. Complete your payment on
-              the next page to confirm your seat.
+              We've saved your details for {course.title}. Next, you'll pay
+              securely on the payment page to confirm your place.
             </p>
+            <p>
+              Once you've paid, an advisor will contact you within one
+              business day to confirm your batch and introduce your mentor.
+            </p>
+            <div className="enroll-countdown" aria-hidden="true">
+              <span style={{ animationDuration: `${REDIRECT_SECONDS}s` }} />
+            </div>
             <button
               type="button"
-              className="enroll-pay-btn"
+              ref={continueRef}
+              className="btn btn-primary btn-lg"
               onClick={() => navigate(paymentPath)}
             >
-              Continue to Payment
+              <FontAwesomeIcon icon={faLock} aria-hidden="true" />
+              Continue to payment
             </button>
             <p className="enroll-pay-note">
               {countdown > 0
@@ -282,58 +337,30 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
             </p>
           </div>
         ) : (
-          <div className="modal-split">
+          <>
             {/* Course summary, so the learner can see what they are enrolling
                 in without leaving the form. */}
-            <aside className="modal-aside enroll-summary">
-              <div className="enroll-summary-media">
-                <img src={course.image} alt="" />
+            <header className="modal-head enroll-head">
+              <div className="enroll-thumb">
+                <img
+                  src={course.image}
+                  alt=""
+                  width="160"
+                  height="160"
+                  decoding="async"
+                />
               </div>
-              <div className="enroll-summary-body">
-                <span className="enroll-summary-level">{course.level}</span>
-                <h3>{course.title}</h3>
-                <dl className="enroll-summary-facts">
-                  <div>
-                    <dt>Duration</dt>
-                    <dd>{course.duration}</dd>
-                  </div>
-                  <div>
-                    <dt>Format</dt>
-                    <dd>{course.mode}</dd>
-                  </div>
-                  <div>
-                    <dt>Schedule</dt>
-                    <dd>Monday – Friday</dd>
-                  </div>
-                  <div>
-                    <dt>Course fee</dt>
-                    <dd>{COURSE_FEE}</dd>
-                  </div>
-                </dl>
-                <p className="enroll-summary-secure">
-                  <FontAwesomeIcon icon={faLock} />
-                  Secure payment by Stripe
+              <div className="enroll-head-text">
+                <h2 id="enroll-title">Apply for {course.title}</h2>
+                <p className="enroll-facts">
+                  {course.duration} · {course.mode}, Mon–Fri · {COURSE_FEE}
                 </p>
               </div>
-            </aside>
-
-            <div className="modal-main">
-            <ol className="enroll-steps" aria-label="Enrolment steps">
-              <li className="is-current" aria-current="step">
-                <span>1</span> Your details
-              </li>
-              <li>
-                <span>2</span> Payment
-              </li>
-            </ol>
-
-            <div className="modal-heading">
-              <h2 id="enroll-title">Enrol in {course.title}</h2>
-              <p>
-                Tell us a little about yourself. You will complete payment on
-                the next step to confirm your seat.
-              </p>
-            </div>
+            </header>
+            <p className="enroll-intro" id="enroll-desc">
+              Tell us a little about yourself. It takes about a minute, and
+              you'll pay on the next step to confirm your place.
+            </p>
 
             <form
               className="modal-form modal-grid"
@@ -342,14 +369,15 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
               noValidate
             >
               <div className={fieldClass("name")}>
-                <label htmlFor="enroll-name">
+                <label htmlFor="enroll-name" className="field-label">
                   Full name{" "}
-                  <span className="modal-required" aria-hidden="true">
+                  <span className="field-required" aria-hidden="true">
                     *
                   </span>
                 </label>
                 <input
                   id="enroll-name"
+                  className="input"
                   type="text"
                   name="name"
                   placeholder="Your full name"
@@ -358,27 +386,29 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                   onBlur={handleBlur}
                   disabled={sending}
                   autoComplete="name"
+                  aria-required="true"
                   aria-invalid={Boolean(errorFor("name"))}
                   aria-describedby={
                     errorFor("name") ? "enroll-name-error" : undefined
                   }
                 />
                 {errorFor("name") && (
-                  <span className="modal-field-error" id="enroll-name-error">
+                  <span className="field-error" id="enroll-name-error">
                     {errorFor("name")}
                   </span>
                 )}
               </div>
 
               <div className={fieldClass("email")}>
-                <label htmlFor="enroll-email">
+                <label htmlFor="enroll-email" className="field-label">
                   Email{" "}
-                  <span className="modal-required" aria-hidden="true">
+                  <span className="field-required" aria-hidden="true">
                     *
                   </span>
                 </label>
                 <input
                   id="enroll-email"
+                  className="input"
                   type="email"
                   name="email"
                   placeholder="name@example.com"
@@ -387,22 +417,23 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                   onBlur={handleBlur}
                   disabled={sending}
                   autoComplete="email"
+                  aria-required="true"
                   aria-invalid={Boolean(errorFor("email"))}
                   aria-describedby={
                     errorFor("email") ? "enroll-email-error" : undefined
                   }
                 />
                 {errorFor("email") && (
-                  <span className="modal-field-error" id="enroll-email-error">
+                  <span className="field-error" id="enroll-email-error">
                     {errorFor("email")}
                   </span>
                 )}
               </div>
 
               <div className={`${fieldClass("number")} modal-span`}>
-                <label htmlFor="enroll-phone">
+                <label htmlFor="enroll-phone" className="field-label">
                   Phone{" "}
-                  <span className="modal-required" aria-hidden="true">
+                  <span className="field-required" aria-hidden="true">
                     *
                   </span>
                 </label>
@@ -415,6 +446,7 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                   />
                   <input
                     id="enroll-phone"
+                    className="input"
                     type="tel"
                     inputMode="numeric"
                     name="number"
@@ -424,6 +456,7 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                     onBlur={handleBlur}
                     disabled={sending}
                     autoComplete="tel-national"
+                    aria-required="true"
                     aria-invalid={Boolean(errorFor("number"))}
                     aria-describedby={
                       errorFor("number")
@@ -433,33 +466,34 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                   />
                 </div>
                 {errorFor("number") ? (
-                  <span className="modal-field-error" id="enroll-phone-error">
+                  <span className="field-error" id="enroll-phone-error">
                     {errorFor("number")}
                   </span>
                 ) : (
-                  <span className="modal-field-hint" id="enroll-phone-hint">
-                    A mentor will call to confirm your batch
+                  <span className="field-hint" id="enroll-phone-hint">
+                    An advisor will call to confirm your batch
                   </span>
                 )}
               </div>
 
               <div className={fieldClass("experience")}>
-                <label htmlFor="enroll-experience">
+                <label htmlFor="enroll-experience" className="field-label">
                   Current level{" "}
-                  <span className="modal-required" aria-hidden="true">
+                  <span className="field-required" aria-hidden="true">
                     *
                   </span>
                 </label>
                 <select
                   id="enroll-experience"
-                  className={
-                    formData.experience ? "" : "modal-select-placeholder"
-                  }
+                  className={`select${
+                    formData.experience ? "" : " modal-select-placeholder"
+                  }`}
                   name="experience"
                   value={formData.experience}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   disabled={sending}
+                  aria-required="true"
                   aria-invalid={Boolean(errorFor("experience"))}
                   aria-describedby={
                     errorFor("experience")
@@ -475,30 +509,28 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                   ))}
                 </select>
                 {errorFor("experience") && (
-                  <span
-                    className="modal-field-error"
-                    id="enroll-experience-error"
-                  >
+                  <span className="field-error" id="enroll-experience-error">
                     {errorFor("experience")}
                   </span>
                 )}
               </div>
 
               <div className={fieldClass("batch")}>
-                <label htmlFor="enroll-batch">
+                <label htmlFor="enroll-batch" className="field-label">
                   Preferred batch{" "}
-                  <span className="modal-required" aria-hidden="true">
+                  <span className="field-required" aria-hidden="true">
                     *
                   </span>
                 </label>
                 <select
                   id="enroll-batch"
-                  className={formData.batch ? "" : "modal-select-placeholder"}
+                  className={`select${formData.batch ? "" : " modal-select-placeholder"}`}
                   name="batch"
                   value={formData.batch}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   disabled={sending}
+                  aria-required="true"
                   aria-invalid={Boolean(errorFor("batch"))}
                   aria-describedby={
                     errorFor("batch") ? "enroll-batch-error" : undefined
@@ -511,21 +543,22 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                   ))}
                 </select>
                 {errorFor("batch") && (
-                  <span className="modal-field-error" id="enroll-batch-error">
+                  <span className="field-error" id="enroll-batch-error">
                     {errorFor("batch")}
                   </span>
                 )}
               </div>
 
-              <div className="modal-field modal-span">
-                <label htmlFor="enroll-message">
+              <div className="field modal-field modal-span">
+                <label htmlFor="enroll-message" className="field-label">
                   Anything we should know?{" "}
-                  <span className="enroll-optional">(optional)</span>
+                  <span className="modal-optional">(optional)</span>
                 </label>
                 <textarea
                   id="enroll-message"
+                  className="textarea"
                   name="message"
-                  placeholder="Your goals, timing, or questions about the programme"
+                  placeholder="Your goals, when you'd like to start, or any questions"
                   value={formData.message}
                   onChange={handleChange}
                   rows="3"
@@ -534,19 +567,38 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
               </div>
 
               {status === "error" && (
-                <p className="modal-error" role="alert">
+                <p className="notice notice-error modal-span" role="alert">
                   We couldn't save your details just now, so we've held off on
-                  sending you to payment. Please try again, or email us at
-                  contactus@url.com.
+                  sending you to payment. Please try again, or email us at{" "}
+                  <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
                 </p>
               )}
 
-              <button type="submit" className="modal-submit modal-submit-full" disabled={sending}>
-                {sending ? "Submitting..." : "Continue to Payment"}
-              </button>
+              <div className="modal-actions modal-span">
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-lg btn-block modal-submit"
+                  disabled={sending}
+                >
+                  {sending ? (
+                    <>
+                      <span className="modal-spinner" aria-hidden="true" />
+                      Saving your details…
+                    </>
+                  ) : (
+                    <>
+                      Continue to payment
+                      <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" aria-hidden="true" />
+                    </>
+                  )}
+                </button>
+                <p className="modal-foot enroll-secure">
+                  <FontAwesomeIcon icon={faLock} aria-hidden="true" />
+                  You'll pay on the next step through Stripe's secure checkout.
+                </p>
+              </div>
             </form>
-            </div>
-          </div>
+          </>
         )}
       </div>
     </div>

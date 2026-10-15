@@ -1,4 +1,4 @@
-// /payment?course=<id> — the required second step of a course enrolment.
+// /payment?course=<id>: the required second step of a course enrolment.
 //
 // The enrolment form saves the learner's details (src/utils/enrolmentSession)
 // and redirects here. This page shows the order, then hands over to the
@@ -14,18 +14,23 @@ import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLock,
-  faCheck,
   faShieldHalved,
   faCircleCheck,
   faClock,
+  faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../Header/header";
 import Footer from "../Footer/footer";
-import { COURSES, COURSE_FEE } from "../../constants/courses";
+import { COURSES, COURSE_FEE, TRACKS, labelOf } from "../../constants/courses";
 import { loadEnrolment } from "../../utils/enrolmentSession";
 import "./payment.css";
+import { COMPANY } from "../../constants/company";
+import { ROUTES } from "../../constants/routes";
+import EnrollModal from "../Learnings/EnrollModal";
+import { sentenceCase } from "../Learnings/courseUtils";
+import { SuccessMark } from "../Modal/modal";
 
-const CONTACT_EMAIL = "contactus@url.com";
+const CONTACT_EMAIL = COMPANY.email;
 
 // Stripe payment links accept these query parameters: the email is filled
 // in for the learner, and client_reference_id travels with the payment.
@@ -67,65 +72,101 @@ function usePaymentLink(courseId) {
   return state;
 }
 
+// Details, then payment, then confirmed. `current` is the 0-based active step.
+function Steps({ current }) {
+  const steps = ["Your details", "Payment", "Confirmed"];
+  return (
+    <ol className="pay-steps" aria-label="Enrolment steps">
+      {steps.map((label, i) => {
+        const done = i < current;
+        const isCurrent = i === current;
+        return (
+          <li
+            key={label}
+            className={done ? "is-done" : isCurrent ? "is-current" : undefined}
+            aria-current={isCurrent ? "step" : undefined}
+          >
+            <span className="pay-steps-num" aria-hidden="true">
+              {done ? <FontAwesomeIcon icon={faCheck} /> : i + 1}
+            </span>
+            <span className="pay-steps-label">{label}</span>
+            {done && <span className="visually-hidden"> (completed)</span>}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function HelpLine() {
+  return (
+    <p className="pay-help">
+      Need help with your enrolment? Email{" "}
+      <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+      {COMPANY.hours && <span className="pay-help-hours"> {COMPANY.hours}</span>}
+    </p>
+  );
+}
+
 export default function PaymentPage() {
   const [params] = useSearchParams();
   const course = COURSES.find((c) => c.id === params.get("course"));
   const enrolment = course ? loadEnrolment(course.id) : null;
   const link = usePaymentLink(enrolment ? course.id : null);
 
-  if (!course) return <Navigate to="/ai-courses" replace />;
+  if (!course) return <Navigate to={ROUTES.courses} replace />;
 
   return (
     <>
       <Header />
       <main className="pay-page" id="main" tabIndex={-1}>
-        <div className="container pay-container">
-          <ol className="pay-steps" aria-label="Enrolment steps">
-            <li className="is-done">
-              <span>
-                <FontAwesomeIcon icon={faCheck} />
-              </span>
-              Your details
-            </li>
-            <li className="is-current" aria-current="step">
-              <span>2</span> Payment
-            </li>
-          </ol>
-
-          <h1 className="pay-title">Complete your enrolment</h1>
-          <p className="pay-lead">
-            Your seat in <strong>{course.title}</strong> is confirmed once
-            payment is complete.
-          </p>
+        <div className="container">
+          <Steps current={enrolment ? 1 : 0} />
 
           <div className="pay-grid">
+            <div className="pay-main">
+              <h1 className="pay-title">Complete your enrolment</h1>
+              <p className="pay-lead">
+                Your place on <strong>{course.title}</strong> is confirmed as
+                soon as your payment goes through.
+              </p>
+
+              <section className="pay-action" aria-labelledby="pay-heading">
+                {!enrolment ? (
+                  <NoEnrolment course={course} />
+                ) : (
+                  <>
+                    <div className="pay-card">
+                      <div className="pay-section-head">
+                        <h2 id="pay-heading">Your details</h2>
+                        <span className="pay-saved">
+                          <FontAwesomeIcon icon={faCircleCheck} aria-hidden="true" /> Saved
+                        </span>
+                      </div>
+                      <dl className="pay-details">
+                        <div>
+                          <dt>Name</dt>
+                          <dd>{enrolment.name}</dd>
+                        </div>
+                        <div>
+                          <dt>Email</dt>
+                          <dd>{enrolment.email}</dd>
+                        </div>
+                        <div>
+                          <dt>Phone</dt>
+                          <dd>{enrolment.phone}</dd>
+                        </div>
+                      </dl>
+                    </div>
+
+                    <PayButton link={link} enrolment={enrolment} />
+                  </>
+                )}
+                <HelpLine />
+              </section>
+            </div>
+
             <OrderSummary course={course} enrolment={enrolment} />
-
-            <section className="pay-card pay-action" aria-labelledby="pay-heading">
-              {!enrolment ? (
-                <NoEnrolment course={course} />
-              ) : (
-                <>
-                  <h2 id="pay-heading">Your details</h2>
-                  <dl className="pay-details">
-                    <div>
-                      <dt>Name</dt>
-                      <dd>{enrolment.name}</dd>
-                    </div>
-                    <div>
-                      <dt>Email</dt>
-                      <dd>{enrolment.email}</dd>
-                    </div>
-                    <div>
-                      <dt>Phone</dt>
-                      <dd>{enrolment.phone}</dd>
-                    </div>
-                  </dl>
-
-                  <PayButton link={link} enrolment={enrolment} />
-                </>
-              )}
-            </section>
           </div>
         </div>
       </main>
@@ -134,41 +175,56 @@ export default function PaymentPage() {
   );
 }
 
+// The order: course thumbnail, a few rows and the total.
 function OrderSummary({ course, enrolment }) {
   return (
-    <aside className="pay-card pay-summary" aria-label="Order summary">
-      <div className="pay-summary-media">
-        <img src={course.image} alt="" />
+    <aside className="pay-summary" aria-labelledby="pay-summary-title">
+      <h2 id="pay-summary-title" className="pay-summary-title">
+        Order summary
+      </h2>
+
+      <div className="pay-summary-course">
+        <img src={course.image} alt="" width="640" height="360" decoding="async" />
+        <div>
+          <p className="pay-summary-name">{course.title}</p>
+          <p className="pay-summary-track">
+            {labelOf(TRACKS, course.track)} · {sentenceCase(course.level)}
+          </p>
+        </div>
       </div>
-      <div className="pay-summary-body">
-        <span className="pay-summary-level">{course.level}</span>
-        <h2>{course.title}</h2>
-        <dl className="pay-facts">
+
+      <dl className="pay-rows">
+        <div>
+          <dt>Course</dt>
+          <dd>{course.title}</dd>
+        </div>
+        <div>
+          <dt>Duration</dt>
+          <dd>{course.duration}</dd>
+        </div>
+        <div>
+          <dt>Schedule</dt>
+          <dd>
+            {course.mode}, {enrolment?.batch || "Monday to Friday"}
+          </dd>
+        </div>
+        {enrolment?.experience && (
           <div>
-            <dt>Duration</dt>
-            <dd>{course.duration}</dd>
+            <dt>Your level</dt>
+            <dd>{enrolment.experience}</dd>
           </div>
-          <div>
-            <dt>Format</dt>
-            <dd>{course.mode}</dd>
-          </div>
-          <div>
-            <dt>Batch</dt>
-            <dd>{enrolment?.batch || "Monday – Friday"}</dd>
-          </div>
-          {enrolment?.experience && (
-            <div>
-              <dt>Your level</dt>
-              <dd>{enrolment.experience}</dd>
-            </div>
-          )}
-          <div className="pay-facts-total">
-            <dt>Course fee</dt>
-            <dd>{COURSE_FEE}</dd>
-          </div>
-        </dl>
-        <p className="pay-fee-note">The exact amount is shown on the secure Stripe checkout.</p>
+        )}
+        <div>
+          <dt>Fee</dt>
+          <dd>{COURSE_FEE}</dd>
+        </div>
+      </dl>
+
+      <div className="pay-total">
+        <span>Total</span>
+        <strong>{COURSE_FEE}</strong>
       </div>
+      <p className="pay-fee-note">Your exact amount is shown on the Stripe checkout page.</p>
     </aside>
   );
 }
@@ -186,89 +242,131 @@ function PayButton({ link, enrolment }) {
     // No link set for this course yet (or it could not be loaded). The
     // enrolment is already with the team, so they can send one.
     return (
-      <div className="pay-pending" role="status">
-        <FontAwesomeIcon icon={faClock} />
-        <div>
-          <strong>
-            {link.status === "missing"
-              ? "Online payment for this course is being set up."
-              : "We couldn't load the checkout just now."}
-          </strong>
-          <p>
-            Your details are saved. A URL counsellor will email you a
-            secure payment link within one business day, or write to{" "}
-            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-          </p>
-          {link.status === "error" && (
-            <button type="button" className="btn-link" onClick={() => window.location.reload()}>
-              Try again
-            </button>
-          )}
-        </div>
+      <div className="notice pay-pending" role="status">
+        <strong>
+          <FontAwesomeIcon icon={faClock} aria-hidden="true" />{" "}
+          {link.status === "missing"
+            ? "Online payment for this course is being set up."
+            : "We couldn't load the checkout just now."}
+        </strong>
+        <p>
+          Your details are saved. An advisor will email you a secure payment
+          link within one business day, or you can write to{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+        </p>
+        {link.status === "error" && (
+          <button type="button" className="btn btn-link pay-retry" onClick={() => window.location.reload()}>
+            Try again
+          </button>
+        )}
       </div>
     );
   }
 
   return (
-    <>
+    <div className="pay-cta">
       <a className="btn btn-primary btn-lg btn-block pay-btn" href={checkoutUrl(link.url, enrolment)}>
-        <FontAwesomeIcon icon={faLock} /> Pay Securely with Stripe
+        <FontAwesomeIcon icon={faLock} aria-hidden="true" /> Pay securely with Stripe
       </a>
       <ul className="pay-trust">
         <li>
-          <FontAwesomeIcon icon={faShieldHalved} />
-          Payment is processed by Stripe. URL never sees or stores your card details.
+          <FontAwesomeIcon icon={faShieldHalved} aria-hidden="true" />
+          Payments are handled by Stripe. We never see or store your card details.
         </li>
         <li>
-          <FontAwesomeIcon icon={faCircleCheck} />
-          After payment, a counsellor confirms your batch and start date within one business day.
+          <FontAwesomeIcon icon={faCircleCheck} aria-hidden="true" />
+          After you pay, an advisor will confirm your batch and start date within one business day.
         </li>
       </ul>
-    </>
-  );
-}
-
-function NoEnrolment({ course }) {
-  return (
-    <div className="pay-empty">
-      <h2 id="pay-heading">Start with your details</h2>
-      <p>
-        To pay for {course.title}, first tell us a little about yourself. It
-        takes under a minute, and you will come straight back here.
-      </p>
-      <Link className="btn btn-primary btn-block" to={`/ai-courses#course-${course.id}`}>
-        Enrol in {course.title}
-      </Link>
     </div>
   );
 }
 
-// /payment/success — where Stripe sends the learner after paying.
+// No saved details for this course yet (a new tab, or the link was shared):
+// the application form opens right here, and saving it reloads this page
+// with the details in place.
+function NoEnrolment({ course }) {
+  const [applying, setApplying] = useState(false);
+  return (
+    <div className="pay-card pay-empty">
+      <h2 id="pay-heading">Start with your details</h2>
+      <p>
+        Before you pay for {course.title}, we need a few details about you.
+        It takes about a minute and you'll stay on this page.
+      </p>
+      <div className="pay-empty-actions">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => setApplying(true)}
+        >
+          Apply now
+        </button>
+        <Link className="btn btn-secondary" to={ROUTES.course(course.id)}>
+          Back to the course
+        </Link>
+      </div>
+      {applying && (
+        <EnrollModal course={course} isOpen={applying} onClose={() => setApplying(false)} />
+      )}
+    </div>
+  );
+}
+
+const NEXT_STEPS = [
+  {
+    title: "Check your inbox",
+    text: "Stripe has emailed you a receipt for your payment.",
+  },
+  {
+    title: "Hear from your advisor",
+    text: "We'll be in touch within one business day to confirm your batch, start date and mentor.",
+  },
+  {
+    title: "Join your first class",
+    text: "Classes are live online, Monday to Friday.",
+  },
+];
+
+// /payment/success: where Stripe sends the learner after paying.
 export function PaymentSuccess() {
   return (
     <>
       <Header />
-      <main className="pay-page" id="main" tabIndex={-1}>
-        <div className="container pay-container">
-          <section className="pay-card pay-thanks" role="status">
-            <div className="pay-thanks-icon" aria-hidden="true">
-              <FontAwesomeIcon icon={faCheck} />
-            </div>
-            <h1>Payment received — you're enrolled!</h1>
-            <p>
-              Thank you. Stripe has emailed your receipt. A URL counsellor
-              will contact you within one business day to confirm your batch,
-              start date and mentor.
+      <main className="pay-page pay-page-success" id="main" tabIndex={-1}>
+        <div className="container">
+          <section className="pay-done" role="status">
+            <SuccessMark />
+
+            <h1>Payment received, you're enrolled</h1>
+            <p className="pay-done-lead">
+              Thank you for enrolling with {COMPANY.name}. Here's what happens
+              next.
             </p>
-            <div className="pay-thanks-actions">
-              <Link className="btn btn-primary" to="/ai-courses">
-                Explore other courses
+
+            <ol className="pay-next">
+              {NEXT_STEPS.map((step, i) => (
+                <li key={step.title}>
+                  <span className="step-num" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <div>
+                    <strong>{step.title}</strong>
+                    <p>{step.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div className="pay-done-actions">
+              <Link className="btn btn-primary" to={ROUTES.courses}>
+                Browse other courses
               </Link>
-              <Link className="btn btn-secondary" to="/">
+              <Link className="btn btn-secondary" to={ROUTES.home}>
                 Back to home
               </Link>
             </div>
-            <p className="pay-fee-note">
+            <p className="pay-done-foot">
               Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
             </p>
           </section>

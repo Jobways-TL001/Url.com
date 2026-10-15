@@ -1,0 +1,918 @@
+/* =================================================================
+   Course page (/courses/:courseId)
+   Warm-grey hero with key facts and the course photo, then the
+   course content on the left and a sticky enrol card on the right.
+   Uses the tokens in src/index.css.
+   ================================================================= */
+
+.cd {
+  display: block;
+  outline: none;
+}
+
+/* ---------------------------------------------------------------
+   Hero
+   --------------------------------------------------------------- */
+
+.cd-hero {
+  padding: 32px 0 64px;
+  background: var(--paper-2);
+}
+
+.cd-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+}
+
+.cd-crumbs {
+  margin-bottom: 28px;
+  font-size: 0.9rem;
+}
+
+.cd-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-crumbs li {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-3);
+}
+
+.cd-crumbs a {
+  color: var(--ink-3);
+  text-decoration: none;
+}
+
+.cd-crumbs a:hover {
+  color: var(--accent-ink);
+  text-decoration: underline;
+}
+
+.cd-crumbs [aria-current="page"] {
+  color: var(--ink-2);
+}
+
+.cd-crumb-sep {
+  margin: 0 10px;
+  font-size: 0.65rem;
+  color: var(--rule-strong);
+}
+
+.cd-title {
+  margin: 0 0 16px;
+  font-size: clamp(2.1rem, 4vw, 3.2rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  outline: none;
+}
+
+.cd-summary {
+  max-width: 60ch;
+  margin: 0 0 32px;
+  color: var(--ink-3);
+  font-size: 1.15rem;
+  line-height: 1.65;
+}
+
+.cd-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-facts li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cd-fact-icon {
+  flex-shrink: 0;
+  width: 18px;
+  margin-top: 4px;
+  color: var(--accent);
+}
+
+.cd-facts li > span {
+  display: grid;
+  line-height: 1.35;
+}
+
+.cd-fact-label {
+  color: var(--ink-3);
+  font-size: 0.85rem;
+}
+
+.cd-fact-value {
+  color: var(--ink);
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.cd-hero-media {
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-lg);
+  background: var(--rule);
+  box-shadow: var(--shadow);
+}
+
+.cd-hero-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------------------------------------------------------------
+   Layout: content | sticky enrol card
+   --------------------------------------------------------------- */
+
+.cd-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  grid-template-areas: "body aside";
+  gap: 64px;
+  align-items: start;
+  padding-top: 40px;
+  padding-bottom: 96px;
+}
+
+.cd-body {
+  grid-area: body;
+  min-width: 0;
+  max-width: 900px;
+}
+
+.cd-aside {
+  grid-area: aside;
+  align-self: stretch;
+}
+
+.cd-card {
+  position: sticky;
+  top: calc(var(--header-h, 72px) + 24px);
+  padding: 28px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.cd-card-heading {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.cd-card-fee {
+  margin: 4px 0 6px;
+  color: var(--ink);
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.cd-card-note {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.92rem;
+}
+
+.cd-card-sub {
+  margin: 24px 0 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.cd-card-included li {
+  font-size: 0.95rem;
+}
+
+.cd-card-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.cd-card-ask {
+  justify-self: center;
+  min-height: 40px;
+}
+
+/* ---------------------------------------------------------------
+   Tabs (sticky section links)
+   --------------------------------------------------------------- */
+
+.cd-subnav {
+  position: sticky;
+  top: var(--header-h, 72px);
+  z-index: 30;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.cd-subnav ul {
+  display: flex;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.cd-subnav ul::-webkit-scrollbar {
+  display: none;
+}
+
+.cd-subnav li {
+  flex-shrink: 0;
+}
+
+.cd-subnav a {
+  display: block;
+  margin-bottom: -1px;
+  padding: 16px 0 14px;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-3);
+  font-size: 0.97rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.cd-subnav a:hover {
+  color: var(--ink);
+}
+
+.cd-subnav a.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* ---------------------------------------------------------------
+   Sections
+   --------------------------------------------------------------- */
+
+.cd-section {
+  padding: 48px 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: calc(var(--header-h, 72px) + 56px);
+}
+
+.cd-section:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.cd-section h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
+  outline: none;
+}
+
+.cd-section-sub,
+.cd-lead {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--ink-3);
+}
+
+.cd-lead {
+  font-size: 1.08rem;
+}
+
+.cd-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cd-expand {
+  flex-shrink: 0;
+  min-height: 40px;
+}
+
+/* Overview */
+
+.cd-fit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.cd-fit {
+  padding: 24px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.cd-fit .icon-tile {
+  margin-bottom: 14px;
+}
+
+.cd-fit h3 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+
+.cd-fit p {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.97rem;
+  line-height: 1.65;
+}
+
+.cd-subhead {
+  margin: 36px 0 16px;
+  font-size: 1.15rem;
+}
+
+.cd-how {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-how li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.cd-how-icon {
+  flex-shrink: 0;
+  width: 18px;
+  margin-top: 5px;
+  color: var(--accent);
+}
+
+.cd-how li > span {
+  display: grid;
+  gap: 2px;
+}
+
+.cd-how strong {
+  color: var(--ink);
+}
+
+.cd-how li > span > span {
+  color: var(--ink-3);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+/* Curriculum accordion */
+
+.cd-modules {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-module {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.cd-module.is-open {
+  border-color: var(--rule-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.cd-module-head {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.cd-module-head button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px 20px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cd-module-head button:hover .cd-module-title {
+  color: var(--accent-ink);
+}
+
+.cd-module-title {
+  flex: 1;
+  transition: color 0.15s var(--ease);
+}
+
+/* Chevron that flips when open. */
+.cd-module-sign {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-right: 4px;
+  border-right: 2px solid var(--ink-3);
+  border-bottom: 2px solid var(--ink-3);
+  transform: translateY(-3px) rotate(45deg);
+  transition: transform 0.2s var(--ease);
+}
+
+.cd-module.is-open .cd-module-sign {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.cd-module-panel {
+  padding: 0 20px 20px;
+}
+
+.cd-module-topics {
+  margin-bottom: 12px;
+}
+
+.cd-module-panel p {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.96rem;
+}
+
+/* Tools */
+
+.cd-tools {
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cd-tools .chip {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+}
+
+/* Final project */
+
+.cd-capstone {
+  padding: 36px;
+  border-radius: var(--radius-lg);
+  background: var(--paper-2);
+}
+
+.cd-capstone-project {
+  max-width: 62ch;
+  margin: 0 0 28px;
+  color: var(--ink);
+  font-size: 1.2rem;
+  line-height: 1.55;
+}
+
+.cd-capstone-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-capstone-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  color: var(--ink-3);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.cd-capstone-steps .step-num {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  background: var(--card);
+  font-size: 0.9rem;
+}
+
+.cd-capstone-steps strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+/* FAQ */
+
+.cd-section .faq-list {
+  margin-top: 16px;
+}
+
+.cd-faq-more {
+  margin: 24px 0 0;
+  color: var(--ink-3);
+}
+
+.cd-inline-link {
+  min-height: 0;
+  padding: 0;
+  vertical-align: baseline;
+}
+
+/* ---------------------------------------------------------------
+   Related courses
+   --------------------------------------------------------------- */
+
+.cd-related {
+  padding: 80px 0 104px;
+  background: var(--paper-2);
+}
+
+.cd-related-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.cd-related-head h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
+}
+
+.cd-related-all {
+  min-height: 40px;
+}
+
+.cd-related-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-related-grid > li {
+  display: flex;
+}
+
+.cd-rel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.cd-rel:hover {
+  border-color: var(--rule-strong);
+  box-shadow: var(--shadow);
+}
+
+.cd-rel-media {
+  margin: 12px 12px 0;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--paper-2);
+}
+
+.cd-rel-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cd-rel-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+  padding: 18px 22px 22px;
+}
+
+.cd-rel-meta {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+
+.cd-rel h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+
+/* The title link covers the whole card. */
+.cd-rel-link {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.cd-rel-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.cd-rel:hover .cd-rel-link {
+  color: var(--accent-ink);
+}
+
+.cd-rel-summary {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.cd-rel-facts {
+  margin: auto 0 0;
+  padding-top: 6px;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------
+   Mobile apply bar (hidden on desktop, where the card is sticky)
+   --------------------------------------------------------------- */
+
+.cd-mbar,
+.cd-mbar-spacer {
+  display: none;
+}
+
+/* ---------------------------------------------------------------
+   Not found
+   --------------------------------------------------------------- */
+
+.cd-missing {
+  padding: 72px 0 112px;
+}
+
+.cd-missing-inner {
+  max-width: 760px;
+}
+
+.cd-missing h1 {
+  margin: 0 0 14px;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  outline: none;
+}
+
+.cd-missing-inner > p {
+  margin: 0 0 28px;
+  color: var(--ink-3);
+}
+
+.cd-missing-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-missing-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cd-missing-list a:hover {
+  border-color: var(--rule-strong);
+  color: var(--accent-ink);
+}
+
+.cd-missing-list svg {
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------- */
+
+@media (max-width: 1180px) {
+  .cd-layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 44px;
+  }
+
+  .cd-related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cd-related-grid > li:nth-child(3) {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .cd-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .cd-hero-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .cd-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "aside"
+      "body";
+    gap: 32px;
+    padding-top: 32px;
+  }
+
+  .cd-body {
+    max-width: none;
+  }
+
+  .cd-card {
+    position: static;
+  }
+
+  .cd-mbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--card);
+    box-shadow: 0 -8px 24px -12px rgba(21, 18, 15, 0.22);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(100%);
+    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), visibility 0.25s;
+  }
+
+  .cd-mbar.is-shown {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .cd-mbar-fee {
+    display: grid;
+    line-height: 1.25;
+  }
+
+  .cd-mbar-fee span {
+    color: var(--ink-3);
+    font-size: 0.82rem;
+  }
+
+  .cd-mbar-fee strong {
+    color: var(--ink);
+    font-size: 1.1rem;
+  }
+
+  .cd-mbar .btn {
+    min-height: 46px;
+  }
+
+  .cd-mbar-spacer {
+    display: block;
+    height: 72px;
+    background: var(--paper);
+  }
+
+  /* Lift the back-to-top button above the bar while it shows. */
+  body:has(.cd-mbar.is-shown) .back-to-top {
+    bottom: 88px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cd-hero {
+    padding: 20px 0 40px;
+  }
+
+  .cd-crumbs {
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+  }
+
+  .cd-summary {
+    font-size: 1.05rem;
+    margin-bottom: 24px;
+  }
+
+  .cd-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .cd-card {
+    padding: 22px;
+  }
+
+  .cd-subnav ul {
+    gap: 22px;
+  }
+
+  .cd-section {
+    padding: 36px 0;
+  }
+
+  .cd-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .cd-fit-grid,
+  .cd-how,
+  .cd-capstone-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cd-capstone {
+    padding: 24px 20px;
+  }
+
+  .cd-module-head button {
+    padding: 16px;
+  }
+
+  .cd-module-panel {
+    padding: 0 16px 16px;
+  }
+
+  .cd-related {
+    padding: 56px 0 72px;
+  }
+
+  .cd-related-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cd-related-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cd-related-grid > li:nth-child(3) {
+    display: flex;
+  }
+}
+
+.cd-nowrap {
+  white-space: nowrap;
+}

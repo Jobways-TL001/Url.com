@@ -1,25 +1,25 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Header from "../Header/header";
 import Footer from "../Footer/footer";
+import LegalDocument from "./LegalDocument";
+import { COMPANY } from "../../constants/company";
+import { ROUTES } from "../../constants/routes";
 import "./Terms.css";
 
 function TermsAndConditions() {
   return (
     <>
       <Header />
-      <main className="terms-container" id="main" tabIndex={-1}>
-        <div className="terms-hero">
-          <h1>Terms and Conditions</h1>
-        </div>
-      <div className="terms-content">
+      <LegalDocument title="Terms and Conditions">
         <h2>ABOUT COMPANY – URL</h2>
         <p>
-          <strong>1.1</strong> <a href="www.url.com">www.url.com</a>{" "}
+          <strong>1.1</strong> <a href={COMPANY.siteUrl}>{COMPANY.domain}</a>{" "}
           (the "Web Application"), the courses, jobs, resumes, available from
           the Web Application (the "URL"), and the training services made
           available on or through the Web Application and the software (the
           "Services"), are developed, owned, operated and maintained, as
-          applicable, by URL LLC (hereinafter referred to as "we", "our",
+          applicable, by {COMPANY.legalName} (hereinafter referred to as "we", "our",
           "us", or the "Company", as the case may be).
         </p>
         <p>
@@ -762,14 +762,14 @@ function TermsAndConditions() {
 
         <h2>13. Miscellaneous</h2>
         <p>
-          <strong>13.1</strong> This agreement is entered into in the State of
-          Delaware and shall be governed by and construed in accordance with the
-          laws of the State of Delaware, excluding its choice of law rules.
+          <strong>13.1</strong> This agreement shall be governed by and
+          construed in accordance with the laws of {COMPANY.jurisdiction || "the jurisdiction in which the Company is registered"},
+          excluding its choice of law rules.
         </p>
         <p>
           <strong>13.2</strong> Each party to this agreement hereby submits to
-          the exclusive jurisdiction of the state and federal courts located in
-          the State of Delaware for any dispute arising under or in connection
+          the exclusive jurisdiction of the courts of {COMPANY.jurisdiction || "the jurisdiction in which the Company is registered"} for any
+          dispute arising under or in connection
           with this agreement, the web application or any web
           application-related services, and waives any jurisdictional, venue, or
           inconvenient forum objections to such courts.
@@ -1031,9 +1031,10 @@ function TermsAndConditions() {
           <strong>22.1</strong> Any personal information submitted in connection
           with user use of the web application is subject to our privacy policy
           which is available at{" "}
-          <a href="https://www.url.com/privacypolicy">
-            https://www.url.com/privacypolicy
-          </a>
+          <Link to={ROUTES.privacy}>
+            {COMPANY.siteUrl}
+            {ROUTES.privacy}
+          </Link>
           . The terms of which are hereby incorporated into these terms by
           reference.
         </p>
@@ -1225,7 +1226,7 @@ function TermsAndConditions() {
         </p>
         <p>
           <strong>24.6</strong> To request a refund, please email
-          support@url.com.
+          {COMPANY.supportEmail}.
         </p>
 
         <h2>25. Reporting</h2>
@@ -1414,7 +1415,7 @@ function TermsAndConditions() {
         <p>
           <strong>27.6</strong> If you wish to discontinue your account on the
           web application or with the services, you may do so by sending an
-          e-mail to support@url.com or using any other account termination
+          e-mail to {COMPANY.supportEmail} or using any other account termination
           functionality that may be offered through the company products and
           services.
         </p>
@@ -1425,8 +1426,7 @@ function TermsAndConditions() {
           FUNCTIONALITY THAT MAY BE OFFERED THROUGH THE COMPANY PRODUCTS AND
           SERVICES.
         </p>
-      </div>
-      </main>
+      </LegalDocument>
       <Footer />
     </>
   );

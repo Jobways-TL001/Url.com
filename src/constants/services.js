@@ -5,6 +5,6 @@
 // api/send-email.js ignores anything not defined here, so the two must be
 // kept in step.
 export const SERVICES = [
-  { value: "e-learning", label: "AI Courses" },
+  { value: "e-learning", label: "AI courses" },
   { value: "general", label: "General enquiry" },
 ];

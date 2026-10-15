@@ -1,17 +1,14 @@
 import React from "react";
 import Header from "../Header/header";
 import Footer from "../Footer/footer";
+import LegalDocument from "./LegalDocument";
 import "./Terms.css";
 
 const Disclaimer = () => {
   return (
     <>
       <Header />
-      <main className="terms-container" id="main" tabIndex={-1}>
-        <div className="terms-hero">
-          <h1>Disclaimer</h1>
-        </div>
-      <div className="terms-content">
+      <LegalDocument title="Disclaimer">
         <p>
           <b>1.1</b> URL.COM DOES NOT ACCREDITATION THE INFORMATION ON THIS
           WEBSITE, WHICH IS PROVIDED &quot;AS IS&quot; WITHOUT ACCREDITATION Y
@@ -112,8 +109,7 @@ const Disclaimer = () => {
           services) or loss of data that results from the download or use of
           such material or data.
         </p>
-      </div>
-      </main>
+      </LegalDocument>
       <Footer />
     </>
   );

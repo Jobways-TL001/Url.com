@@ -1,0 +1,329 @@
+/* =================================================================
+   Course finder: a white rounded card holding three radio questions,
+   then a suggested course and two smaller alternatives.
+   ================================================================= */
+
+.finder {
+  padding: 36px;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  scroll-margin-top: calc(var(--header-h, 72px) + 16px);
+}
+
+/* ---------------- Progress ---------------- */
+
+.finder-top {
+  margin-bottom: 24px;
+}
+
+.finder-step {
+  margin: 0 0 10px;
+  color: var(--ink-3);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.finder-bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.finder-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease);
+}
+
+/* ---------------- Question ---------------- */
+
+.finder-q {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.finder-legend {
+  display: block;
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 0;
+  color: var(--ink);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.finder-legend:focus {
+  outline: none;
+}
+
+.finder-legend:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.finder-options {
+  display: grid;
+  gap: 10px;
+}
+
+.finder-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+
+.finder-option:hover {
+  border-color: var(--ink-3);
+}
+
+.finder-option.is-checked {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent-soft) 40%, var(--card));
+}
+
+.finder-option input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.finder-option-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.finder-option-label {
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.finder-option-detail {
+  color: var(--ink-3);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* ---------------- Navigation ---------------- */
+
+.finder-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.finder-hint {
+  color: var(--ink-3);
+  font-size: 0.92rem;
+}
+
+/* ---------------- Results ---------------- */
+
+.finder-results-title {
+  margin: 0 0 18px;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.finder-results-title:focus {
+  outline: none;
+}
+
+.finder-results-title:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.finder-match {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.finder-match-media {
+  min-height: 220px;
+  background: var(--paper-2);
+}
+
+.finder-match-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.finder-match-body {
+  padding: 24px;
+}
+
+.finder-match-body h4 {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.finder-match-meta {
+  margin: 0 0 14px;
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+
+.finder-why {
+  margin: 0 0 12px;
+  color: var(--ink-2);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.finder-role {
+  margin: 0 0 20px;
+  color: var(--ink-2);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.finder-alts-title {
+  margin: 28px 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.finder-alts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.finder-alt {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+  padding: 10px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.finder-alt:hover {
+  border-color: var(--rule-strong);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+}
+
+.finder-alt img {
+  flex-shrink: 0;
+  width: 88px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.finder-alt-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.finder-alt-title {
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.finder-alt:hover .finder-alt-title {
+  color: var(--accent-ink);
+}
+
+.finder-alt-meta {
+  color: var(--ink-3);
+  font-size: 0.85rem;
+}
+
+.finder-results-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  margin-top: 24px;
+}
+
+.finder-how {
+  margin-top: 20px;
+  color: var(--ink-3);
+  font-size: 0.92rem;
+}
+
+.finder-how summary {
+  color: var(--ink-2);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.finder-how p {
+  margin: 10px 0 0;
+  max-width: 64ch;
+  line-height: 1.6;
+}
+
+/* ---------------- Responsive ---------------- */
+
+@media (max-width: 760px) {
+  .finder {
+    padding: 24px 20px;
+  }
+
+  .finder-match {
+    grid-template-columns: 1fr;
+  }
+
+  .finder-match-media {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+
+  .finder-match-body {
+    padding: 20px;
+  }
+
+  .finder-alts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .finder-nav .btn {
+    padding: 0 16px;
+  }
+
+  .finder-hint {
+    font-size: 0.85rem;
+  }
+}

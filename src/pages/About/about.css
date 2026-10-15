@@ -1,85 +1,194 @@
 /* =================================================================
-   About page
+   About
+   Intro with photo · how we teach · the six months · learning paths ·
+   closing CTA band (shared component).
    ================================================================= */
 
-.about-story {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 72px;
+/* ---------------- Intro ---------------- */
+
+.about-hero {
+  padding: clamp(56px, 7vw, 96px) 0;
 }
 
-.about-story-visual img {
+.about-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+}
+
+.about-hero-text h1 {
+  margin-bottom: 24px;
+}
+
+.about-hero-text p {
+  max-width: 62ch;
+  font-size: 1.15rem;
+}
+
+.about-hero-text p + p {
+  margin-top: 16px;
+}
+
+.about-hero-media img {
+  display: block;
   width: 100%;
-  aspect-ratio: 4 / 3.6;
+  height: auto;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
 }
 
-.about-story-text p {
-  color: var(--text);
-  font-size: 1.04rem;
-  line-height: 1.8;
+/* ---------------- How we teach ---------------- */
+
+.about-teach-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.about-story-btn {
-  margin-top: 12px;
+.about-teach-card {
+  height: 100%;
 }
 
-@media (max-width: 960px) {
-  .about-story {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-}
+/* ---------------- The six months ---------------- */
 
-/* ---------------- Corporate update ---------------- */
-
-.about-update {
-  display: flex;
-  align-items: flex-start;
-  gap: 28px;
-  max-width: none;
-  margin: 0 auto;
-  padding: 44px 48px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--blue-100);
-  background: linear-gradient(135deg, var(--blue-50), var(--white) 70%);
-}
-
-.about-update-icon {
-  display: inline-flex;
+.about-months-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 80px);
   align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  background: var(--blue-600);
-  color: var(--white);
-  font-size: 1.5rem;
-  flex-shrink: 0;
-  box-shadow: 0 12px 24px -10px rgba(37, 99, 235, 0.6);
 }
 
-.about-update .eyebrow {
+.about-months-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+.about-months-body h2 {
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
   margin-bottom: 12px;
 }
 
-.about-update h2 {
-  font-size: 1.6rem;
-  margin-bottom: 10px;
+.about-months-intro {
+  margin: 0 0 32px;
+  max-width: 60ch;
+  font-size: 1.1rem;
+  color: var(--ink-3);
 }
 
-.about-update p {
+.about-plan {
+  display: grid;
+  gap: 24px;
   margin: 0;
-  color: var(--text);
-  line-height: 1.8;
+  padding: 0;
+  list-style: none;
 }
 
-@media (max-width: 600px) {
-  .about-update {
-    flex-direction: column;
-    padding: 32px 24px;
+.about-plan li {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.about-plan .step-num {
+  margin: 0;
+}
+
+.about-plan h3 {
+  margin: 6px 0 4px;
+  font-size: 1.1rem;
+}
+
+.about-plan p {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--ink-3);
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+
+/* ---------------- Learning paths ---------------- */
+
+.about-path {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.about-path h3 {
+  margin-bottom: 4px;
+}
+
+.card .about-path-count {
+  margin: 0 0 16px;
+  font-size: 0.92rem;
+}
+
+.about-path-courses {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.about-course {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  margin: 0 -12px;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 0.15s var(--ease);
+}
+
+.about-course:hover {
+  background: var(--paper-2);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.about-course-title {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.about-course:hover .about-course-title {
+  color: var(--accent-ink);
+}
+
+.about-course-level {
+  font-size: 0.88rem;
+  color: var(--ink-3);
+}
+
+.about-path-link {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+/* ---------------- Responsive ---------------- */
+
+@media (max-width: 900px) {
+  .about-hero-grid,
+  .about-months-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-months-media {
+    max-width: 640px;
+  }
+}
+
+@media (max-width: 680px) {
+  .about-hero-text p {
+    font-size: 1.05rem;
   }
 }

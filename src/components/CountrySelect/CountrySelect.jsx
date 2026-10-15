@@ -165,7 +165,7 @@ const CountrySelect = ({ value, onChange, disabled, id, label = "Country diallin
           <input
             ref={inputRef}
             type="text"
-            className="country-select-search"
+            className="input country-select-search"
             placeholder="Search country or code"
             value={query}
             onChange={(e) => setQuery(e.target.value)}

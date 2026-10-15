@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
+import "./ui.css";
 
-// Appears once the visitor is well down a page.
+// A small round button that appears once the visitor is well down a page.
 const BackToTop = () => {
   const [visible, setVisible] = useState(false);
 

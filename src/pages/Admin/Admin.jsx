@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SERVICES } from "../../constants/services";
 import { COURSES } from "../../constants/courses";
+import Logo from "../../components/ui/Logo";
 import "./admin.css";
 
 const STATUSES = [
@@ -188,7 +189,7 @@ function Login({ notice, onSignedIn }) {
   return (
     <div className="adm-login">
       <form className="adm-login-card" onSubmit={submit} noValidate>
-        <img src="/images/URL_header_logo.webp" alt="URL" className="adm-login-logo" />
+        <Logo className="adm-login-logo" />
         <h1>URL Admin</h1>
         <p className="adm-muted">Sign in to view and manage enquiries.</p>
 
@@ -352,7 +353,8 @@ function Dashboard({ email, onExpired, onSignOut }) {
     <div className="adm">
       <header className="adm-topbar">
         <div className="adm-brand">
-          <img src="/images/URL_header_logo.webp" alt="URL" className="adm-brand-logo" />
+          <Logo className="adm-brand-logo" />
+          <span className="visually-hidden">URL</span>
           <span className="adm-brand-tag">Admin</span>
         </div>
         <nav className="adm-tabs" aria-label="Admin sections">

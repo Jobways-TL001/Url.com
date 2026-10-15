@@ -1,4 +1,2 @@
-#logo {
-  height: 50px;
-  width: 50px;
-}
+/* App-level styles. The design system lives in src/index.css and each page
+   has its own stylesheet; nothing global is needed here. */

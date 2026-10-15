@@ -16,9 +16,3 @@ comment on table public.course_payment_links is
 
 alter table public.course_payment_links enable row level security;
 revoke all on public.course_payment_links from anon, authenticated;
-
--- The AI & Machine Learning link that was previously hard-coded in
--- src/constants/courses.js. Left alone if it has already been changed.
-insert into public.course_payment_links (course_id, url)
-values ('ai-ml', 'https://buy.stripe.com/aEU7vD5Kf5Fi8KsdXo')
-on conflict (course_id) do nothing;

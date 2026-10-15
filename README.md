@@ -4,6 +4,18 @@ React 18 (Create React App) site deployed on Vercel. A serverless function
 emails contact-form enquiries over SMTP via Nodemailer and stores them in
 Supabase, and an `/admin` dashboard lets the team review and follow them up.
 
+## Brand and company details
+
+- **Company details** (legal name, emails, phone, hours, offices, socials,
+  governing law) live in `src/constants/company.js`. Empty values are hidden
+  on the site rather than shown as placeholders. The email templates keep a
+  copy in `COMPANY` in `api/_lib/brand.js`; keep the two in step.
+- **Colours and type** are design tokens at the top of `src/index.css`
+  (forest / emerald / amber palette, Sora + Manrope).
+- **Logo**: `src/components/ui/Logo.jsx` (inline SVG). Static copies are in
+  `public/brand/`, plus `public/favicon.svg`, `favicon.ico`, `logo192.png`
+  and `logo512.png`.
+
 ## Layout
 
 ```
@@ -21,9 +33,13 @@ vercel.json         framework preset, function config and SPA rewrites
 .env.example        the environment variables to set
 ```
 
-Routes: `/`, `/about-us`, `/ai-courses`, `/contact-us`,
-`/TermsAndConditions`, `/Privacypolicy`, `/Disclaimer`, `/payment`,
-`/payment/success`, `/admin`.
+Routes (defined once in `src/constants/routes.js`): `/`, `/courses`,
+`/courses/:id`, `/about`, `/contact`, `/legal/terms`, `/legal/privacy`,
+`/legal/disclaimer`, `/payment`, `/payment/success`, `/admin`.
+
+The old paths (`/ai-courses`, `/about-us`, `/contact-us`,
+`/TermsAndConditions`, `/Privacypolicy`, `/Disclaimer`, `/e-learning`) redirect
+to their new equivalents, so older links and emails keep working.
 
 ## Contact forms
 
@@ -160,7 +176,7 @@ npm run dev:api   # terminal 1: serves /api on :3001
 npm start         # terminal 2: React dev server on :3000
 ```
 
-Open http://localhost:3000/contact-us and submit the form. `src/setupProxy.js`
+Open http://localhost:3000/contact and submit the form. `src/setupProxy.js`
 forwards `/api/*` from :3000 to the API server, so the browser posts to the
 same `/api/send-email` path it uses in production, and the mail really goes
 out to `contactus@url.com`.
@@ -220,7 +236,7 @@ the UK) is accepted and dropped.
 
 Payment is the required second step of an enrolment:
 
-1. The learner submits the enrolment form on `/ai-courses`. The details are
+1. The learner submits the enrolment form on `/courses` or a course page. The details are
    stored and emailed as before.
 2. A "Details submitted successfully" confirmation shows, then redirects to
    `/payment?course=<id>` after 3 seconds. It cannot be dismissed.

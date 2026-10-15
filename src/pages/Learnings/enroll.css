@@ -1,259 +1,179 @@
-/* ===========================
-   COURSE ENROLMENT MODAL
-   ===========================
-   Additions only. The overlay, fields, errors and submit button come from
-   src/pages/Modal/Modal.css, which this component also imports. */
+/* =================================================================
+   Enrolment dialog (EnrollModal.jsx). Builds on the shared dialog
+   rules in src/pages/Modal/Modal.css.
+   ================================================================= */
 
-/* ---- Course summary (inside .modal-aside) ---- */
-
-.enroll-summary-media {
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
+.enroll-dialog {
+  max-width: 660px;
 }
 
-.enroll-summary-media img {
+/* ---------------- "Step 1 of 2" and progress bar ---------------- */
+
+.enroll-steps {
+  padding: 28px 36px 0;
+  padding-right: 76px;
+}
+
+.enroll-step-count {
+  margin: 0 0 8px;
+  color: var(--ink-3);
+  font-size: 0.88rem;
+}
+
+.enroll-progress {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.enroll-progress li {
+  display: grid;
+  gap: 6px;
+}
+
+.enroll-progress li::before {
+  content: "";
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--rule);
+}
+
+.enroll-progress li.is-current::before,
+.enroll-progress li.is-done::before {
+  background: var(--accent);
+}
+
+.enroll-progress-label {
+  color: var(--ink-3);
+  font-size: 0.82rem;
+}
+
+.enroll-progress li.is-current .enroll-progress-label {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------------- Course summary header ---------------- */
+
+.enroll-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+.enroll-thumb {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+}
+
+.enroll-thumb img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.enroll-summary-body {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 26px 28px 28px;
+.enroll-head-text {
+  min-width: 0;
 }
 
-.enroll-summary-level {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--teal-400);
+.enroll-head h2 {
+  margin: 0 0 4px;
+  padding-right: 0;
+  font-size: 1.45rem;
 }
 
-.enroll-summary h3 {
-  margin: 8px 0 22px;
-  font-size: 1.3rem;
-  color: var(--white);
-}
-
-.enroll-summary-facts {
-  display: grid;
-  gap: 14px;
+.enroll-head .enroll-facts {
   margin: 0;
+  color: var(--ink-3);
+  font-size: 0.92rem;
 }
 
-.enroll-summary-facts div {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.9rem;
+.enroll-intro {
+  margin: 16px 36px 0;
+  color: var(--ink-3);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
-.enroll-summary-facts dt {
-  font-weight: 400;
-  color: #8a97ae;
-}
-
-.enroll-summary-facts dd {
-  margin: 0;
-  font-weight: 600;
-  color: var(--white);
-  text-align: right;
-}
-
-.enroll-summary-secure {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: auto 0 0;
-  padding-top: 24px;
-  font-size: 0.84rem;
-  color: #8a97ae;
-}
-
-.enroll-summary-secure svg {
-  color: var(--teal-400);
-}
-
-/* ---- Form column ---- */
-
-.enroll-steps {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 0 24px;
-  padding: 0;
-  list-style: none;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.enroll-steps li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.enroll-steps li + li::before {
-  content: "";
-  width: 32px;
-  height: 2px;
-  margin-right: 4px;
-  border-radius: 2px;
-  background: var(--line);
-}
-
-.enroll-steps span {
+.enroll-secure {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1.5px solid var(--line);
-  font-size: 0.75rem;
+  gap: 8px;
 }
 
-.enroll-steps .is-current {
-  color: var(--ink);
+.enroll-secure svg {
+  color: var(--success);
 }
 
-.enroll-steps .is-current span {
-  border-color: var(--blue-600);
-  background: var(--blue-600);
-  color: var(--white);
-}
-
-.enroll-optional {
-  font-weight: 400;
-  color: #9aa5b1;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-/* ===========================
-   PAYMENT STEP
-   =========================== */
+/* ---------------- Confirmation ---------------- */
 
 .enroll-done {
-  text-align: center;
-  padding: 48px 40px 40px;
-  animation: modal-fade-in 0.4s ease;
+  padding-top: 32px;
 }
 
-.enroll-done h2 {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--ink);
-  margin: 0 0 10px;
+.enroll-countdown {
+  width: 160px;
+  height: 4px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--rule);
 }
 
-.enroll-done > p {
-  font-size: 0.92rem;
-  line-height: 1.65;
-  color: #667;
-  margin: 0 auto;
-  max-width: 380px;
+.enroll-countdown span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+  animation: enroll-countdown linear both;
 }
 
-/* The one thing left to do, so it is the only thing drawn as a solid
-   button. */
-.enroll-pay-btn {
-  display: inline-block;
-  margin-top: 24px;
-  padding: 15px 38px;
-  border: none;
-  cursor: pointer;
-  background: var(--blue-600);
-  color: #fff;
-  border-radius: 12px;
-  font-size: 0.98rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
+@keyframes enroll-countdown {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
-.enroll-pay-btn:hover {
-  background: var(--blue-700);
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+.enroll-done .enroll-pay-note {
+  margin: 10px 0 0;
+  font-size: 0.88rem;
 }
 
-.enroll-pay-note {
-  margin: 14px auto 0;
-  max-width: 320px;
-  font-size: 0.76rem;
-  line-height: 1.6;
-  color: #9aa5b1;
-}
+/* ---------------- Small screens ---------------- */
 
-.enroll-later {
-  margin-top: 16px;
-  padding: 4px 8px;
-  background: none;
-  border: none;
-  font-family: inherit;
-  font-size: 0.82rem;
-  color: #8792a2;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.enroll-later:hover {
-  color: var(--ink);
-}
-
-/* Tablets and phones: the summary becomes a compact header above the form. */
-@media (max-width: 820px) {
-  .enroll-summary-media,
-  .enroll-summary-secure {
-    display: none;
+@media (max-width: 600px) {
+  .enroll-steps {
+    padding: 22px 64px 0 22px;
   }
 
-  .enroll-summary-body {
-    padding: 24px 24px 20px;
+  .enroll-head {
+    align-items: flex-start;
+    padding-top: 20px;
   }
 
-  .enroll-summary h3 {
-    margin-bottom: 16px;
-    padding-right: 40px;
+  .enroll-thumb {
+    width: 52px;
+    height: 52px;
   }
 
-  .enroll-summary-facts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 20px;
+  .enroll-head h2 {
+    font-size: 1.25rem;
   }
 
-  .enroll-summary-facts div {
-    flex-direction: column;
-    gap: 2px;
-    padding-bottom: 0;
-    border-bottom: 0;
-  }
-
-  .enroll-summary-facts dd {
-    text-align: left;
-  }
-
-}
-
-@media (max-width: 520px) {
-  .enroll-done {
-    padding: 40px 22px 28px;
-  }
-
-  .enroll-done h2 {
-    font-size: 1.2rem;
-  }
-
-  .enroll-pay-btn {
-    width: 100%;
-    padding: 15px 20px;
+  .enroll-intro {
+    margin: 14px 22px 0;
   }
 }

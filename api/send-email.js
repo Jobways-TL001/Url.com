@@ -24,7 +24,7 @@ const SOURCES = ["contact-page", "home-modal", "course-enrollment"];
 // Anything not listed here is reported as "Not specified" rather than echoed
 // into the mail, so the subject line cannot be driven by the request body.
 const SERVICE_LABELS = {
-  "e-learning": "AI Courses",
+  "e-learning": "AI courses",
   general: "General enquiry",
 };
 
@@ -83,7 +83,7 @@ function acknowledgementMail({ name, email, number, message, service, source, en
   const content = isEnrolment
     ? {
         subject: `Your enrolment request for ${headerSafe(enrolment.course)} — URL`,
-        preheader: `Thanks ${firstName} — we have your enrolment details for ${enrolment.course}.`,
+        preheader: `Thanks ${firstName}, we have your enrolment details for ${enrolment.course}.`,
         eyebrow: "Enrolment received",
         title: `Thank you, ${firstName}`,
         intro: `We have received your enrolment request for ${enrolment.course}. Here is what happens next.`,
@@ -91,11 +91,11 @@ function acknowledgementMail({ name, email, number, message, service, source, en
         steps: [
           [
             "Complete your payment",
-            "Your seat is confirmed once payment is complete. If you have not paid yet, a counsellor will send you a secure payment link.",
+            "Your seat is confirmed once payment is complete. If you have not paid yet, an advisor will send you a secure payment link.",
           ],
           [
             "We confirm your batch",
-            "A counsellor will call you within one business day to confirm your Monday – Friday batch and start date.",
+            "An advisor will call you within one business day to confirm your Monday – Friday batch and start date.",
           ],
           [
             "Meet your mentor",
@@ -112,18 +112,21 @@ function acknowledgementMail({ name, email, number, message, service, source, en
           ["Phone", number || "Not provided"],
           ...(enrolment.notes ? [["Your notes", enrolment.notes]] : []),
         ],
-        cta: { label: "View course details", href: `${SITE_URL}/ai-courses#courses` },
+        cta: {
+          label: "View course details",
+          href: `${SITE_URL}/courses${enrolment.courseId ? `/${enrolment.courseId}` : ""}`,
+        },
       }
     : {
         subject: "We've received your enquiry — URL",
-        preheader: `Thanks ${firstName} — your enquiry has reached the URL team.`,
+        preheader: `Thanks ${firstName}, your enquiry has reached the URL team.`,
         eyebrow: "Enquiry received",
         title: `Thank you, ${firstName}`,
-        intro: "Your enquiry has reached our team. A URL counsellor will reply within one business day.",
+        intro: "Your enquiry has reached our team. A URL advisor will reply within one business day.",
         stepsHeading: "What happens next",
         steps: [
           ["We review your enquiry", "A member of our team reads every enquiry personally."],
-          ["A counsellor contacts you", "We will talk through your background, goals and questions."],
+          ["An advisor contacts you", "We will talk through your background, goals and questions."],
           ["You receive a recommendation", "We will suggest the AI course that suits you best."],
         ],
         detailsHeading: "A copy of your enquiry",
@@ -134,7 +137,7 @@ function acknowledgementMail({ name, email, number, message, service, source, en
           ["Service", service ? SERVICE_LABELS[service] : "Not specified"],
           ["Message", message],
         ],
-        cta: { label: "Explore our AI courses", href: `${SITE_URL}/ai-courses` },
+        cta: { label: "Explore our AI courses", href: `${SITE_URL}/courses` },
       };
 
   const model = {

@@ -1,22 +1,20 @@
 import React from "react";
 import Header from "../Header/header";
 import Footer from "../Footer/footer";
+import LegalDocument from "./LegalDocument";
+import { COMPANY } from "../../constants/company";
 import "./Terms.css";
 
 const Privacypolicy = () => {
   return (
     <>
       <Header />
-      <main className="terms-container" id="main" tabIndex={-1}>
-        <div className="terms-hero">
-          <h1>Privacy Policy</h1>
-        </div>
-      <div className="terms-content">
+      <LegalDocument title="Privacy Policy">
         <h2>1. ABOUT COMPANY – URL</h2>
         <p>
           <b>1.1</b> ANY REFERENCE TO "WE", "US", "OUR WEB APPLICATION” ARE
           REFERENCES TO THE WWW.URL.COM (THE "WEB APPLICATION") PRODUCT OF
-          URL LLC LOCATED AT 8 THE GREEN STE R · DOVER, DE 19901.
+          {COMPANY.legalName.toUpperCase()}.
         </p>
         <p>
           <b>1.2</b> URL.COM PROVIDES HYPERLINKS TO THE WEBSITES OF MANY
@@ -460,14 +458,13 @@ const Privacypolicy = () => {
         </p>
 
         <h2>CONTACT US</h2>
-        <p style={{ fontWeight: "bold", fontSize: "16px" }}>
-          URL.COM BY URL LLC
+        <p className="legal-contact-line">
+          {COMPANY.domain.toUpperCase()} BY {COMPANY.legalName.toUpperCase()}
         </p>
-        <p style={{ fontWeight: "bold", fontSize: "16px" }}>
-          8 THE GREEN STE R · DOVER, DE 19901
+        <p className="legal-contact-line">
+          <a href={`mailto:${COMPANY.supportEmail}`}>{COMPANY.supportEmail}</a>
         </p>
-      </div>
-      </main>
+      </LegalDocument>
       <Footer />
     </>
   );

@@ -1,59 +1,83 @@
 /* =================================================================
-   URL design system
+   URL design system — "Human"
    -----------------------------------------------------------------
-   Tokens, a small reset (replacing Bootstrap's reboot, which the site
-   no longer loads) and the shared building blocks every page uses:
-   container, section, section heading, buttons, cards, chips and the
-   check list. Page stylesheets only add what is specific to them.
+   Plain, warm and professional, the way an established school
+   presents itself: white pages with soft warm-grey bands, one
+   friendly sans-serif (Figtree) in sentence case, near-black text,
+   a burnt-orange accent used sparingly, gently rounded cards and
+   large real photography. No decorative typography: no mono labels,
+   no italic accents, no figure captions.
+
+   Page stylesheets must use only the tokens in the first :root block.
    ================================================================= */
 
 :root {
+  color-scheme: light;
+
   /* Type */
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+  --font-sans: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Plus Jakarta Sans", var(--font-sans);
+  --font-display: var(--font-sans);
+  /* Kept so older markup still renders; it is the body font, not a mono. */
+  --font-mono: var(--font-sans);
+  /* Only the logo wordmark uses the serif. */
+  --font-brand: "Fraunces", Georgia, serif;
 
-  /* Brand */
-  --navy-950: #050b1c;
-  --navy-900: #0a1630;
-  --navy-800: #102043;
-  --navy-700: #1a2f5c;
-  --blue-700: #1d4ed8;
-  --blue-600: #2563eb;
-  --blue-500: #3b82f6;
-  --blue-100: #dbe7ff;
-  --blue-50: #eef4ff;
-  --teal-400: #2ee6c1;
-  --teal-600: #0f9f84;
-  --teal-50: #e7fbf6;
-  --violet-500: #7c5cff;
+  /* Paper (backgrounds, lightest → darker) */
+  --paper: #ffffff;            /* page */
+  --paper-2: #f7f4ef;          /* alternate band (warm grey) */
+  --card: #ffffff;             /* cards, inputs, panels */
 
-  /* Neutrals */
-  --ink: #0b1220;
-  --text: #3a4559;
-  --muted: #677489;
-  --line: #e4e9f1;
-  --surface: #f5f7fb;
-  --white: #ffffff;
+  /* Ink (text) */
+  --ink: #15120f;              /* headings, primary buttons */
+  --ink-2: #3f3a34;            /* body */
+  --ink-3: #625a51;            /* secondary text (6:1 on white) */
+  --ink-on-dark: #f6f3ec;      /* text on --night */
+  --ink-on-dark-2: #b9b0a3;    /* secondary text on --night */
+
+  /* Rules */
+  --rule: #e8e2d8;
+  --rule-strong: #d3cabc;
+  --rule-dark: rgba(246, 243, 236, 0.14); /* rules on --night */
+
+  /* Dark band */
+  --night: #1c1814;
+  --night-2: #26211c;
+
+  /* Accent */
+  --accent: #d9480f;           /* burnt orange: fills, marks, focus */
+  --accent-ink: #a8380b;       /* accent as text on paper (6:1) */
+  --accent-soft: #f9e2d4;      /* tinted backgrounds */
+  --accent-on-dark: #ff8a50;   /* accent as text on --night */
+
+  /* Supporting */
+  --olive: #55602f;            /* secondary mark colour, sparingly */
+  --olive-soft: #e6e8d6;
+
+  /* Status */
+  --success: #2f6b3b;
+  --success-bg: #e3efe2;
+  --danger: #b42318;
+  --danger-bg: #fbe7e4;
+  --warning: #8a5a00;
+  --warning-bg: #fbf0d6;
 
   /* Shape and depth */
-  --radius-sm: 10px;
-  --radius: 16px;
-  --radius-lg: 24px;
-  --shadow-sm: 0 1px 2px rgba(11, 18, 32, 0.05),
-    0 1px 3px rgba(11, 18, 32, 0.06);
-  --shadow: 0 12px 32px -14px rgba(11, 18, 32, 0.18);
-  --shadow-lg: 0 32px 64px -24px rgba(11, 18, 32, 0.3);
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(21, 18, 15, 0.06);
+  --shadow: 0 8px 24px -12px rgba(21, 18, 15, 0.16);
+  --shadow-lg: 0 24px 48px -20px rgba(21, 18, 15, 0.24);
 
-  /* Layout */
-  /* The layout spans the full window; only the side gutter grows with the
-     screen, so wide monitors are not left with empty margins. The cap only
-     stops lines becoming unreadably long on ultra-wide displays. */
-  --container: 1760px;
-  --gutter: clamp(20px, 5vw, 96px);
+  /* Layout: full width — only the side gutter grows with the window. The
+     cap only stops lines running off on ultra-wide (4K+) displays. */
+  --container: 2560px;
+  --gutter: clamp(20px, 4.5vw, 96px);
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  --focus-ring: var(--blue-600);
+  --focus-ring: var(--accent);
 }
 
 /* ---------------------------------------------------------------
@@ -68,27 +92,29 @@
 
 html {
   scroll-behavior: smooth;
-  /* Stop the page shifting sideways when a short page is replaced by a
-     scrolling one. */
   scrollbar-gutter: stable;
-  /* Anchored sections land below the sticky header, not under it. */
-  scroll-padding-top: calc(var(--header-h, 96px) + 16px);
+  scroll-padding-top: calc(var(--header-h, 72px) + 16px);
   -webkit-text-size-adjust: 100%;
+  background: var(--paper);
 }
 
 body {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--text);
-  background: var(--white);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ink-2);
+  background: var(--paper);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* Guards against a long unbroken string (a pasted URL, a long word) forcing
-     a horizontal scrollbar on narrow screens. */
   overflow-wrap: break-word;
+  font-feature-settings: "kern", "liga";
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
 }
 
 h1,
@@ -100,33 +126,48 @@ h6 {
   margin: 0 0 0.5em;
   font-family: var(--font-display);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--ink);
   letter-spacing: -0.02em;
 }
 
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
 p {
-  margin: 0 0 1rem;
+  margin: 0 0 1em;
 }
 
 ul,
 ol {
-  margin: 0 0 1rem;
-  padding-left: 1.5rem;
+  margin: 0 0 1em;
+  padding-left: 1.25em;
 }
 
 a {
-  color: var(--blue-600);
-  text-decoration: none;
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s var(--ease), text-decoration-color 0.15s var(--ease);
 }
 
 a:hover {
-  color: var(--blue-700);
+  color: var(--accent-ink);
+  text-decoration-color: currentColor;
 }
 
 strong,
 b {
   font-weight: 600;
+  color: var(--ink);
 }
 
 img,
@@ -136,7 +177,6 @@ iframe {
   vertical-align: middle;
 }
 
-/* Media should never exceed its container, whatever the intrinsic size. */
 img,
 video,
 iframe {
@@ -164,13 +204,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* One visible focus ring for keyboard users across the whole site.
-   :focus-visible, not :focus, so it does not appear on mouse clicks.
-   Components that need a different ring override this themselves. */
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 0;
+}
+
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-  outline: 3px solid var(--focus-ring);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 2px;
 }
 
 /* ---------------------------------------------------------------
@@ -185,21 +228,40 @@ button:disabled {
 }
 
 .section {
+  position: relative;
   padding: 104px 0;
 }
 
+.section + .section {
+  border-top: 0;
+}
+
 .section-alt {
-  background: var(--surface);
+  background: var(--paper-2);
 }
 
+/* Warm-black band for contrast moments. */
 .section-dark {
-  background: var(--navy-900);
-  color: #c4cee0;
+  background: var(--night);
+  color: var(--ink-on-dark-2);
+  border: 0;
 }
 
+.section-dark h1,
 .section-dark h2,
-.section-dark h3 {
-  color: var(--white);
+.section-dark h3,
+.section-dark h4,
+.section-dark strong {
+  color: var(--ink-on-dark);
+}
+
+.section-dark a {
+  color: var(--ink-on-dark);
+  text-decoration-color: var(--rule-dark);
+}
+
+.section-dark a:hover {
+  color: var(--accent-on-dark);
 }
 
 .grid {
@@ -238,33 +300,71 @@ button:disabled {
   }
 }
 
-/* ---------------------------------------------------------------
-   Section heading
-   --------------------------------------------------------------- */
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  margin-bottom: 18px;
-  border-radius: 999px;
-  background: var(--blue-50);
-  color: var(--blue-700);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+/* Faint ruled-paper texture (kept for markup that asks for .bg-grid). */
+.bg-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: calc(100% / 12) 100%;
+  opacity: 0.35;
+  pointer-events: none;
 }
 
-.eyebrow-dark {
-  background: rgba(46, 230, 193, 0.12);
-  color: var(--teal-400);
+/* A thin rule with a short accent segment at its start. */
+.rule-accent {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, var(--accent) 0 48px, var(--rule) 48px);
+}
+
+/* ---------------------------------------------------------------
+   Text
+   --------------------------------------------------------------- */
+
+/* Emphasis inside a headline: serif italic in the accent colour.
+   (Named .text-gradient for compatibility with existing markup.) */
+.text-gradient,
+.em-accent {
+  font: inherit;
+  color: inherit;
+}
+
+.section-dark .text-gradient,
+.section-dark .em-accent {
+  color: inherit;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* Small label above a heading: mono caps with a short rule. */
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--accent-ink);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.eyebrow-dark,
+.section-dark .eyebrow {
+  color: var(--accent-on-dark);
 }
 
 .section-head {
-  max-width: 720px;
-  margin: 0 auto 56px;
+  max-width: 760px;
+  margin: 0 0 56px;
+}
+
+/* Kept for markup that asks for a centred head. */
+.section-head-center {
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
 }
 
@@ -276,214 +376,235 @@ button:disabled {
 .section-head h2,
 .h2 {
   font-size: clamp(1.9rem, 3.2vw, 2.6rem);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .section-head p,
 .lead {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   line-height: 1.7;
-  color: var(--muted);
+  color: var(--ink-3);
   margin: 0;
 }
 
-.section-dark .section-head p {
-  color: #a9b6cc;
+.section-dark .section-head p,
+.section-dark .lead {
+  color: var(--ink-on-dark-2);
+}
+
+/* Large numerals for numbered lists and step markers. */
+.numeral {
+  font-weight: 700;
+  color: var(--accent-ink);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------------------------------------------------------------
-   Buttons
+   Buttons — rectangular, solid ink or outlined
    --------------------------------------------------------------- */
 
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   min-height: 48px;
-  padding: 0 24px;
+  padding: 0 22px;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-sans);
-  font-size: 0.975rem;
+  font-size: 1rem;
   font-weight: 600;
   line-height: 1;
+  letter-spacing: 0;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.2s var(--ease), color 0.2s var(--ease),
-    border-color 0.2s var(--ease), box-shadow 0.2s var(--ease),
-    transform 0.2s var(--ease);
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease),
+    border-color 0.15s var(--ease);
 }
 
 .btn:hover {
-  transform: translateY(-1px);
-}
-
-.btn:active {
-  transform: none;
+  text-decoration: none;
 }
 
 .btn:disabled {
-  opacity: 0.6;
-  transform: none;
+  opacity: 0.5;
 }
 
 .btn-lg {
   min-height: 56px;
-  padding: 0 30px;
-  font-size: 1.025rem;
+  padding: 0 28px;
+  font-size: 1rem;
 }
 
 .btn-sm {
-  min-height: 40px;
-  padding: 0 18px;
-  font-size: 0.9rem;
-  border-radius: 10px;
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 0.875rem;
 }
 
 .btn-block {
   width: 100%;
 }
 
+/* Solid ink; turns accent on hover. */
 .btn-primary {
-  background: var(--blue-600);
-  color: var(--white);
-  box-shadow: 0 8px 20px -8px rgba(37, 99, 235, 0.6);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .btn-primary:hover {
-  background: var(--blue-700);
-  color: var(--white);
-  box-shadow: 0 12px 26px -10px rgba(37, 99, 235, 0.7);
+  background: var(--accent-ink);
+  border-color: var(--accent-ink);
+  color: #fff;
 }
 
-.btn-secondary {
-  background: var(--white);
+/* Outlined. */
+.btn-secondary,
+.btn-outline-light {
+  background: var(--card);
+  border-color: var(--rule-strong);
   color: var(--ink);
-  border-color: var(--line);
-  box-shadow: var(--shadow-sm);
 }
 
-.btn-secondary:hover {
-  color: var(--blue-700);
-  border-color: var(--blue-100);
-  background: var(--blue-50);
+.btn-secondary:hover,
+.btn-outline-light:hover {
+  background: var(--paper-2);
+  border-color: var(--ink-3);
+  color: var(--ink);
 }
 
+/* Accent fill for the single most important action on a page. */
 .btn-accent {
-  background: var(--teal-400);
-  color: var(--navy-900);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .btn-accent:hover {
-  background: #22d4b0;
-  color: var(--navy-900);
+  background: var(--accent-ink);
+  border-color: var(--accent-ink);
+  color: #fff;
 }
 
+/* For dark bands. */
 .btn-light {
-  background: var(--white);
-  color: var(--navy-900);
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
 }
 
 .btn-light:hover {
-  background: var(--blue-50);
-  color: var(--navy-900);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
-.btn-outline-light {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--white);
-  border-color: rgba(255, 255, 255, 0.28);
+.section-dark .btn-secondary,
+.section-dark .btn-outline-light {
+  background: transparent;
+  border-color: var(--ink-on-dark);
+  color: var(--ink-on-dark);
 }
 
-.btn-outline-light:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.5);
-  color: var(--white);
+.section-dark .btn-secondary:hover,
+.section-dark .btn-outline-light:hover {
+  background: var(--ink-on-dark);
+  color: var(--ink);
 }
 
+/* Text link with an arrow. */
 .btn-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  min-height: 0;
   padding: 0;
   border: 0;
+  border-radius: 0;
   background: none;
-  color: var(--blue-600);
+  color: var(--accent-ink);
   font-weight: 600;
 }
 
 .btn-link:hover {
-  color: var(--blue-700);
+  color: var(--accent-ink);
+  text-decoration: underline;
 }
 
 .btn-arrow {
+  font-size: 0.85em;
   transition: transform 0.2s var(--ease);
 }
 
-.btn:hover .btn-arrow,
-.btn-link:hover .btn-arrow,
+.btn:hover > .btn-arrow,
 a:hover > .btn-arrow {
-  transform: translateX(3px);
+  transform: translateX(4px);
 }
 
 /* ---------------------------------------------------------------
-   Cards, chips, icon tiles, lists
+   Cards — paper white with a hairline border
    --------------------------------------------------------------- */
 
 .card {
   position: relative;
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
   padding: 28px;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease),
-    border-color 0.25s var(--ease);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease),
+    transform 0.2s var(--ease);
 }
 
 .card-hover:hover {
-  transform: translateY(-4px);
-  border-color: var(--blue-100);
+  border-color: var(--rule-strong);
   box-shadow: var(--shadow);
+  transform: translateY(-2px);
 }
 
 .card h3 {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   margin-bottom: 10px;
 }
 
 .card p {
   margin: 0;
-  color: var(--muted);
+  color: var(--ink-3);
   line-height: 1.7;
-  font-size: 0.97rem;
+  font-size: 0.98rem;
+}
+
+/* Kept for markup that asks for a "glass" panel: a plain card here. */
+.glass {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
 }
 
 .icon-tile {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   margin-bottom: 20px;
+  border: 0;
   border-radius: 12px;
-  background: var(--blue-50);
-  color: var(--blue-600);
-  font-size: 1.2rem;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 1.05rem;
   flex-shrink: 0;
 }
 
+.icon-tile-cyan,
 .icon-tile-teal {
-  background: var(--teal-50);
-  color: var(--teal-600);
+  color: var(--olive);
 }
 
 .chip-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -493,25 +614,48 @@ a:hover > .btn-arrow {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.2;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
-.chip-dark {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
-  color: #dbe3f0;
+.chip-dark,
+.section-dark .chip {
+  border-color: var(--rule-dark);
+  color: var(--ink-on-dark-2);
+}
+
+.chip-accent {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+
+/* Tag: tiny uppercase label, e.g. "Most in demand". */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.tag-accent {
+  background: var(--accent);
+  color: #fff;
 }
 
 .check-list {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -519,78 +663,39 @@ a:hover > .btn-arrow {
 
 .check-list li {
   position: relative;
-  padding-left: 32px;
-  color: var(--text);
+  padding-left: 28px;
+  color: var(--ink-2);
   line-height: 1.55;
 }
 
-/* A drawn tick in a soft circle, so it carries the brand colour and stays
-   out of the accessibility tree. */
 .check-list li::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 1px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--teal-50);
-}
-
-.check-list li::after {
-  content: "";
-  position: absolute;
-  left: 7px;
-  top: 7px;
-  width: 9px;
-  height: 5px;
-  border-left: 2px solid var(--teal-600);
-  border-bottom: 2px solid var(--teal-600);
+  left: 2px;
+  top: 6px;
+  width: 11px;
+  height: 6px;
+  border-left: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
   transform: rotate(-45deg);
 }
 
 .section-dark .check-list li {
-  color: #c4cee0;
+  color: var(--ink-on-dark-2);
 }
 
 .section-dark .check-list li::before {
-  background: rgba(46, 230, 193, 0.14);
-}
-
-.section-dark .check-list li::after {
-  border-color: var(--teal-400);
+  border-color: var(--accent-on-dark);
 }
 
 /* ---------------------------------------------------------------
-   Page hero (inner pages)
+   Page hero (inner pages) — editorial masthead
    --------------------------------------------------------------- */
 
 .page-hero {
   position: relative;
-  overflow: hidden;
-  padding: 112px 0 104px;
-  background: radial-gradient(
-      900px 420px at 85% -10%,
-      rgba(124, 92, 255, 0.28),
-      transparent 60%
-    ),
-    radial-gradient(700px 380px at 0% 110%, rgba(46, 230, 193, 0.16), transparent 60%),
-    var(--navy-900);
-  color: #c4cee0;
-}
-
-/* A faint grid, masked so it fades out towards the edges. */
-.page-hero::before,
-.hero-grid::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 56px 56px;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
-  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
-  pointer-events: none;
+  padding: 80px 0 72px;
+  background: var(--paper-2);
 }
 
 .page-hero .container {
@@ -598,7 +703,7 @@ a:hover > .btn-arrow {
 }
 
 .page-hero-inner {
-  max-width: 760px;
+  max-width: 880px;
 }
 
 .page-hero-center .page-hero-inner {
@@ -607,24 +712,29 @@ a:hover > .btn-arrow {
 }
 
 .page-hero h1 {
-  font-size: clamp(2.3rem, 5vw, 3.6rem);
+  font-size: clamp(2.3rem, 4.6vw, 3.6rem);
   line-height: 1.1;
-  color: var(--white);
+  letter-spacing: -0.025em;
   margin-bottom: 20px;
 }
 
 .page-hero p {
-  font-size: 1.15rem;
-  line-height: 1.7;
-  color: #a9b6cc;
+  max-width: 640px;
+  font-size: 1.2rem;
+  line-height: 1.65;
+  color: var(--ink-3);
   margin: 0;
+}
+
+.page-hero-center p {
+  margin: 0 auto;
 }
 
 .page-hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 36px;
 }
 
 .page-hero-center .page-hero-actions,
@@ -638,48 +748,40 @@ a:hover > .btn-arrow {
 
 @media (max-width: 680px) {
   .page-hero {
-    padding: 80px 0 72px;
+    padding: 56px 0 48px;
   }
 }
 
 /* ---------------------------------------------------------------
-   CTA band
+   CTA band — a warm-black panel
    --------------------------------------------------------------- */
 
 .cta-band {
   padding: 0 0 104px;
 }
 
-.section-alt + .cta-band,
-.cta-band-alt {
-  background: var(--surface);
-}
-
 .cta-band-inner {
   position: relative;
-  overflow: hidden;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 32px;
-  padding: 56px 64px;
+  gap: 40px;
+  padding: 64px;
   border-radius: var(--radius-lg);
-  background: radial-gradient(600px 300px at 100% 0%, rgba(46, 230, 193, 0.25), transparent 60%),
-    linear-gradient(120deg, var(--blue-700), #3b3fd8 55%, var(--violet-500));
-  color: rgba(255, 255, 255, 0.85);
-  box-shadow: var(--shadow-lg);
+  background: var(--night);
+  color: var(--ink-on-dark-2);
 }
 
 .cta-band-inner h2 {
-  font-size: clamp(1.7rem, 3vw, 2.3rem);
-  color: var(--white);
-  margin-bottom: 10px;
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  color: var(--ink-on-dark);
+  margin-bottom: 12px;
 }
 
 .cta-band-inner p {
   margin: 0;
   max-width: 560px;
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   line-height: 1.7;
 }
 
@@ -690,11 +792,36 @@ a:hover > .btn-arrow {
   flex-shrink: 0;
 }
 
+.cta-band-inner .btn-primary {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
+}
+
+.cta-band-inner .btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.cta-band-inner .btn-secondary,
+.cta-band-inner .btn-outline-light {
+  background: transparent;
+  border-color: var(--ink-on-dark);
+  color: var(--ink-on-dark);
+}
+
+.cta-band-inner .btn-secondary:hover,
+.cta-band-inner .btn-outline-light:hover {
+  background: var(--ink-on-dark);
+  color: var(--ink);
+}
+
 @media (max-width: 900px) {
   .cta-band-inner {
     flex-direction: column;
     align-items: flex-start;
-    padding: 40px 28px;
+    padding: 44px 28px;
   }
 
   .cta-band {
@@ -710,72 +837,66 @@ a:hover > .btn-arrow {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
-  counter-reset: none;
+  border-top: 0;
 }
 
-/* The line joining the step numbers on wide screens. */
 .steps::before {
-  content: "";
-  position: absolute;
-  top: 24px;
-  left: 12%;
-  right: 12%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--blue-100), var(--teal-400), var(--blue-100));
+  content: none;
 }
 
 .step {
   position: relative;
-  text-align: center;
-  padding: 0 8px;
+  padding: 28px 28px 0 0;
+}
+
+.step + .step {
+  padding-left: 28px;
+  border-left: 1px solid var(--rule);
 }
 
 .step-num {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
-  margin-bottom: 22px;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
   border-radius: 50%;
-  background: var(--white);
-  border: 2px solid var(--blue-600);
-  color: var(--blue-600);
-  font-family: var(--font-display);
-  font-size: 1.1rem;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 1rem;
   font-weight: 700;
-  box-shadow: 0 0 0 8px var(--white);
-}
-
-.section-alt .step-num {
-  box-shadow: 0 0 0 8px var(--surface);
 }
 
 .step h3 {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   margin-bottom: 8px;
 }
 
 .step p {
   margin: 0;
-  color: var(--muted);
-  font-size: 0.96rem;
+  color: var(--ink-3);
+  font-size: 0.98rem;
   line-height: 1.65;
 }
 
 @media (max-width: 900px) {
   .steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    row-gap: 40px;
   }
 
-  .steps::before {
-    display: none;
+  .step:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .step:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+    margin-top: 28px;
   }
 }
 
@@ -784,80 +905,195 @@ a:hover > .btn-arrow {
     grid-template-columns: 1fr;
   }
 
-  .step {
-    display: grid;
-    grid-template-columns: 50px 1fr;
-    column-gap: 18px;
-    text-align: left;
-    padding: 0;
+  .step,
+  .step + .step {
+    padding: 24px 0 0;
+    border-left: 0;
   }
 
-  .step-num {
-    grid-row: span 2;
-    margin: 0;
+  .step + .step {
+    border-top: 1px solid var(--rule);
+    margin-top: 24px;
   }
 }
 
 /* ---------------------------------------------------------------
-   FAQ accordion
+   FAQ accordion — ruled list
    --------------------------------------------------------------- */
 
 .faq-list {
   display: grid;
-  gap: 12px;
+  border-top: 1px solid var(--rule);
 }
 
 .faq-item {
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--white);
-  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
-}
-
-.faq-item[open] {
-  border-color: var(--blue-100);
-  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--rule);
+  background: transparent;
 }
 
 .faq-item summary {
   position: relative;
-  padding: 20px 60px 20px 24px;
-  font-family: var(--font-display);
-  font-size: 1.02rem;
+  padding: 24px 56px 24px 0;
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
   font-weight: 600;
+  line-height: 1.4;
   color: var(--ink);
   cursor: pointer;
   list-style: none;
+  transition: color 0.15s var(--ease);
+}
+
+.faq-item summary:hover {
+  color: var(--accent-ink);
 }
 
 .faq-item summary::-webkit-details-marker {
   display: none;
 }
 
+/* Plus that rotates into a cross. */
 .faq-item summary::after {
-  content: "";
+  content: "+";
   position: absolute;
-  right: 24px;
+  right: 4px;
   top: 50%;
-  width: 10px;
-  height: 10px;
-  margin-top: -7px;
-  border-right: 2px solid var(--blue-600);
-  border-bottom: 2px solid var(--blue-600);
-  transform: rotate(45deg);
-  transition: transform 0.2s var(--ease);
+  margin-top: -16px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--accent);
+  transition: transform 0.25s var(--ease);
 }
 
 .faq-item[open] summary::after {
-  transform: rotate(-135deg);
-  margin-top: -2px;
+  transform: rotate(45deg);
 }
 
 .faq-item p {
-  padding: 0 24px 22px;
+  max-width: 760px;
+  padding: 0 0 26px;
   margin: 0;
-  color: var(--muted);
+  color: var(--ink-3);
   line-height: 1.75;
+}
+
+.faq-item[open] p {
+  animation: fade-up 0.3s var(--ease) both;
+}
+
+/* ---------------------------------------------------------------
+   Form fields — shared by every form
+   --------------------------------------------------------------- */
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.field-required {
+  color: var(--accent-ink);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--card);
+  color: var(--ink);
+  font-size: 1rem;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: #9a9086;
+}
+
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: var(--ink-3);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.field-invalid .input,
+.field-invalid .select,
+.field-invalid .textarea {
+  border-color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.field-hint {
+  color: var(--ink-3);
+  font-size: 0.84rem;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%2315120f' stroke-width='1.6' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+.notice {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-left: 0;
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+  font-size: 0.95rem;
+  color: var(--ink-2);
+}
+
+.notice-success {
+  border-left-color: var(--success);
+  background: var(--success-bg);
+  color: #1f4a28;
+}
+
+.notice-error {
+  border-left-color: var(--danger);
+  background: var(--danger-bg);
+  color: #7a1a12;
 }
 
 /* ---------------------------------------------------------------
@@ -876,28 +1112,23 @@ a:hover > .btn-arrow {
   border: 0;
 }
 
-/* Skip link: lets a keyboard user jump past the nav on every page. */
 .skip-link {
   position: absolute;
   left: -9999px;
   top: 0;
   z-index: 10000;
   padding: 12px 20px;
-  background: var(--navy-900);
-  color: var(--white);
+  background: var(--ink);
+  color: var(--paper);
   font-weight: 600;
   text-decoration: none;
-  border-radius: 0 0 8px 0;
 }
 
 .skip-link:focus {
   left: 0;
-  color: var(--white);
+  color: var(--paper);
 }
 
-/* Respect the OS "reduce motion" setting. Card hover transforms and the
-   modal's scale-in animation are motion that can trigger discomfort, and
-   smooth scrolling is the worst offender. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -914,24 +1145,14 @@ a:hover > .btn-arrow {
 }
 
 /* ---------------------------------------------------------------
-   Scroll reveal
-   ---------------------------------------------------------------
-   Both classes are added by src/utils/useScrollReveal.js, never present in
-   the markup. That matters: if the hidden state lived in the stylesheet,
-   anything that stopped the JS running would leave the page permanently
-   blank. The hook also skips all of this under prefers-reduced-motion. */
+   Scroll reveal (classes added by src/utils/useScrollReveal.js)
+   --------------------------------------------------------------- */
 
-/* The attribute is included in the selector deliberately. Several revealed
-   components carry their own `transition` shorthand, which at equal
-   specificity would override both the opacity/transform transition and the
-   stagger delay, making the reveal snap instead of fade. */
 [data-reveal].reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  transform: translateY(16px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
   transition-delay: var(--reveal-delay, 0ms);
-  /* Promote only while animating; the hook strips these classes once the
-     reveal finishes, so long pages do not retain dozens of layers. */
   will-change: opacity, transform;
 }
 
@@ -941,52 +1162,37 @@ a:hover > .btn-arrow {
 }
 
 /* =================================================================
-   Motion
-   -----------------------------------------------------------------
-   Short, purposeful animation only: page heroes settle in, hero glows
-   drift slowly, cards and buttons respond to the pointer, and the steps
-   connector draws across once. The reduced-motion block above cuts every
-   one of these to an instant change.
+   Motion — restrained
    ================================================================= */
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
 @keyframes scale-in {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.98);
   }
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-@keyframes glow-drift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(-8%, 6%, 0) scale(1.12);
-  }
-}
-
-@keyframes shine {
-  from {
-    left: -60%;
-  }
-  to {
-    left: 130%;
   }
 }
 
@@ -996,177 +1202,69 @@ a:hover > .btn-arrow {
   }
 }
 
-/* ---- Hero entrance: a quick, staggered settle ---- */
-
-.page-hero-inner > *,
-.home-hero-copy > * {
-  animation: fade-up 0.55s var(--ease) both;
+@keyframes draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
-.page-hero-inner > :nth-child(2),
-.home-hero-copy > :nth-child(2) {
+.page-hero-inner > * {
+  animation: fade-up 0.5s var(--ease) both;
+}
+
+.page-hero-inner > :nth-child(2) {
   animation-delay: 60ms;
 }
 
-.page-hero-inner > :nth-child(3),
-.home-hero-copy > :nth-child(3) {
+.page-hero-inner > :nth-child(3) {
   animation-delay: 120ms;
 }
 
-.page-hero-inner > :nth-child(4),
-.home-hero-copy > :nth-child(4) {
+.page-hero-inner > :nth-child(4) {
   animation-delay: 180ms;
 }
 
-.home-hero-image {
-  animation: scale-in 0.7s var(--ease) 0.1s both;
+/* Steps: the top rule draws across when scrolled into view. */
+.steps.anim-pending {
+  border-top-color: transparent;
 }
 
-/* ---- Slowly drifting glow behind the hero ---- */
-
-.page-hero::after,
-.home-hero::after {
-  content: "";
-  position: absolute;
-  top: -220px;
-  right: -140px;
-  width: 620px;
-  height: 620px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.32), transparent 65%);
-  animation: glow-drift 16s ease-in-out infinite;
-  pointer-events: none;
+.steps.anim-pending::after,
+.steps.in-view::after {
+  display: none;
 }
 
-.page-hero .container,
-.home-hero-grid {
-  z-index: 1;
-}
-
-/* ---- Buttons: a light sweep across solid buttons on hover ---- */
-
-.btn-primary,
-.btn-light,
-.btn-accent {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.btn-primary::after,
-.btn-light::after,
-.btn-accent::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -60%;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-  transform: skewX(-20deg);
-  pointer-events: none;
-}
-
-.btn-primary:hover::after,
-.btn-light:hover::after,
-.btn-accent:hover::after {
-  animation: shine 0.8s var(--ease);
-}
-
-/* ---- Cards: accent bar and icon fill on hover ---- */
-
-.card-hover::before {
+.steps.anim-pending::after,
+.steps.in-view::after {
   content: "";
   position: absolute;
   top: -1px;
-  left: -1px;
-  right: -1px;
-  height: 3px;
-  border-radius: var(--radius) var(--radius) 0 0;
-  background: linear-gradient(90deg, var(--blue-600), var(--teal-400));
-  transform: scaleX(0);
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--ink);
   transform-origin: left;
-  transition: transform 0.35s var(--ease);
 }
 
-.card-hover:hover::before {
-  transform: scaleX(1);
-}
-
-.card .icon-tile {
-  transition: background-color 0.25s var(--ease), color 0.25s var(--ease),
-    transform 0.25s var(--ease);
-}
-
-.card-hover:hover .icon-tile {
-  background: var(--blue-600);
-  color: var(--white);
-  transform: translateY(-2px);
-}
-
-.card-hover:hover .icon-tile-teal {
-  background: var(--teal-600);
-}
-
-/* ---- Steps: the connector draws across, then each number pops in ---- */
-
-.steps.anim-pending::before {
+.steps.anim-pending::after {
   transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 1.1s var(--ease) 0.15s;
 }
 
-.steps.anim-pending .step-num {
-  opacity: 0;
-  transform: scale(0.6);
-  transition: opacity 0.4s var(--ease), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+.steps.in-view::after {
+  animation: draw-x 0.9s var(--ease) both;
 }
 
-.steps.in-view::before {
-  transform: scaleX(1);
-}
-
-.steps.in-view .step-num {
-  opacity: 1;
-  transform: none;
-}
-
-.steps.in-view .step:nth-child(2) .step-num {
-  transition-delay: 0.25s;
-}
-
-.steps.in-view .step:nth-child(3) .step-num {
-  transition-delay: 0.5s;
-}
-
-.steps.in-view .step:nth-child(4) .step-num {
-  transition-delay: 0.75s;
-}
-
-/* ---- FAQ: the answer eases in when opened ---- */
-
-.faq-item[open] p {
-  animation: fade-up 0.35s var(--ease) both;
-}
-
-.faq-item summary {
-  transition: color 0.2s var(--ease);
-}
-
-.faq-item summary:hover {
-  color: var(--blue-600);
-}
-
-/* ---- Topic ticker ---- */
+/* ---------------------------------------------------------------
+   Ticker
+   --------------------------------------------------------------- */
 
 .ticker {
   overflow: hidden;
-  padding: 22px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  background: var(--white);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
 
 .ticker-track {
@@ -1175,7 +1273,7 @@ a:hover > .btn-arrow {
   margin: 0;
   padding: 0;
   list-style: none;
-  animation: marquee 40s linear infinite;
+  animation: marquee 50s linear infinite;
 }
 
 .ticker:hover .ticker-track {
@@ -1183,26 +1281,26 @@ a:hover > .btn-arrow {
 }
 
 .ticker-track li {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 40px;
-  padding-right: 40px;
-  font-family: var(--font-display);
+  padding: 16px 28px;
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--ink-2);
   white-space: nowrap;
 }
 
 .ticker-track li::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--teal-400);
+  content: "·";
+  position: absolute;
+  right: -4px;
+  color: var(--accent);
 }
 
-/* ---- Back to top ---- */
+/* ---------------------------------------------------------------
+   Back to top
+   --------------------------------------------------------------- */
 
 .back-to-top {
   position: fixed;
@@ -1212,18 +1310,18 @@ a:hover > .btn-arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border: 0;
-  border-radius: 14px;
-  background: var(--navy-900);
-  color: var(--white);
-  box-shadow: var(--shadow-lg);
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(12px);
-  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease),
-    visibility 0.25s, background-color 0.2s var(--ease);
+  transform: translateY(10px);
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease), visibility 0.2s,
+    background-color 0.15s var(--ease), color 0.15s var(--ease);
 }
 
 .back-to-top.is-visible {
@@ -1233,7 +1331,8 @@ a:hover > .btn-arrow {
 }
 
 .back-to-top:hover {
-  background: var(--blue-600);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 @media (max-width: 600px) {
@@ -1243,4 +1342,90 @@ a:hover > .btn-arrow {
     width: 44px;
     height: 44px;
   }
+}
+
+/* ---------------------------------------------------------------
+   Brand logo — size it with font-size on the wrapper.
+   --------------------------------------------------------------- */
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.brand-logo-mark {
+  display: block;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+.brand-logo-word {
+  font-family: var(--font-brand);
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variation-settings: "opsz" 72;
+}
+
+.brand-logo-light .brand-logo-word {
+  color: var(--ink-on-dark);
+}
+
+.brand-logo-dot {
+  color: var(--accent);
+}
+
+/* =================================================================
+   Admin dashboard (/admin) keeps its own dense, light internal theme,
+   built on these older token names, defined only inside it.
+   ================================================================= */
+
+.adm,
+.adm-login {
+  color-scheme: light;
+  --forest-950: #15120f;
+  --forest-900: #1c1814;
+  --forest-800: #26211c;
+  --forest-700: #3a332b;
+  --emerald-700: #a8380b;
+  --emerald-600: #c2410c;
+  --emerald-500: #d9480f;
+  --emerald-100: #f9e2d4;
+  --emerald-50: #fcf1ea;
+  --amber-400: #ff8a50;
+  --amber-500: #d9480f;
+  --amber-50: #fcf1ea;
+  --mint-300: #f9e2d4;
+  --success-600: #2f6b3b;
+  --success-50: #e3efe2;
+  --text: #3f3a34;
+  --muted: #6b635a;
+  --line: #e4ddd1;
+  --surface: #f6f3ec;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 2px rgba(21, 18, 15, 0.05), 0 1px 3px rgba(21, 18, 15, 0.06);
+  --shadow: 0 12px 32px -14px rgba(21, 18, 15, 0.18);
+  --shadow-lg: 0 32px 64px -24px rgba(21, 18, 15, 0.3);
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --font-display: "IBM Plex Sans", system-ui, sans-serif;
+  --focus-ring: #d9480f;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.adm a,
+.adm-login a {
+  color: var(--emerald-600);
+}
+
+.adm .brand-logo-word,
+.adm-login .brand-logo-word {
+  color: var(--ink);
 }

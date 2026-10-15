@@ -130,7 +130,7 @@ async function retryUrl(supabase, enquiry, email) {
       return url.toString();
     }
   }
-  return `${SITE_URL}/ai-courses`;
+  return `${SITE_URL}/courses`;
 }
 
 function learnerMail(kind, p) {
@@ -146,20 +146,20 @@ function learnerMail(kind, p) {
   const content =
     kind === "paid"
       ? {
-          subject: `Payment received — you're enrolled in ${headerSafe(p.course)}`,
+          subject: `Payment received: you're enrolled in ${headerSafe(p.course)}`,
           preheader: `Your seat in ${p.course} is confirmed.`,
           eyebrow: "Payment received",
           title: `You're enrolled, ${first}!`,
           intro: `We have received your payment${p.amount ? ` of ${p.amount}` : ""} for ${p.course}. Your seat is confirmed.`,
           stepsHeading: "What happens next",
           steps: [
-            ["We confirm your batch", "A counsellor will call you within one business day to confirm your batch and start date."],
+            ["We confirm your batch", "An advisor will call you within one business day to confirm your batch and start date."],
             ["Meet your mentor", "Before your first class you will be introduced to the industry mentor who will guide you."],
             ["Start learning", "You will receive your class schedule and joining details before day one."],
           ],
           detailsHeading: "Payment details",
           rows,
-          cta: { label: "View your course", href: `${SITE_URL}/ai-courses` },
+          cta: { label: "View your course", href: `${SITE_URL}/courses` },
           footerNote: "Stripe emails your official payment receipt separately.",
         }
       : {
@@ -174,7 +174,7 @@ function learnerMail(kind, p) {
           stepsHeading: "How to finish",
           steps: [
             ["Complete your payment", "Use the button below to return to secure Stripe checkout. Your details are already saved."],
-            ["Need another way to pay?", "Reply to this email and a counsellor will help you complete your enrolment."],
+            ["Need another way to pay?", "Reply to this email and an advisor will help you complete your enrolment."],
           ],
           detailsHeading: "Your enrolment",
           rows,
