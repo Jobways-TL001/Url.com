@@ -299,6 +299,19 @@ Developers -> Webhooks add the endpoint
 `https://<your-domain>/api/stripe-webhook` with the four events above; put its
 signing secret in `STRIPE_WEBHOOK_SECRET` and redeploy.
 
+### Accounts dashboard (Jobways.urladmin)
+
+The separate accounts dashboard (repo `Jobways-TL001/Jobways.urladmin`) has
+no database of its own. It reads this site's `contact_submissions` and keeps
+URL's Stripe bookkeeping (payments, refunds, fees, disputes, payouts,
+reconciliation notes) in `ledger_*` tables in this Supabase project.
+
+Setup: apply `supabase/migrations/0008_accounts_ledger.sql`. In Stripe -> Developers ->
+Webhooks, add a **second** endpoint,
+`https://<dashboard-domain>/api/webhooks/stripe?site=url`, next to this
+site's own `/api/stripe-webhook`. That endpoint's signing secret goes in the
+dashboard's Vercel project, not this one. This site's code does not change.
+
 ## Deploying
 
 ```bash
