@@ -241,15 +241,18 @@ Payment is the required second step of an enrolment:
 2. A "Details submitted successfully" confirmation shows, then redirects to
    `/payment?course=<id>` after 3 seconds. It cannot be dismissed.
 3. `/payment` shows the order and the learner's details (handed over in
-   `sessionStorage`, never in the URL) and a "Pay Securely with Stripe"
-   button that opens the course's Stripe payment link, with the learner's
-   email prefilled and the enquiry id as `client_reference_id`.
-4. If a course has no link yet, the page says the team will email one.
+   `sessionStorage`, never in the URL), the course fee for their state, and
+   a "Pay Securely with Stripe" button that opens a Stripe Checkout for
+   exactly that fee (see "Course fee by state" below), with the learner's
+   email prefilled and the enquiry id as `client_reference_id`. After
+   paying, Stripe returns them to `/payment/success`.
+4. If online payment is not available for the enrolment (outside the US, a
+   state without a fee, or `STRIPE_SECRET_KEY` not set), the page says the
+   team will email the fee and how to pay.
 
-Payment links are managed in `/admin` -> Payment links (stored in
-`public.course_payment_links`, migration 0005). Only `https` links on
-`buy.stripe.com`, `checkout.stripe.com` or `donate.stripe.com` are accepted.
-In Stripe, set each link's after-payment redirect to `/payment/success`.
+There are no Stripe payment links: every checkout is created by
+`/api/checkout`. The old `public.course_payment_links` table (migration
+0005) is no longer read and can be dropped.
 
 ## Admin dashboard
 
@@ -258,11 +261,19 @@ filters (status, source, period, failed delivery), a detail panel per
 enquiry, a follow-up status (new, contacted, enrolled, closed) and CSV
 export. It works on desktop and phone.
 
+Each section has its own URL, so refresh, Back/Forward and bookmarks work:
+
+| URL | Section |
+|---|---|
+| `/admin/enquiries` | Enquiries (default; `/admin` redirects here) |
+| `/admin/payments` | Stripe payments: revenue, paid / failed / not completed, per-payment rows with a link to Stripe |
+| `/admin/state-tax` | Per-state hours, pay rate, taxes, payable to vendor and the resulting course fee |
+| `/admin/emails` | Previews of every email the site sends, rendered with sample data (`/api/admin/email-previews`; nothing is sent) |
+
 Setup, once:
 
-1. Apply `supabase/migrations/0004_admin_status.sql` and
-   `0005_course_payment_links.sql` (and 0001–0003 if not already applied) in
-   the Supabase SQL editor.
+1. Apply `supabase/migrations/0004_admin_status.sql` (and 0001–0003 if not
+   already applied) in the Supabase SQL editor.
 2. Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in Vercel, then redeploy.
 
 There is one admin login. To change it, edit the two variables and redeploy;
@@ -312,7 +323,60 @@ Webhooks, add a **second** endpoint,
 site's own `/api/stripe-webhook`. That endpoint's signing secret goes in the
 dashboard's Vercel project, not this one. This site's code does not change.
 
+### State tax
+
+`/admin` -> State tax lists every US state (plus DC) with editable hours per
+month, pay rate per hour (USD), employee tax (%), employer tax (%) and company
+margin (USD), plus a calculated Total ($) the customer pays. Each row saves
+on its own to
+`public.state_tax_rates` through `/api/admin/state-taxes`; clearing every
+value in a row removes it.
+
+Setup: apply `supabase/migrations/0009_state_tax_rates.sql`, then
+`0010_state_tax_margin_usd.sql`, then `0011_state_minimum_wage_defaults.sql`
+(fills each state's blank pay rate with its minimum wage), then
+`0012_state_rates_2026.sql` (2026 pay rates and payroll tax figures).
+
+### Course fee by state
+
+Each learner pays the course fee for the state they choose on the
+enrolment form, worked out from that state's row in /admin -> State tax:
+
+    course fee = pay rate x hours per month          (gross salary)
+               + employer tax % of gross salary      (= payroll)
+               + payable to vendor ($)
+
+e.g. Illinois: $15 x 90 = $1,350; + 8% = $1,458; + $200 = **$1,658**.
+Employee tax does not change the fee. Every course costs the same.
+
+- `/api/course-fees` gives the site the final fee per state (never the
+  rates, taxes or margins). No fee is shown until a state is known: it is
+  detected from the visitor's IP (`/api/locate`) or picked in the course
+  list toolbar or a course page's fee panel, and shared by the course list,
+  the course pages, the enrolment form and the payment page.
+- The Pay button goes to `/api/checkout?enquiry=<id>`, which prices the
+  enrolment from the state saved with the enquiry and opens a Stripe
+  checkout for exactly that amount. The enquiry id is the
+  `client_reference_id`, so `/api/stripe-webhook` records it as before.
+- Learners outside the US, or in a state without a pay rate and hours, are
+  not offered online payment; the team emails them.
+
+Setup: set `STRIPE_SECRET_KEY` in Vercel (same Stripe account and mode as
+the webhook) and redeploy. Until it is set, no online payment is offered.
+
 ## Deploying
+
+**Function limit.** The Vercel Hobby plan deploys at most 12 serverless
+functions, and every `.js` file under `api/` counts as one unless its name
+starts with `_` (shared code lives in `api/_lib/`). There are 10 today. The
+admin `login`, `logout` and `session` URLs share one function,
+`api/admin/auth.js`, via rewrites in `vercel.json` (`scripts/dev-api.js`
+applies the same rewrites locally). Before adding a new file
+under `api/`, check the count:
+
+```bash
+find api -name '*.js' -not -path '*/_lib/*' -not -name '_*' | wc -l
+```
 
 ```bash
 vercel          # preview deployment

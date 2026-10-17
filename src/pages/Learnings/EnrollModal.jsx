@@ -5,8 +5,10 @@ import {
   EXPERIENCE_LEVELS,
   BATCH_OPTIONS,
   labelOf,
-  COURSE_FEE,
 } from "../../constants/courses";
+import { STATE_OPTIONS } from "../../constants/usStates";
+import { useCourseFees, feeForState, formatFee } from "../../utils/courseFees";
+import { useUserState } from "../../utils/userState";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLock,
@@ -35,6 +37,7 @@ const EMPTY = {
   name: "",
   email: "",
   number: "",
+  state: "",
   experience: "",
   batch: "weekday", // the only batch, so it starts selected
   message: "",
@@ -46,6 +49,7 @@ const FIELD_VALIDATOR = {
   name: validators.name,
   email: validators.email,
   number: requiredPhone,
+  state: (value) => (value ? "" : "Please choose your state."),
   experience: (value) =>
     value ? "" : "Please tell us where you are starting from.",
   batch: (value) => (value ? "" : "Please choose a batch."),
@@ -60,6 +64,7 @@ function describeEnrollment(course, data) {
     ``,
     // Name, email and phone are not repeated here: the endpoint already
     // prints them as their own lines above the message.
+    `State : ${labelOf(STATE_OPTIONS, data.state)}`,
     `Current level : ${labelOf(EXPERIENCE_LEVELS, data.experience)}`,
     `Preferred batch : ${labelOf(BATCH_OPTIONS, data.batch)}`,
     ``,
@@ -92,6 +97,28 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
   useDialogFocus(isOpen, dialogRef);
 
   const sending = status === "sending";
+
+  // The fee depends on the learner's state and is not shown until one is
+  // chosen. Fees are fetched again each time the form opens.
+  const courseFees = useCourseFees(isOpen);
+  const stateFee = feeForState(courseFees, formData.state);
+  const feeText =
+    stateFee !== null
+      ? formatFee(stateFee)
+      : formData.state
+        ? courseFees
+          ? "Confirmed by our team"
+          : "…"
+        : null;
+
+  // The state picked on the course cards, or detected from the IP address,
+  // pre-fills the form; picking one here updates the cards too.
+  const [userState, chooseState] = useUserState();
+  useEffect(() => {
+    if (isOpen && userState) {
+      setFormData((prev) => (prev.state ? prev : { ...prev, state: userState }));
+    }
+  }, [isOpen, userState]);
 
   // A number valid for one country may not be for another, so recheck it
   // as soon as the country changes.
@@ -159,6 +186,7 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
     const next = filters[key] ? filters[key](value) : value;
 
     setFormData((prev) => ({ ...prev, [name]: next }));
+    if (name === "state") chooseState(next);
 
     // Clear an error as soon as it is fixed, rather than making the learner
     // leave the field to find out.
@@ -183,6 +211,7 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
       name: true,
       email: true,
       number: true,
+      state: true,
       experience: true,
       batch: true,
     });
@@ -213,6 +242,8 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
           enrolment: {
             course: course.title,
             courseId: course.id,
+            state: labelOf(STATE_OPTIONS, formData.state),
+            stateCode: formData.state,
             experience: labelOf(EXPERIENCE_LEVELS, formData.experience),
             batch: labelOf(BATCH_OPTIONS, formData.batch),
             notes: formData.message.trim(),
@@ -235,6 +266,10 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
         name: formData.name.trim(),
         email: formData.email.trim(),
         phone,
+        state: labelOf(STATE_OPTIONS, formData.state),
+        // The payment page looks the fee up again by code, so it shows the
+        // current figure rather than whatever was on screen here.
+        stateCode: formData.state,
         experience: labelOf(EXPERIENCE_LEVELS, formData.experience),
         batch: labelOf(BATCH_OPTIONS, formData.batch),
       });
@@ -353,7 +388,8 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
               <div className="enroll-head-text">
                 <h2 id="enroll-title">Apply for {course.title}</h2>
                 <p className="enroll-facts">
-                  {course.duration} · {course.mode}, Mon–Fri · {COURSE_FEE}
+                  {course.duration} · {course.mode}, Mon–Fri
+                  {stateFee !== null && <> · {formatFee(stateFee)}</>}
                 </p>
               </div>
             </header>
@@ -472,6 +508,48 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                 ) : (
                   <span className="field-hint" id="enroll-phone-hint">
                     An advisor will call to confirm your batch
+                  </span>
+                )}
+              </div>
+
+              <div className={`${fieldClass("state")} modal-span`}>
+                <label htmlFor="enroll-state" className="field-label">
+                  State{" "}
+                  <span className="field-required" aria-hidden="true">
+                    *
+                  </span>
+                </label>
+                <select
+                  id="enroll-state"
+                  className={`select${formData.state ? "" : " modal-select-placeholder"}`}
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={sending}
+                  autoComplete="address-level1"
+                  aria-required="true"
+                  aria-invalid={Boolean(errorFor("state"))}
+                  aria-describedby={
+                    errorFor("state") ? "enroll-state-error" : "enroll-state-fee"
+                  }
+                >
+                  <option value="">Select your state</option>
+                  {STATE_OPTIONS.map((state) => (
+                    <option key={state.value} value={state.value}>
+                      {state.label}
+                    </option>
+                  ))}
+                </select>
+                {errorFor("state") ? (
+                  <span className="field-error" id="enroll-state-error">
+                    {errorFor("state")}
+                  </span>
+                ) : (
+                  <span className="field-hint" id="enroll-state-fee" aria-live="polite">
+                    {feeText
+                      ? <>Course fee for your state: <strong>{feeText}</strong></>
+                      : "Course fees are set by state."}
                   </span>
                 )}
               </div>

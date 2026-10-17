@@ -5,8 +5,8 @@
 // /Privacypolicy, /Disclaimer, /e-learning) redirect to these in App.js, so
 // bookmarks and links in emails already sent keep working.
 //
-// /payment and /payment/success must not change: the success URL is set on
-// each Stripe payment link.
+// /payment and /payment/success must not change: api/checkout.js sends
+// Stripe Checkout back to them.
 export const ROUTES = {
   home: "/",
   courses: "/courses",

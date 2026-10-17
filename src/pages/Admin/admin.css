@@ -730,7 +730,8 @@
   margin-left: 24px;
 }
 
-.adm-tabs button {
+.adm-tabs button,
+.adm-tabs a {
   padding: 8px 14px;
   border: 0;
   border-radius: 999px;
@@ -740,58 +741,26 @@
   font-weight: 600;
   color: var(--muted);
   cursor: pointer;
+  text-decoration: none;
 }
 
-.adm-tabs button:hover {
+.adm-tabs button:hover,
+.adm-tabs a:hover {
   color: var(--ink);
   background: var(--surface);
 }
 
-.adm-tabs button.is-active {
+.adm-tabs button.is-active,
+.adm-tabs a.is-active {
   color: var(--emerald-700);
   background: var(--emerald-50);
 }
 
-/* ---------- Payment links ---------- */
+/* ---------- Shared: inline loading, save status ---------- */
 
 .adm-inline-center {
   min-height: 200px;
   background: none;
-}
-
-.adm-link-row {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.6fr);
-  gap: 8px 24px;
-  align-items: center;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--line);
-}
-
-.adm-link-row:last-child {
-  border-bottom: 0;
-}
-
-.adm-link-course {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  color: var(--ink);
-}
-
-.adm-link-form {
-  display: flex;
-  gap: 8px;
-}
-
-.adm-link-form .adm-search {
-  flex: 1;
-  min-width: 0;
-}
-
-.adm-link-row > [role="status"] {
-  grid-column: 2;
 }
 
 .adm-ok-text {
@@ -800,19 +769,6 @@
 
 .adm-error-text {
   color: #b91c1c;
-}
-
-.adm-links-tip {
-  margin-top: 16px;
-  max-width: 760px;
-}
-
-.adm-links-tip code {
-  padding: 1px 6px;
-  border-radius: 6px;
-  background: var(--white);
-  border: 1px solid var(--line);
-  font-size: 0.8rem;
 }
 
 @media (max-width: 760px) {
@@ -826,24 +782,233 @@
     margin: 4px 0 0;
   }
 
-  .adm-tabs button {
+  .adm-tabs button,
+  .adm-tabs a {
+    text-align: center;
     flex: 1;
   }
 
-  .adm-link-row {
+}
+
+/* ---------- State tax ---------- */
+
+.adm-tax-table th,
+.adm-tax-table td {
+  padding: 10px 12px;
+}
+
+.adm-tax-unit {
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.adm-tax-table tbody th.adm-tax-state {
+  display: table-cell;
+  padding: 10px 16px;
+  background: none;
+  border-bottom: 1px solid var(--line);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.adm-tax-state strong {
+  display: block;
+  color: var(--ink);
+}
+
+.adm-tax-input {
+  width: 120px;
+  min-height: 38px;
+  padding: 7px 10px;
+  text-align: right;
+}
+
+.adm-tax-actions {
+  white-space: nowrap;
+}
+
+.adm-tax-actions [role="status"] {
+  margin-left: 10px;
+}
+
+.adm-tax-table tbody tr:hover td,
+.adm-tax-table tbody tr:hover th {
+  background: var(--emerald-50);
+}
+
+/* Keep the state name in view while scrolling across the wide table. */
+.adm-tax-table thead th:first-child,
+.adm-tax-table tbody th.adm-tax-state {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--white);
+  box-shadow: 1px 0 0 var(--line);
+}
+
+.adm-tax-table thead th:first-child {
+  background: var(--surface);
+  z-index: 2;
+}
+
+.adm-tax-table tbody tr:hover th.adm-tax-state {
+  background: var(--emerald-50);
+}
+
+/* What the customer pays, worked out from the inputs on the row. */
+.adm-tax-table .adm-tax-total {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  border-left: 2px solid var(--line);
+}
+
+.adm-tax-table td.adm-tax-total strong {
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.adm-tax-unsaved {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.adm-tax-table td.adm-tax-actions {
+  min-width: 150px;
+}
+
+/* ---------- Payments ---------- */
+
+.adm-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.adm-chip:hover {
+  color: var(--ink);
+}
+
+.adm-chip.is-active {
+  border-color: var(--emerald-600);
+  background: var(--emerald-50);
+  color: var(--emerald-700);
+}
+
+.adm-table .adm-num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Email templates ---------- */
+
+.adm-mail {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.adm-mail-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-mail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.adm-mail-item:last-child {
+  border-bottom: 0;
+}
+
+.adm-mail-item:hover {
+  background: var(--surface);
+}
+
+.adm-mail-item.is-active {
+  background: var(--emerald-50);
+  box-shadow: inset 3px 0 0 var(--emerald-600);
+}
+
+.adm-mail-preview {
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-mail-meta {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.875rem;
+}
+
+.adm-mail-meta div {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.adm-mail-meta dt {
+  color: var(--muted);
+}
+
+.adm-mail-meta dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.adm-mail-frame {
+  width: 100%;
+  height: 760px;
+  border: 0;
+  background: #f5f7fb;
+}
+
+.adm-mail-text {
+  margin: 0;
+  padding: 20px;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+@media (max-width: 900px) {
+  .adm-mail {
     grid-template-columns: 1fr;
-    padding: 16px 14px;
   }
 
-  .adm-link-row > [role="status"] {
-    grid-column: 1;
-  }
-
-  .adm-link-form {
-    flex-wrap: wrap;
-  }
-
-  .adm-link-form .adm-search {
-    flex-basis: 100%;
+  .adm-mail-frame {
+    height: 640px;
   }
 }

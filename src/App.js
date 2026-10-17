@@ -42,7 +42,7 @@ function App() {
         <Route path={ROUTES.disclaimer} element={<Disclaimer />} />
         <Route path={ROUTES.payment} element={withSuspense(<PaymentPage />)} />
         <Route path={ROUTES.paymentSuccess} element={withSuspense(<PaymentSuccess />)} />
-        <Route path="/admin" element={withSuspense(<Admin />)} />
+        <Route path="/admin/:section?" element={withSuspense(<Admin />)} />
 
         {/* Old URLs (bookmarks, links in emails already sent) keep working. */}
         {Object.entries(LEGACY_REDIRECTS).map(([from, to]) => (
@@ -83,21 +83,37 @@ const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const ScrollToTop = () => {
-  const { pathname, hash, key } = useLocation();
+  const { pathname, search, hash, key } = useLocation();
   const lastPath = useRef(null);
+  const lastSearch = useRef(null);
 
   // A layout effect, so the page is already at the top before it paints and
   // before useScrollReveal measures what is on screen. "instant" overrides
   // the smooth scrolling set on <html>, which made every page switch
   // visibly scroll up from wherever the last page was left.
+  //
+  // Keyed on location.key, not pathname: clicking the menu link for the page
+  // you are already on (Home while on Home) keeps the same pathname, so a
+  // pathname-only effect never ran and the click appeared to do nothing.
+  // That case scrolls smoothly, so it reads as "back to the top".
   useLayoutEffect(() => {
     const pageChanged = lastPath.current !== pathname;
+    const searchChanged = lastSearch.current !== search;
     lastPath.current = pathname;
+    lastSearch.current = search;
 
     if (!hash) {
       // Only a new page starts at the top: a filter that changes the query
       // string must not throw the reader back up.
-      if (pageChanged) window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      if (pageChanged) {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      } else if (!searchChanged) {
+        // The same URL again: the menu link for the page you are already on
+        // (Home while on Home). Effects keyed on pathname never saw that
+        // click, so it appeared to do nothing; scroll smoothly back to the
+        // top so it reads as "back to the top".
+        window.scrollTo({ top: 0, left: 0, behavior: prefersReducedMotion() ? "instant" : "smooth" });
+      }
       return undefined;
     }
 
@@ -134,7 +150,7 @@ const ScrollToTop = () => {
     };
     go();
     return () => cancelAnimationFrame(frame);
-  }, [pathname, hash, key]);
+  }, [pathname, search, hash, key]);
 
   return null;
 };

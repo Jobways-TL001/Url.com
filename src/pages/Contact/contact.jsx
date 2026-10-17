@@ -23,7 +23,7 @@ import {
 import Header from "../Header/header";
 import Footer from "../Footer/footer";
 import { COMPANY, telHref } from "../../constants/company";
-import { COURSES, TRACKS, COURSE_FEE } from "../../constants/courses";
+import { COURSES, TRACKS } from "../../constants/courses";
 import { ROUTES } from "../../constants/routes";
 
 // "Book a free call": a form card that asks three short sets of questions in
@@ -119,7 +119,7 @@ const NEXT_STEPS = [
   },
   {
     title: "You get a recommendation",
-    text: `The course and batch that suit you, and the fee (${COURSE_FEE}).`,
+    text: "The course and batch that suit you, and the course fee for your state.",
   },
 ];
 

@@ -13,13 +13,25 @@
   },
   "rewrites": [
     {
+      "source": "/api/admin/login",
+      "destination": "/api/admin/auth?action=login"
+    },
+    {
+      "source": "/api/admin/logout",
+      "destination": "/api/admin/auth?action=logout"
+    },
+    {
+      "source": "/api/admin/session",
+      "destination": "/api/admin/auth?action=session"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
     {
-      "source": "/admin",
+      "source": "/admin/:path*",
       "headers": [
         {
           "key": "X-Robots-Tag",

@@ -716,3 +716,21 @@
     margin-left: 0;
   }
 }
+
+/* ---------- State fee picker in the toolbar ---------- */
+.cat-state {
+  flex: 0 0 270px;
+}
+
+.cat-row-fee.is-pending {
+  color: var(--ink-3);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .cat-state {
+    flex: 1 1 100%;
+    order: 3;
+  }
+}

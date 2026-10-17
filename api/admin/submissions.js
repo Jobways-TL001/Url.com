@@ -1,6 +1,7 @@
 // /api/admin/submissions — enquiries for the admin dashboard.
 //
-//   GET    ?q=&status=&source=&delivery=&period=&page=   one page of rows + total
+//   GET    ?q=&status=&source=&delivery=&payment=&period=&page=   one page + total
+//          (payment: paid, failed, expired, pending or any)
 //   GET    ...same filters...&format=csv                 every matching row as CSV
 //   PATCH  { id, status }                                 change follow-up status
 //
@@ -55,6 +56,8 @@ function applyFilters(query, params) {
   if (SOURCES.includes(params.source)) query = query.eq("source", params.source);
   if (params.delivery === "failed") query = query.eq("email_sent", false);
   if (PAYMENTS.includes(params.payment)) query = query.eq("payment_status", params.payment);
+  // Any payment outcome (the Payments page's "All" view).
+  if (params.payment === "any") query = query.not("payment_status", "is", null);
   // Enrolments that have not reached a payment outcome yet.
   if (params.payment === "pending") {
     query = query.eq("source", "course-enrollment").is("payment_status", null);
@@ -76,14 +79,14 @@ function csvCell(value) {
 function toCsv(rows) {
   const header = [
     "Received (UTC)", "Name", "Email", "Phone", "Service", "Source", "Status",
-    "Course", "Experience", "Batch", "Notes", "Message",
+    "Course", "State", "Experience", "Batch", "Notes", "Message",
     "Email sent", "Acknowledged", "Email error",
     "Payment", "Paid at (UTC)", "Amount paid", "Currency", "Stripe session",
   ];
   const lines = rows.map((r) =>
     [
       r.created_at, r.name, r.email, r.number, r.service, r.source, r.status,
-      r.enrolment?.course, r.enrolment?.experience, r.enrolment?.batch, r.enrolment?.notes,
+      r.enrolment?.course, r.enrolment?.state, r.enrolment?.experience, r.enrolment?.batch, r.enrolment?.notes,
       r.message, r.email_sent, r.acknowledged, r.email_error,
       r.payment_status, r.paid_at,
       r.amount_paid === null || r.amount_paid === undefined ? "" : r.amount_paid / 100,

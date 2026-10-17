@@ -20,6 +20,13 @@ const fs = require("fs");
 const PORT = 3001; // src/setupProxy.js forwards /api here.
 const API_DIR = path.join(__dirname, "..", "api");
 
+// Exact-path /api rewrites from vercel.json: { "/api/admin/login": "/api/admin/auth?action=login" }.
+const API_REWRITES = Object.fromEntries(
+  (JSON.parse(fs.readFileSync(path.join(__dirname, "..", "vercel.json"), "utf8")).rewrites || [])
+    .filter((r) => r.source.startsWith("/api/") && !/[:(*]/.test(r.source))
+    .map((r) => [r.source, r.destination])
+);
+
 // Collect the raw body, then parse JSON — Vercel hands the handler an already
 // parsed req.body, and api/send-email.js is written against that.
 function readBody(req) {
@@ -63,6 +70,14 @@ const server = http.createServer(async (req, res) => {
   decorate(res);
 
   const url = new URL(req.url, `http://localhost:${PORT}`);
+  // Apply vercel.json's /api rewrites (e.g. /api/admin/login ->
+  // /api/admin/auth?action=login), as Vercel does in production.
+  const rewrite = API_REWRITES[url.pathname.replace(/\/+$/, "")];
+  if (rewrite) {
+    const target = new URL(rewrite, url);
+    url.pathname = target.pathname;
+    target.searchParams.forEach((value, key) => url.searchParams.set(key, value));
+  }
   const route = url.pathname.replace(/^\/api\//, "").replace(/\/+$/, "");
   const file = path.join(API_DIR, `${route}.js`);
 

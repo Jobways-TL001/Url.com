@@ -49,10 +49,6 @@ const META = {
     title: `Payment received | ${NAME}`,
     description: "Thank you for enrolling with URL.",
   },
-  "/admin": {
-    title: `Admin | ${NAME}`,
-    description: "URL admin dashboard.",
-  },
 };
 
 const FALLBACK = META[ROUTES.home];

@@ -13,7 +13,8 @@ import {
 import Header from "../Header/header";
 import Footer from "../Footer/footer";
 import EnrollModal from "./EnrollModal";
-import { COURSES, COURSE_FEE, TRACKS } from "../../constants/courses";
+import { COURSES, TRACKS } from "../../constants/courses";
+import { useStateFee, StateSelect } from "../../components/ui/StateFee";
 import { ROUTES } from "../../constants/routes";
 import { LEVELS, levelsOf, matchesQuery, sentenceCase, trackLabel } from "./courseUtils";
 import "./learning.css";
@@ -29,11 +30,11 @@ const FAQS = [
   },
   {
     q: "What does a course cost?",
-    a: `Fees are between ${COURSE_FEE}, depending on the course. An advisor confirms your exact fee with you before you pay.`,
+    a: "The fee is the same for every course and depends on the US state you live in. Choose your state above the course list to see it.",
   },
   {
     q: "How do I pay?",
-    a: "You apply with a short form, then pay through a secure Stripe payment link. We never see or store your card details.",
+    a: "You apply with a short form, then pay the course fee for your state through secure Stripe checkout. We never see or store your card details.",
   },
   {
     q: "What happens after I apply?",
@@ -56,6 +57,10 @@ const countFor = (track) =>
 const Learning = () => {
   const [enrollCourse, setEnrollCourse] = useState(null);
   const [query, setQuery] = useState("");
+  // Fees depend on the learner's state, so no price is shown until one is
+  // known: detected from the IP address on a first visit, or picked in the
+  // toolbar (one choice prices every card, the course pages and the form).
+  const fee = useStateFee();
   const [searchParams, setSearchParams] = useSearchParams();
   const { hash } = useLocation();
   const navigate = useNavigate();
@@ -202,6 +207,14 @@ const Learning = () => {
                   </select>
                 </div>
 
+                <StateSelect
+                  id="cat-state"
+                  className="cat-state"
+                  label="Fees for"
+                  state={fee.state}
+                  onChange={fee.chooseState}
+                />
+
                 <div className="cat-view" role="group" aria-label="Layout">
                   {VIEWS.map((v) => (
                     <button
@@ -267,12 +280,12 @@ const Learning = () => {
               <ul className="cat-grid">
                 {visible.map((course) => (
                   <li key={course.id}>
-                    <CourseCard course={course} onApply={() => setEnrollCourse(course)} />
+                    <CourseCard course={course} fee={fee} onApply={() => setEnrollCourse(course)} />
                   </li>
                 ))}
               </ul>
             ) : (
-              <CourseTable courses={visible} onApply={setEnrollCourse} />
+              <CourseTable courses={visible} fee={fee} onApply={setEnrollCourse} />
             )}
           </div>
         </section>
@@ -354,7 +367,7 @@ const Learning = () => {
 
 // One course in the grid: photo, a short track/level line, title, summary,
 // a few tools and the two actions.
-function CourseCard({ course, onApply }) {
+function CourseCard({ course, fee, onApply }) {
   const extraTools = course.tools.length - CARD_TOOLS;
   return (
     <article className="cat-card">
@@ -394,7 +407,8 @@ function CourseCard({ course, onApply }) {
           )}
         </ul>
         <p className="cat-card-facts">
-          {course.duration} · {course.mode || "Live online"} · {COURSE_FEE}
+          {course.duration} · {course.mode || "Live online"}
+          {fee.known && <> · {fee.label}</>}
         </p>
       </div>
       <div className="cat-card-foot">
@@ -419,7 +433,7 @@ function CourseCard({ course, onApply }) {
 }
 
 // Comparison view: one row per course.
-function CourseTable({ courses, onApply }) {
+function CourseTable({ courses, fee, onApply }) {
   return (
     <div className="cat-table-wrap">
       <table className="cat-table">
@@ -450,8 +464,8 @@ function CourseTable({ courses, onApply }) {
               <td data-label="Track">{trackLabel(course.track)}</td>
               <td data-label="Level">{sentenceCase(course.level)}</td>
               <td data-label="Duration">{course.duration}</td>
-              <td data-label="Fee" className="cat-row-fee">
-                {COURSE_FEE}
+              <td data-label="Fee" className={`cat-row-fee${fee.known ? "" : " is-pending"}`}>
+                {fee.label}
               </td>
               <td className="cat-row-actions">
                 <Link

@@ -1,13 +1,13 @@
 // The AI course catalogue.
 //
-// Every card shows the shared COURSE_FEE range (defined below).
+// Course fees depend on the learner's state and come from /api/course-fees
+// (src/utils/courseFees.js); no fee is shown until a state is known.
 //
-// Payment: each course's Stripe payment link is managed in the admin
-// dashboard (/admin -> Payment links) and looked up by `id` on the /payment
-// page, so the ids here must not change once links are set.
+// Payment: /payment?course=<id> and the enrolment records use these ids,
+// so they must not change once learners have enrolled.
 //
 // Fields
-//   id          stable slug (payment links, URL hashes, enrolment emails)
+//   id          stable slug (payment, URL hashes, enrolment emails)
 //   title       course name
 //   image       card / detail photo (credits in public/images/CREDITS.md)
 //   track       which catalogue filter the course sits under (see TRACKS)
@@ -246,9 +246,6 @@ export const TRACKS = [
   { value: "genai", label: "Generative & Agentic AI" },
   { value: "data", label: "Data & MLOps" },
 ];
-
-// Every course card shows the same fee range.
-export const COURSE_FEE = "$1,000 - $1,400";
 
 // How much experience a learner is starting with, asked on the enrolment
 // form so a mentor can be matched before the first session.

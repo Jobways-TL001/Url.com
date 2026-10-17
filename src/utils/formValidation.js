@@ -165,11 +165,12 @@ function countryName(code) {
 // service field, so there is nothing to select; a phone number is required,
 // because an enrolment is followed up by a call; and the free-text note is
 // optional, since the structured answers already say what a mentor needs.
-export function validateEnrollment({ name, email, number, experience, batch }, country) {
+export function validateEnrollment({ name, email, number, state, experience, batch }, country) {
   const errors = {
     name: validators.name(name || ""),
     email: validators.email(email || ""),
     number: requiredPhone(number, country),
+    state: state ? "" : "Please choose your state.",
     experience: experience ? "" : "Please tell us where you are starting from.",
     batch: batch ? "" : "Please choose a batch.",
   };

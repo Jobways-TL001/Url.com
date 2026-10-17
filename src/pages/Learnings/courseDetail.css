@@ -916,3 +916,21 @@
 .cd-nowrap {
   white-space: nowrap;
 }
+
+/* ---------- State fee picker in the enrol card ---------- */
+.cd-card-state {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+
+.cd-card-state .state-fee-input {
+  width: 100%;
+}
+
+.cd-card-fee.is-pending {
+  color: var(--ink-3);
+  font-size: 1.15rem;
+  font-weight: 600;
+}

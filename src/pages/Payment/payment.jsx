@@ -1,15 +1,15 @@
 // /payment?course=<id>: the required second step of a course enrolment.
 //
 // The enrolment form saves the learner's details (src/utils/enrolmentSession)
-// and redirects here. This page shows the order, then hands over to the
-// course's Stripe payment link, which the team manages in /admin -> Payment
-// links. The learner's email is prefilled at checkout and the enquiry id is
-// sent as client_reference_id, so each Stripe payment can be matched to its
-// enrolment.
+// and redirects here. This page shows the order and the course fee for the
+// learner's state, then hands over to Stripe Checkout through
+// /api/checkout, which charges exactly that fee. The learner's email is
+// prefilled and the enquiry id is sent as client_reference_id, so each
+// Stripe payment is matched to its enrolment.
 //
-// /payment/success is the thank-you page. Set it as the payment link's
-// "after payment" redirect in Stripe.
-import { useEffect, useState } from "react";
+// /payment/success is the thank-you page; api/checkout.js sends Stripe's
+// success redirect there.
+import { useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -21,8 +21,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../Header/header";
 import Footer from "../Footer/footer";
-import { COURSES, COURSE_FEE, TRACKS, labelOf } from "../../constants/courses";
+import { COURSES, TRACKS, labelOf } from "../../constants/courses";
 import { loadEnrolment } from "../../utils/enrolmentSession";
+import { useCourseFees, feeForState, formatFee } from "../../utils/courseFees";
 import "./payment.css";
 import { COMPANY } from "../../constants/company";
 import { ROUTES } from "../../constants/routes";
@@ -32,47 +33,14 @@ import { SuccessMark } from "../Modal/modal";
 
 const CONTACT_EMAIL = COMPANY.email;
 
-// Stripe payment links accept these query parameters: the email is filled
-// in for the learner, and client_reference_id travels with the payment.
-function checkoutUrl(base, enrolment) {
-  try {
-    const url = new URL(base);
-    if (enrolment?.email) url.searchParams.set("prefilled_email", enrolment.email);
-    if (enrolment?.submissionId && /^[\w-]{1,200}$/.test(enrolment.submissionId)) {
-      url.searchParams.set("client_reference_id", enrolment.submissionId);
-    }
-    return url.toString();
-  } catch {
-    return base;
-  }
+// The Stripe checkout for this enrolment: api/checkout.js looks up the
+// enquiry, prices it from the learner's state and opens a Stripe Checkout
+// for exactly that amount.
+function checkoutPath(enrolment) {
+  const id = enrolment?.submissionId;
+  return id && /^[\w-]{1,200}$/.test(id) ? `/api/checkout?enquiry=${encodeURIComponent(id)}` : null;
 }
 
-function usePaymentLink(courseId) {
-  const [state, setState] = useState({ status: "loading", url: null });
-
-  useEffect(() => {
-    if (!courseId) return undefined;
-    const controller = new AbortController();
-    setState({ status: "loading", url: null });
-    fetch(`/api/payment-link?course=${encodeURIComponent(courseId)}`, {
-      signal: controller.signal,
-    })
-      .then(async (res) => {
-        if (res.status === 404) return setState({ status: "missing", url: null });
-        if (!res.ok) throw new Error(String(res.status));
-        const data = await res.json();
-        setState({ status: "ready", url: data.url });
-      })
-      .catch((error) => {
-        if (error.name !== "AbortError") setState({ status: "error", url: null });
-      });
-    return () => controller.abort();
-  }, [courseId]);
-
-  return state;
-}
-
-// Details, then payment, then confirmed. `current` is the 0-based active step.
 function Steps({ current }) {
   const steps = ["Your details", "Payment", "Confirmed"];
   return (
@@ -112,7 +80,13 @@ export default function PaymentPage() {
   const [params] = useSearchParams();
   const course = COURSES.find((c) => c.id === params.get("course"));
   const enrolment = course ? loadEnrolment(course.id) : null;
-  const link = usePaymentLink(enrolment ? course.id : null);
+  // The fee for the state given on the enrolment form. Payment is only
+  // offered when there is one and Stripe can charge it (STRIPE_SECRET_KEY
+  // set); otherwise the team follows up with the learner by email.
+  const courseFees = useCourseFees();
+  const stateFee = feeForState(courseFees, enrolment?.stateCode);
+  const canPay = Boolean(courseFees?.checkout) && stateFee !== null && Boolean(checkoutPath(enrolment));
+  const checkoutFailed = params.get("checkout") === "error";
 
   if (!course) return <Navigate to={ROUTES.courses} replace />;
 
@@ -159,14 +133,39 @@ export default function PaymentPage() {
                       </dl>
                     </div>
 
-                    <PayButton link={link} enrolment={enrolment} />
+                    {checkoutFailed && (
+                      <div className="notice pay-pending" role="alert">
+                        <strong>
+                          <FontAwesomeIcon icon={faClock} aria-hidden="true" />{" "}
+                          We couldn't open the secure checkout just now.
+                        </strong>
+                        <p>
+                          You have not been charged. Please try again, or write to{" "}
+                          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                        </p>
+                      </div>
+                    )}
+                    <PayButton
+                      loading={!courseFees}
+                      href={canPay ? checkoutPath(enrolment) : null}
+                    />
                   </>
                 )}
                 <HelpLine />
               </section>
             </div>
 
-            <OrderSummary course={course} enrolment={enrolment} />
+            <OrderSummary
+              course={course}
+              enrolment={enrolment}
+              fee={
+                stateFee !== null
+                  ? formatFee(stateFee)
+                  : enrolment && !courseFees
+                    ? "…"
+                    : "Confirmed by our team"
+              }
+            />
           </div>
         </div>
       </main>
@@ -176,7 +175,7 @@ export default function PaymentPage() {
 }
 
 // The order: course thumbnail, a few rows and the total.
-function OrderSummary({ course, enrolment }) {
+function OrderSummary({ course, enrolment, fee }) {
   return (
     <aside className="pay-summary" aria-labelledby="pay-summary-title">
       <h2 id="pay-summary-title" className="pay-summary-title">
@@ -214,23 +213,31 @@ function OrderSummary({ course, enrolment }) {
             <dd>{enrolment.experience}</dd>
           </div>
         )}
-        <div>
-          <dt>Fee</dt>
-          <dd>{COURSE_FEE}</dd>
-        </div>
+        {enrolment?.state && (
+          <div>
+            <dt>State</dt>
+            <dd>{enrolment.state}</dd>
+          </div>
+        )}
       </dl>
 
       <div className="pay-total">
-        <span>Total</span>
-        <strong>{COURSE_FEE}</strong>
+        <span>Course fee</span>
+        <strong>{fee}</strong>
       </div>
-      <p className="pay-fee-note">Your exact amount is shown on the Stripe checkout page.</p>
+      <p className="pay-fee-note">
+        The fee is set for your state. The exact amount is shown on the Stripe checkout page.
+      </p>
     </aside>
   );
 }
 
-function PayButton({ link, enrolment }) {
-  if (link.status === "loading") {
+// `href` is the state-priced checkout, or null when online payment is not
+// available for this enrolment (outside the US, no fee for the state yet,
+// or Stripe not configured). The enquiry is already saved, so the team
+// follows up by email.
+function PayButton({ loading, href }) {
+  if (loading) {
     return (
       <div className="pay-loading" aria-live="polite">
         <span className="pay-spinner" aria-hidden="true" /> Preparing secure checkout…
@@ -238,34 +245,24 @@ function PayButton({ link, enrolment }) {
     );
   }
 
-  if (link.status !== "ready") {
-    // No link set for this course yet (or it could not be loaded). The
-    // enrolment is already with the team, so they can send one.
+  if (!href) {
     return (
       <div className="notice pay-pending" role="status">
         <strong>
-          <FontAwesomeIcon icon={faClock} aria-hidden="true" />{" "}
-          {link.status === "missing"
-            ? "Online payment for this course is being set up."
-            : "We couldn't load the checkout just now."}
+          <FontAwesomeIcon icon={faClock} aria-hidden="true" /> Our team will confirm your fee and payment.
         </strong>
         <p>
-          Your details are saved. An advisor will email you a secure payment
-          link within one business day, or you can write to{" "}
+          Your details are saved. An advisor will email you within one business
+          day with your course fee and how to pay, or you can write to{" "}
           <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
         </p>
-        {link.status === "error" && (
-          <button type="button" className="btn btn-link pay-retry" onClick={() => window.location.reload()}>
-            Try again
-          </button>
-        )}
       </div>
     );
   }
 
   return (
     <div className="pay-cta">
-      <a className="btn btn-primary btn-lg btn-block pay-btn" href={checkoutUrl(link.url, enrolment)}>
+      <a className="btn btn-primary btn-lg btn-block pay-btn" href={href}>
         <FontAwesomeIcon icon={faLock} aria-hidden="true" /> Pay securely with Stripe
       </a>
       <ul className="pay-trust">

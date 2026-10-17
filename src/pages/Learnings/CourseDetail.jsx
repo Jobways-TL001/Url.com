@@ -19,7 +19,8 @@ import Header from "../Header/header";
 import Footer from "../Footer/footer";
 import Modal from "../Modal/modal";
 import EnrollModal from "./EnrollModal";
-import { COURSES, COURSE_FEE } from "../../constants/courses";
+import { COURSES } from "../../constants/courses";
+import { useStateFee, StateSelect } from "../../components/ui/StateFee";
 import { COMPANY } from "../../constants/company";
 import { ROUTES } from "../../constants/routes";
 import {
@@ -134,7 +135,7 @@ function faqsFor(course) {
     },
     {
       q: "What does it cost, and how do I pay?",
-      a: `Fees are between ${COURSE_FEE}. An advisor confirms the exact fee for this course before you pay. You apply with a short form, then pay securely through Stripe.`,
+      a: "The fee depends on the US state you live in: choose yours in the Course fee panel to see it. You apply with a short form, then pay that fee securely through Stripe.",
     },
   ];
 }
@@ -166,6 +167,8 @@ function CourseView({ course }) {
   const [openModules, setOpenModules] = useState(() => new Set([0]));
   const [active, setActive] = useState(SECTIONS[0].id);
   const [showBar, setShowBar] = useState(false);
+  // The fee for the visitor's state (the same for every course).
+  const fee = useStateFee();
   const titleRef = useRef(null);
   const cardRef = useRef(null);
   const subnavRef = useRef(null);
@@ -291,7 +294,7 @@ function CourseView({ course }) {
       ),
     },
     { icon: faSignal, label: "Level", value: sentenceCase(course.level) },
-    { icon: faWallet, label: "Fee", value: COURSE_FEE },
+    { icon: faWallet, label: "Fee", value: fee.label },
     { icon: faBriefcase, label: "Prepares you for", value: course.role },
   ];
 
@@ -356,9 +359,20 @@ function CourseView({ course }) {
               <h2 id="cd-card-title" className="cd-card-heading">
                 Course fee
               </h2>
-              <p className="cd-card-fee">{COURSE_FEE}</p>
+              <StateSelect
+                id="cd-state"
+                className="cd-card-state"
+                label="Your state"
+                state={fee.state}
+                onChange={fee.chooseState}
+              />
+              <p className={`cd-card-fee${fee.known ? "" : " is-pending"}`} aria-live="polite">
+                {fee.label}
+              </p>
               <p className="cd-card-note">
-                An advisor confirms your exact fee before you pay.
+                {fee.known
+                  ? "The fee for your state, charged securely through Stripe."
+                  : "Fees are set by state. An advisor confirms yours if it isn't shown."}
               </p>
 
               <h3 className="cd-card-sub">What's included</h3>
@@ -625,7 +639,8 @@ function CourseView({ course }) {
                       </h3>
                       <p className="cd-rel-summary">{c.summary}</p>
                       <p className="cd-rel-facts">
-                        {c.duration} · {c.mode} · {COURSE_FEE}
+                        {c.duration} · {c.mode}
+                        {fee.known && <> · {fee.label}</>}
                       </p>
                     </div>
                   </article>
@@ -643,7 +658,7 @@ function CourseView({ course }) {
       >
         <div className="cd-mbar-fee">
           <span>Course fee</span>
-          <strong>{COURSE_FEE}</strong>
+          <strong>{fee.label}</strong>
         </div>
         <button type="button" className="btn btn-primary" onClick={() => setEnrollOpen(true)}>
           Apply now

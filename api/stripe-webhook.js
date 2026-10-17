@@ -1,7 +1,7 @@
 // POST /api/stripe-webhook — Stripe tells us how a payment ended.
 //
 // How we know: Stripe sends an event to this URL whenever a checkout made
-// from one of our payment links changes state. Each request is signed with
+// by api/checkout.js changes state. Each request is signed with
 // STRIPE_WEBHOOK_SECRET (Stripe Dashboard -> Developers -> Webhooks), so a
 // forged "payment succeeded" is rejected. The /payment page attached the
 // enquiry id as client_reference_id, which ties the payment to the learner.
@@ -114,21 +114,13 @@ async function findEnquiry(supabase, ref) {
   return data;
 }
 
-// The link that takes the learner back to checkout, prefilled as before.
-async function retryUrl(supabase, enquiry, email) {
-  const courseId = enquiry?.enrolment?.courseId;
-  if (supabase && courseId) {
-    const { data } = await supabase
-      .from("course_payment_links")
-      .select("url")
-      .eq("course_id", courseId)
-      .maybeSingle();
-    if (data?.url) {
-      const url = new URL(data.url);
-      if (email) url.searchParams.set("prefilled_email", email);
-      url.searchParams.set("client_reference_id", enquiry.id);
-      return url.toString();
-    }
+// The link that takes the learner back to checkout: api/checkout.js opens a
+// fresh Stripe Checkout for their state's fee. `apiOrigin` is the domain
+// Stripe called this webhook on, which serves /api (url.com is a static
+// host and does not).
+function retryUrl(enquiry, apiOrigin) {
+  if (enquiry?.id && apiOrigin) {
+    return `${apiOrigin}/api/checkout?enquiry=${encodeURIComponent(enquiry.id)}`;
   }
   return `${SITE_URL}/courses`;
 }
@@ -214,14 +206,13 @@ function teamMail(kind, p) {
       `Enquiry id : ${p.enquiryId || "Not linked (paid outside the /payment page)"}`,
       ``,
       kind === "paid"
-        ? "The enquiry has been marked Paid in the admin dashboard. Confirm the learner's batch, then set it to Enrolled."
+        ? "The enquiry has been marked Paid. Confirm the learner's batch, then set it to Enrolled."
         : "The learner has been emailed a link to complete payment. Consider a follow-up call.",
-      `${SITE_URL}/admin`,
     ].join("\n"),
   };
 }
 
-async function handle(event, supabase) {
+async function handle(event, supabase, apiOrigin) {
   const kind = outcomeOf(event);
   if (!kind) return "ignored";
 
@@ -249,7 +240,7 @@ async function handle(event, supabase) {
     enquiryId: enquiry?.id || null,
     retryUrl: null,
   };
-  if (kind !== "paid") p.retryUrl = await retryUrl(supabase, enquiry, email);
+  if (kind !== "paid") p.retryUrl = retryUrl(enquiry, apiOrigin);
 
   if (enquiry) {
     const update =
@@ -330,7 +321,9 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const result = await handle(event, supabase);
+    const host = String(req.headers?.["x-forwarded-host"] || req.headers?.host || "");
+    const apiOrigin = /^[a-z0-9.-]+(:\d+)?$/i.test(host) ? `https://${host}` : null;
+    const result = await handle(event, supabase, apiOrigin);
     return res.status(200).json({ received: true, result });
   } catch (error) {
     console.error("stripe-webhook: handling failed:", error.message || error);
@@ -343,3 +336,6 @@ module.exports = async function handler(req, res) {
 // Exposed for tests.
 module.exports.verifySignature = verifySignature;
 module.exports.formatAmount = formatAmount;
+// Used by /api/admin/email-previews to show these emails in the dashboard.
+module.exports.learnerMail = learnerMail;
+module.exports.teamMail = teamMail;

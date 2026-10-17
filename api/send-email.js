@@ -91,7 +91,7 @@ function acknowledgementMail({ name, email, number, message, service, source, en
         steps: [
           [
             "Complete your payment",
-            "Your seat is confirmed once payment is complete. If you have not paid yet, an advisor will send you a secure payment link.",
+            "Your seat is confirmed once payment is complete. If you have not paid yet, an advisor will email you how to complete payment.",
           ],
           [
             "We confirm your batch",
@@ -105,6 +105,7 @@ function acknowledgementMail({ name, email, number, message, service, source, en
         detailsHeading: "Your enrolment details",
         rows: [
           ["Course", enrolment.course],
+          ...(enrolment.state ? [["State", enrolment.state]] : []),
           ["Current level", enrolment.experience || "Not provided"],
           ["Preferred batch", enrolment.batch || "Not provided"],
           ["Name", name],
@@ -273,6 +274,10 @@ module.exports = async function handler(req, res) {
           // Matches src/constants/courses.js ids; used by the payment emails
           // to find the course's Stripe link. Dropped if malformed.
           courseId: /^[a-z0-9-]{1,60}$/.test(String(raw.courseId || "")) ? raw.courseId : null,
+          state: headerSafe(String(raw.state || "")).slice(0, LIMITS.field),
+          // Two-letter US state code; api/checkout.js prices the course
+          // from it. Dropped for "Outside the United States" or if malformed.
+          stateCode: /^[A-Z]{2}$/.test(String(raw.stateCode || "")) ? raw.stateCode : null,
           experience: headerSafe(String(raw.experience || "")).slice(0, LIMITS.field),
           batch: headerSafe(String(raw.batch || "")).slice(0, LIMITS.field),
           notes: String(raw.notes || "").trim().slice(0, LIMITS.message),
@@ -358,3 +363,7 @@ module.exports = async function handler(req, res) {
 
   return respond();
 };
+
+// Used by /api/admin/email-previews to show these emails in the dashboard.
+module.exports.notificationMail = notificationMail;
+module.exports.acknowledgementMail = acknowledgementMail;

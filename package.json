@@ -28,7 +28,7 @@
     "web-vitals": "^2.1.4"
   },
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "vercel dev",

@@ -15,7 +15,7 @@ import Header from "../Header/header";
 import SectionHead from "../../components/ui/SectionHead";
 import CtaBand from "../../components/ui/CtaBand";
 import CourseFinder from "../../components/CourseFinder/CourseFinder";
-import { COURSES, COURSE_FEE } from "../../constants/courses";
+import { COURSES } from "../../constants/courses";
 import { ROUTES } from "../../constants/routes";
 import FeaturedCourses from "./FeaturedCourses";
 import "./home.css";
@@ -118,7 +118,7 @@ const FAQS = [
   },
   {
     q: "How much does a course cost?",
-    a: `Course fees are ${COURSE_FEE}, depending on the course. An advisor can confirm the fee for your course on a free call.`,
+    a: "The fee is the same for every course and depends on the US state you live in. Pick your state on the Courses page to see it, or ask an advisor on a free call.",
   },
   {
     q: "What career support is included?",

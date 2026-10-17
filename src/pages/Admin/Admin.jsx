@@ -4,10 +4,19 @@
 // the session in HttpOnly cookies. This page never sees a token or a
 // Supabase key; it only knows whether the API says it is signed in.
 import { useCallback, useEffect, useRef, useState } from "react";
+import { NavLink, Navigate, useParams } from "react-router-dom";
 import { SERVICES } from "../../constants/services";
-import { COURSES } from "../../constants/courses";
+import { US_STATES } from "../../constants/usStates";
+import { courseFeeFrom } from "../../utils/courseFees";
 import Logo from "../../components/ui/Logo";
 import "./admin.css";
+
+// Whole dollars without cents ($1,658), otherwise two decimals ($652.50).
+const usdTotal = (n) =>
+  `$${n.toLocaleString("en-US", {
+    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })}`;
 
 const STATUSES = [
   { value: "new", label: "New" },
@@ -231,6 +240,14 @@ function Login({ notice, onSignedIn }) {
 
 const EMPTY_FILTERS = { status: "", source: "", delivery: "", period: "", payment: "" };
 
+// Admin sections, each at its own URL: /admin/<path>.
+const SECTIONS = [
+  { path: "enquiries", label: "Enquiries" },
+  { path: "payments", label: "Payments" },
+  { path: "state-tax", label: "State tax" },
+  { path: "emails", label: "Email templates" },
+];
+
 function Dashboard({ email, onExpired, onSignOut }) {
   const [stats, setStats] = useState(null);
   const [searchInput, setSearchInput] = useState("");
@@ -245,7 +262,10 @@ function Dashboard({ email, onExpired, onSignOut }) {
   // the rows quietly instead of dimming the table.
   const silentReload = useRef(false);
   const [selectedId, setSelectedId] = useState(null);
-  const [view, setView] = useState("enquiries"); // "enquiries" | "links"
+  // The section comes from the URL (/admin/<section>), so a refresh, the
+  // browser's Back/Forward and bookmarks all land on the right page.
+  const { section } = useParams();
+  const view = SECTIONS.some((s) => s.path === section) ? section : null;
 
   const handleError = useCallback(
     (err) => {
@@ -358,22 +378,15 @@ function Dashboard({ email, onExpired, onSignOut }) {
           <span className="adm-brand-tag">Admin</span>
         </div>
         <nav className="adm-tabs" aria-label="Admin sections">
-          <button
-            type="button"
-            className={view === "enquiries" ? "is-active" : undefined}
-            aria-current={view === "enquiries" ? "page" : undefined}
-            onClick={() => setView("enquiries")}
-          >
-            Enquiries
-          </button>
-          <button
-            type="button"
-            className={view === "links" ? "is-active" : undefined}
-            aria-current={view === "links" ? "page" : undefined}
-            onClick={() => setView("links")}
-          >
-            Payment links
-          </button>
+          {SECTIONS.map((s) => (
+            <NavLink
+              key={s.path}
+              to={`/admin/${s.path}`}
+              className={({ isActive }) => (isActive ? "is-active" : undefined)}
+            >
+              {s.label}
+            </NavLink>
+          ))}
         </nav>
         <div className="adm-user">
           <span className="adm-user-email" title={email}>
@@ -385,8 +398,15 @@ function Dashboard({ email, onExpired, onSignOut }) {
         </div>
       </header>
 
-      {view === "links" ? (
-        <PaymentLinks onError={handleError} />
+      {!view ? (
+        // /admin, or a section that does not exist.
+        <Navigate to="/admin/enquiries" replace />
+      ) : view === "state-tax" ? (
+        <StateTaxes onError={handleError} />
+      ) : view === "payments" ? (
+        <Payments onError={handleError} />
+      ) : view === "emails" ? (
+        <EmailTemplates onError={handleError} />
       ) : (
       <main className="adm-main">
         <div className="adm-heading">
@@ -668,6 +688,7 @@ function Detail({ row, onClose, onStatus }) {
           {enrolment && (
             <>
               <Field label="Course" value={enrolment.course} />
+              {enrolment.state && <Field label="State" value={enrolment.state} />}
               <Field label="Experience" value={enrolment.experience || "Not provided"} />
               <Field label="Preferred batch" value={enrolment.batch || "Not provided"} />
               {enrolment.notes && <Field label="Notes" value={enrolment.notes} />}
@@ -718,20 +739,49 @@ function Field({ label, value, small }) {
   );
 }
 
-// Per-course Stripe payment links, used by the /payment page.
-function PaymentLinks({ onError }) {
-  const [links, setLinks] = useState(null);
+// Per-state W2 cost inputs: hours per month, hourly pay rate, employee and
+// employer tax and the amount payable to the vendor (dollars, stored as
+// company_margin). Every state is listed; each
+// row is edited in place and saved on its own.
+const TAX_FIELDS = [
+  { key: "hoursPerMonth", label: "Hours per month", unit: "hrs", step: "0.5", max: 744 },
+  { key: "payRate", label: "Pay rate per hour", unit: "$", step: "0.01", max: 100000 },
+  { key: "employeeTax", label: "Employee tax", unit: "%", step: "0.001", max: 100 },
+  { key: "employerTax", label: "Employer tax", unit: "%", step: "0.001", max: 100 },
+  { key: "companyMargin", label: "Payable to Vendor", unit: "$", step: "0.01", max: 1000000 },
+];
+
+// Saved value -> input text. Blank when not filled in.
+function taxDraftOf(rate) {
+  return Object.fromEntries(
+    TAX_FIELDS.map(({ key }) => [key, rate?.[key] === null || rate?.[key] === undefined ? "" : String(rate[key])])
+  );
+}
+
+function taxDirty(draft, rate) {
+  const saved = taxDraftOf(rate);
+  return TAX_FIELDS.some(({ key }) => {
+    const a = (draft?.[key] ?? "").trim();
+    const b = saved[key];
+    if (a === "" || b === "") return a !== b;
+    return Number(a) !== Number(b);
+  });
+}
+
+function StateTaxes({ onError }) {
+  const [rates, setRates] = useState(null);
   const [drafts, setDrafts] = useState({});
-  const [saving, setSaving] = useState("");
+  const [saving, setSaving] = useState({}); // { [stateCode]: true } while saving
   const [messages, setMessages] = useState({});
   const [loadError, setLoadError] = useState("");
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
-    api("/api/admin/payment-links", { signal: controller.signal })
+    api("/api/admin/state-taxes", { signal: controller.signal })
       .then((data) => {
-        setLinks(data.links);
-        setDrafts(Object.fromEntries(COURSES.map((c) => [c.id, data.links[c.id]?.url || ""])));
+        setRates(data.rates);
+        setDrafts(Object.fromEntries(US_STATES.map((s) => [s.value, taxDraftOf(data.rates[s.value])])));
       })
       .catch((err) => {
         if (err.name === "AbortError") return;
@@ -741,41 +791,76 @@ function PaymentLinks({ onError }) {
     return () => controller.abort();
   }, [onError]);
 
-  async function save(courseId) {
-    setSaving(courseId);
-    setMessages((m) => ({ ...m, [courseId]: null }));
+  function edit(state, key, value) {
+    setDrafts((d) => ({ ...d, [state]: { ...d[state], [key]: value } }));
+    setMessages((m) => ({ ...m, [state]: null }));
+  }
+
+  // Rows save themselves when a box is left (blur, Tab or Enter), so a
+  // change reaches the website's course fee without a Save click. Saving on
+  // leaving the box rather than on every keystroke means a half-typed value
+  // ("2" on the way to "200") never goes live.
+  //
+  // Several saves for one row can overlap (tabbing across its boxes); each
+  // gets a number, and only the newest one's reply is applied, so an older
+  // reply arriving late cannot undo a newer value.
+  const saveSeq = useRef({});
+
+  async function save(state) {
+    const draft = drafts[state] || {};
+    if (!taxDirty(draft, rates?.[state])) return;
+    const seq = (saveSeq.current[state] || 0) + 1;
+    saveSeq.current[state] = seq;
+    const isLatest = () => saveSeq.current[state] === seq;
+
+    setSaving((s) => ({ ...s, [state]: true }));
+    setMessages((m) => ({ ...m, [state]: null }));
     try {
-      const saved = await api("/api/admin/payment-links", {
-        method: "PUT",
-        body: { course: courseId, url: drafts[courseId] || "" },
-      });
-      setLinks((l) => {
-        const next = { ...l };
-        if (saved.url) next[courseId] = { url: saved.url, updated_at: saved.updated_at };
-        else delete next[courseId];
+      const body = { state };
+      for (const { key } of TAX_FIELDS) body[key] = (draft[key] ?? "").trim();
+      const saved = await api("/api/admin/state-taxes", { method: "PUT", body });
+      if (!isLatest()) return;
+      setRates((r) => {
+        const next = { ...r };
+        if (saved.rate) next[state] = saved.rate;
+        else delete next[state];
         return next;
       });
-      setDrafts((d) => ({ ...d, [courseId]: saved.url || "" }));
+      // The boxes are left as typed: replacing them with the saved values
+      // could wipe out something typed while this save was in flight.
       setMessages((m) => ({
         ...m,
-        [courseId]: { ok: true, text: saved.url ? "Saved. Live on the payment page." : "Link removed." },
+        [state]: { ok: true, text: saved.rate ? "Saved · website updated" : "Cleared" },
       }));
     } catch (err) {
       if (err.status === 401 || err.status === 403) return onError(err);
-      setMessages((m) => ({ ...m, [courseId]: { ok: false, text: err.message } }));
+      if (isLatest()) setMessages((m) => ({ ...m, [state]: { ok: false, text: err.message } }));
     } finally {
-      setSaving("");
+      if (isLatest()) setSaving((s) => ({ ...s, [state]: false }));
     }
   }
+
+  const needle = filter.trim().toLowerCase();
+  const shown = needle
+    ? US_STATES.filter(
+        (s) => s.label.toLowerCase().includes(needle) || s.value.toLowerCase() === needle
+      )
+    : US_STATES;
+  const filled = rates ? Object.keys(rates).length : 0;
 
   return (
     <main className="adm-main">
       <div className="adm-heading">
         <div>
-          <h1>Payment links</h1>
+          <h1>State tax</h1>
           <p className="adm-muted">
-            The Stripe payment link each course's /payment page opens. Create a
-            link in Stripe (Payment Links &rarr; New), paste it here and save.
+            Hours, pay rate, taxes and the amount payable to the vendor for each
+            state. Taxes are percentages; pay rate (per hour) and payable to
+            vendor are US dollars. Leave a value blank if it is not known yet.
+            Total is what the customer pays: pay rate &times; hours + employer
+            tax + payable to vendor. Employee tax is withheld from the employee&rsquo;s pay, so it
+            does not change it. Changes save automatically when you leave a box,
+            and the website&rsquo;s course fee updates within seconds.
           </p>
         </div>
       </div>
@@ -786,75 +871,400 @@ function PaymentLinks({ onError }) {
         </div>
       )}
 
-      {!links && !loadError && (
+      {!rates && !loadError && (
         <div className="adm-center adm-inline-center">
           <div className="adm-spinner" aria-label="Loading" />
         </div>
       )}
 
-      {links && (
-        <section className="adm-panel adm-links">
-          {COURSES.map((course) => {
-            const current = links[course.id];
-            const draft = drafts[course.id] ?? "";
-            const dirty = draft.trim() !== (current?.url || "");
-            const message = messages[course.id];
-            return (
-              <div className="adm-link-row" key={course.id}>
-                <div className="adm-link-course">
-                  <strong>{course.title}</strong>
-                  <span className={`adm-badge ${current ? "adm-badge-ok" : "adm-badge-bad"}`}>
-                    {current ? "Link set" : "No link — learners see “team will send a link”"}
-                  </span>
-                  {current?.updated_at && (
-                    <span className="adm-muted adm-small">Updated {formatDate(current.updated_at)}</span>
-                  )}
-                </div>
-                <form
-                  className="adm-link-form"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    save(course.id);
-                  }}
-                >
-                  <input
-                    type="url"
-                    className="adm-search"
-                    placeholder="https://buy.stripe.com/..."
-                    value={draft}
-                    onChange={(e) => setDrafts((d) => ({ ...d, [course.id]: e.target.value }))}
-                    aria-label={`Stripe payment link for ${course.title}`}
-                  />
-                  <button
-                    type="submit"
-                    className="btn btn-primary btn-sm"
-                    disabled={!dirty || saving === course.id}
+      {rates && (
+        <section className="adm-panel">
+          <div className="adm-filters">
+            <input
+              type="search"
+              className="adm-search"
+              placeholder="Find a state…"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              aria-label="Find a state"
+            />
+            <span className="adm-muted adm-small">
+              {filled} of {US_STATES.length} states filled in
+            </span>
+          </div>
+          <div className="adm-table-wrap">
+            <table className="adm-table adm-tax-table">
+              <thead>
+                <tr>
+                  <th scope="col">State</th>
+                  {TAX_FIELDS.map((f) => (
+                    <th scope="col" key={f.key}>
+                      {f.label} <span className="adm-tax-unit">({f.unit})</span>
+                    </th>
+                  ))}
+                  <th
+                    scope="col"
+                    className="adm-tax-total"
+                    title="What the customer pays: pay rate × hours + employer tax + payable to vendor"
                   >
-                    {saving === course.id ? "Saving…" : !draft.trim() && current ? "Remove" : "Save"}
-                  </button>
-                  {current && (
-                    <a className="btn btn-secondary btn-sm" href={current.url} target="_blank" rel="noopener noreferrer">
-                      Open
-                    </a>
-                  )}
-                </form>
-                {message && (
-                  <div className={`adm-small ${message.ok ? "adm-ok-text" : "adm-error-text"}`} role="status">
-                    {message.text}
-                  </div>
+                    Total <span className="adm-tax-unit">($)</span>
+                  </th>
+                  <th scope="col">
+                    <span className="visually-hidden">Save status</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {shown.map((s) => {
+                  const draft = drafts[s.value] || {};
+                  const dirty = taxDirty(draft, rates[s.value]);
+                  const message = messages[s.value];
+                  // From the values on screen, so it updates as you type.
+                  const total = courseFeeFrom(draft);
+                  // The website and checkout use the saved figures, so say
+                  // when the Total on screen has not been saved yet.
+                  const savedTotal = rates[s.value] ? courseFeeFrom(rates[s.value]) : null;
+                  return (
+                    <tr key={s.value}>
+                      <th scope="row" className="adm-tax-state">
+                        <strong>{s.label}</strong>
+                        <span className="adm-muted adm-small">{s.value}</span>
+                      </th>
+                      {TAX_FIELDS.map((f) => (
+                        <td key={f.key}>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min="0"
+                            max={f.max}
+                            step={f.step}
+                            className="adm-search adm-tax-input"
+                            value={draft[f.key] ?? ""}
+                            onChange={(e) => edit(s.value, f.key, e.target.value)}
+                            onBlur={() => save(s.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") save(s.value);
+                            }}
+                            aria-label={`${f.label} for ${s.label}`}
+                          />
+                        </td>
+                      ))}
+                      <td className="adm-tax-total">
+                        {total !== null ? (
+                          <strong>{usdTotal(total)}</strong>
+                        ) : (
+                          <span className="adm-muted" title="Needs hours per month and a pay rate">
+                            —
+                          </span>
+                        )}
+                        {dirty && !saving[s.value] && total !== savedTotal && (
+                          <span className="adm-tax-unsaved">
+                            Saves when you leave the box · website shows{" "}
+                            {savedTotal !== null ? usdTotal(savedTotal) : "no fee"}
+                          </span>
+                        )}
+                      </td>
+                      <td className="adm-tax-actions">
+                        {saving[s.value] ? (
+                          <span className="adm-small adm-muted" role="status">
+                            Saving…
+                          </span>
+                        ) : message && (
+                          <span
+                            className={`adm-small ${message.ok ? "adm-ok-text" : "adm-error-text"}`}
+                            role="status"
+                          >
+                            {message.text}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {!shown.length && (
+                  <tr>
+                    <td colSpan={TAX_FIELDS.length + 3} className="adm-empty">
+                      No state matches &ldquo;{filter}&rdquo;.
+                    </td>
+                  </tr>
                 )}
-              </div>
-            );
-          })}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
+    </main>
+  );
+}
 
-      <p className="adm-muted adm-small adm-links-tip">
-        Tip: in each Stripe payment link, set &ldquo;After payment&rdquo; &rarr; &ldquo;Don&rsquo;t show
-        confirmation page&rdquo; and redirect to <code>{window.location.origin}/payment/success</code>.
-        The learner&rsquo;s email is prefilled, and the enquiry id is sent as the payment&rsquo;s
-        client reference.
-      </p>
+// Every enrolment payment Stripe has reported (paid, failed, not completed),
+// newest first, with totals. Rows come from the same enquiries API, filtered
+// to ones with a payment outcome; amounts are what Stripe actually charged.
+const PAYMENT_TABS = [
+  { value: "any", label: "All" },
+  { value: "paid", label: "Paid" },
+  { value: "failed", label: "Failed" },
+  { value: "expired", label: "Not completed" },
+  { value: "pending", label: "Awaiting payment" },
+];
+
+function stripeLink(sessionId) {
+  return `https://dashboard.stripe.com/search?query=${encodeURIComponent(sessionId)}`;
+}
+
+function Payments({ onError }) {
+  const [tab, setTab] = useState("any");
+  const [page, setPage] = useState(1);
+  const [result, setResult] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    api("/api/admin/stats", { signal: controller.signal })
+      .then(setStats)
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        if (err.status === 401 || err.status === 403) onError(err);
+      });
+    return () => controller.abort();
+  }, [onError]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setError("");
+    api(`/api/admin/submissions?payment=${tab}&page=${page}`, { signal: controller.signal })
+      .then(setResult)
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        if (err.status === 401 || err.status === 403) onError(err);
+        else setError(err.message);
+      });
+    return () => controller.abort();
+  }, [tab, page, onError]);
+
+  const pages = result ? Math.max(1, Math.ceil(result.total / result.pageSize)) : 1;
+  const revenue = stats?.revenue && Object.keys(stats.revenue).length
+    ? Object.entries(stats.revenue).map(([cur, cents]) => formatMoney(cents, cur)).join(" + ")
+    : formatMoney(0, "usd");
+
+  return (
+    <main className="adm-main">
+      <div className="adm-heading">
+        <div>
+          <h1>Payments</h1>
+          <p className="adm-muted">
+            Course payments made through Stripe Checkout. A payment shows here as
+            soon as Stripe confirms it; refunds and payouts are in Stripe.
+          </p>
+        </div>
+      </div>
+
+      <section className="adm-stats" aria-label="Payment totals">
+        <StatCard label="Revenue" value={stats ? revenue : undefined} tone="teal" />
+        <StatCard label="Paid" value={stats?.paid} onClick={() => { setTab("paid"); setPage(1); }} />
+        <StatCard label="Failed" value={stats?.paymentsFailed} onClick={() => { setTab("failed"); setPage(1); }} />
+        <StatCard label="Not completed" value={stats?.paymentsExpired} onClick={() => { setTab("expired"); setPage(1); }} />
+      </section>
+
+      <section className="adm-panel">
+        <div className="adm-filters" role="tablist" aria-label="Payment status">
+          {PAYMENT_TABS.map((t) => (
+            <button
+              key={t.value}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.value}
+              className={`adm-chip${tab === t.value ? " is-active" : ""}`}
+              onClick={() => {
+                setTab(t.value);
+                setPage(1);
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {error && (
+          <div className="adm-alert" role="alert">
+            {error}
+          </div>
+        )}
+
+        <div className={`adm-table-wrap${result ? "" : " is-loading"}`}>
+          <table className="adm-table">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Learner</th>
+                <th scope="col">Course</th>
+                <th scope="col">State</th>
+                <th scope="col">Status</th>
+                <th scope="col" className="adm-num">Amount</th>
+                <th scope="col">Stripe</th>
+              </tr>
+            </thead>
+            <tbody>
+              {result?.rows.map((row) => (
+                <tr key={row.id}>
+                  <td className="adm-small">{formatDate(row.paid_at || row.created_at)}</td>
+                  <td>
+                    <strong>{row.name}</strong>
+                    <div className="adm-muted adm-small">{row.email}</div>
+                  </td>
+                  <td>{row.enrolment?.course || "—"}</td>
+                  <td>{row.enrolment?.state || "—"}</td>
+                  <td>
+                    <PaymentBadge row={{ ...row, amount_paid: null }} />
+                  </td>
+                  <td className="adm-num">
+                    {row.amount_paid !== null && row.amount_paid !== undefined
+                      ? formatMoney(row.amount_paid, row.payment_currency)
+                      : "—"}
+                  </td>
+                  <td>
+                    {row.stripe_session_id ? (
+                      <a href={stripeLink(row.stripe_session_id)} target="_blank" rel="noopener noreferrer">
+                        Open
+                      </a>
+                    ) : (
+                      <span className="adm-muted">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {result && !result.rows.length && (
+                <tr>
+                  <td colSpan={7} className="adm-empty">
+                    No payments here yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {result && result.total > result.pageSize && (
+          <div className="adm-pager">
+            <span className="adm-muted adm-small">
+              Page {page} of {pages} · {result.total} payments
+            </span>
+            <div className="adm-pager-buttons">
+              <button type="button" className="btn btn-secondary btn-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                Previous
+              </button>
+              <button type="button" className="btn btn-secondary btn-sm" disabled={page >= pages} onClick={() => setPage((p) => p + 1)}>
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+// Every email the site sends, rendered with sample data exactly as it is
+// built for real (api/admin/email-previews.js). Nothing is sent.
+function EmailTemplates({ onError }) {
+  const [templates, setTemplates] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    api("/api/admin/email-previews", { signal: controller.signal })
+      .then((data) => {
+        const emails = Array.isArray(data?.emails) ? data.emails : [];
+        setTemplates(emails);
+        setSelected(emails[0]?.key || null);
+      })
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        if (err.status === 401 || err.status === 403) onError(err);
+        else setError(err.message);
+      });
+    return () => controller.abort();
+  }, [onError]);
+
+  const current = templates?.find((t) => t.key === selected) || null;
+
+  return (
+    <main className="adm-main">
+      <div className="adm-heading">
+        <div>
+          <h1>Email templates</h1>
+          <p className="adm-muted">
+            Every email the site sends, shown with sample details. Learner emails
+            are branded; team notifications are plain text. Previews only —
+            nothing is sent.
+          </p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="adm-alert" role="alert">
+          {error}
+        </div>
+      )}
+
+      {!templates && !error && (
+        <div className="adm-center adm-inline-center">
+          <div className="adm-spinner" aria-label="Loading" />
+        </div>
+      )}
+
+      {templates && (
+        <div className="adm-mail">
+          <nav className="adm-panel adm-mail-list" aria-label="Email templates">
+            {templates.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                className={`adm-mail-item${t.key === selected ? " is-active" : ""}`}
+                aria-current={t.key === selected ? "true" : undefined}
+                onClick={() => setSelected(t.key)}
+              >
+                <span className={`adm-badge ${t.audience === "Learner" ? "adm-badge-ok" : "adm-badge-muted"}`}>
+                  {t.audience}
+                </span>
+                <strong>{t.label}</strong>
+                <span className="adm-muted adm-small">{t.when}</span>
+              </button>
+            ))}
+          </nav>
+
+          {current && (
+            <section className="adm-panel adm-mail-preview" aria-label={`${current.label} preview`}>
+              <dl className="adm-mail-meta">
+                <div>
+                  <dt>Subject</dt>
+                  <dd>{current.subject}</dd>
+                </div>
+                <div>
+                  <dt>From</dt>
+                  <dd>{current.from}</dd>
+                </div>
+                <div>
+                  <dt>To</dt>
+                  <dd>{current.to}</dd>
+                </div>
+                <div>
+                  <dt>Sent when</dt>
+                  <dd>{current.when}</dd>
+                </div>
+              </dl>
+              {current.html ? (
+                // sandbox="" blocks scripts, forms and navigation in the preview.
+                <iframe className="adm-mail-frame" title={current.label} sandbox="" srcDoc={current.html} />
+              ) : (
+                <pre className="adm-mail-text">{current.text}</pre>
+              )}
+            </section>
+          )}
+        </div>
+      )}
     </main>
   );
 }
