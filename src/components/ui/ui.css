@@ -27,6 +27,12 @@
   margin-top: 32px;
 }
 
+/* The hero is the skip link's target (tabIndex -1): it takes focus but
+   is not a control, so it gets no focus ring. */
+.page-hero:focus {
+  outline: none;
+}
+
 /* ---------------- Section head ---------------- */
 
 .section-head h2 {
@@ -111,5 +117,18 @@
 
 .state-fee-input.is-empty {
   border-color: var(--accent);
+  background-color: var(--accent-soft);
   color: var(--accent-ink);
+  font-weight: 500;
+  box-shadow: 0 0 0 4px rgba(46, 91, 255, 0.1);
+}
+
+.state-fee-input.is-empty:hover {
+  border-color: var(--accent-ink);
+}
+
+.state-fee-input.is-empty option {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 400;
 }

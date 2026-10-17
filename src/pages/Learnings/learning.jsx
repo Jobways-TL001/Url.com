@@ -3,11 +3,14 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
+  faClock,
   faCompass,
   faHeadset,
   faMagnifyingGlass,
+  faSignal,
   faTableCellsLarge,
   faList,
+  faVideo,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../Header/header";
@@ -262,6 +265,9 @@ const Learning = () => {
 
             {visible.length === 0 ? (
               <div className="cat-empty">
+                <span className="icon-tile cat-empty-icon" aria-hidden="true">
+                  <FontAwesomeIcon icon={faMagnifyingGlass} />
+                </span>
                 <h3>No courses match your search</h3>
                 <p>
                   Try a different word, another track or all levels. You can
@@ -365,8 +371,8 @@ const Learning = () => {
   );
 };
 
-// One course in the grid: photo, a short track/level line, title, summary,
-// a few tools and the two actions.
+// One course in the grid: photo, track chip, title, summary, a few tools,
+// a facts row, the fee and the two actions.
 function CourseCard({ course, fee, onApply }) {
   const extraTools = course.tools.length - CARD_TOOLS;
   return (
@@ -388,7 +394,7 @@ function CourseCard({ course, fee, onApply }) {
       </Link>
       <div className="cat-card-body">
         <p className="cat-card-meta">
-          {trackLabel(course.track)} · {sentenceCase(course.level)}
+          <span className="cat-card-track">{trackLabel(course.track)}</span>
         </p>
         <h3 className="cat-card-title">
           <Link to={ROUTES.course(course.id)}>{course.title}</Link>
@@ -406,27 +412,43 @@ function CourseCard({ course, fee, onApply }) {
             </li>
           )}
         </ul>
-        <p className="cat-card-facts">
-          {course.duration} · {course.mode || "Live online"}
-          {fee.known && <> · {fee.label}</>}
-        </p>
+        <ul className="cat-card-facts" aria-label="Course facts">
+          <li>
+            <FontAwesomeIcon icon={faClock} aria-hidden="true" />
+            {course.duration}
+          </li>
+          <li>
+            <FontAwesomeIcon icon={faSignal} aria-hidden="true" />
+            {sentenceCase(course.level)}
+          </li>
+          <li>
+            <FontAwesomeIcon icon={faVideo} aria-hidden="true" />
+            {course.mode || "Live online"}
+          </li>
+        </ul>
       </div>
       <div className="cat-card-foot">
-        <Link
-          to={ROUTES.course(course.id)}
-          className="btn btn-secondary btn-sm"
-          aria-label={`View course: ${course.title}`}
-        >
-          View course
-        </Link>
-        <button
-          type="button"
-          className="btn btn-primary btn-sm"
-          onClick={onApply}
-          aria-label={`Apply now: ${course.title}`}
-        >
-          Apply now
-        </button>
+        <p className={`cat-card-price${fee.known ? "" : " is-pending"}`}>
+          <span className="cat-card-price-label">Course fee</span>
+          <span className="cat-card-price-value">{fee.label}</span>
+        </p>
+        <div className="cat-card-actions">
+          <Link
+            to={ROUTES.course(course.id)}
+            className="btn btn-secondary btn-sm"
+            aria-label={`View course: ${course.title}`}
+          >
+            View course
+          </Link>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={onApply}
+            aria-label={`Apply now: ${course.title}`}
+          >
+            Apply now
+          </button>
+        </div>
       </div>
     </article>
   );

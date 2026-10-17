@@ -2,7 +2,7 @@ import React from "react";
 import "./ui.css";
 
 // The heading block at the top of every inner page: an optional kicker,
-// the page title and an intro line on a warm-grey band. It carries
+// the page title and an intro line on a cool mist band with a soft brand glow. It carries
 // id="main" so the skip link in the header lands on it.
 //
 // Props (all optional except title):

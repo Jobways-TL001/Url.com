@@ -373,7 +373,7 @@ function Dashboard({ email, onExpired, onSignOut }) {
     <div className="adm">
       <header className="adm-topbar">
         <div className="adm-brand">
-          <Logo className="adm-brand-logo" />
+          <Logo variant="light" className="adm-brand-logo" />
           <span className="visually-hidden">URL</span>
           <span className="adm-brand-tag">Admin</span>
         </div>
@@ -931,7 +931,7 @@ function StateTaxes({ onError }) {
                         <span className="adm-muted adm-small">{s.value}</span>
                       </th>
                       {TAX_FIELDS.map((f) => (
-                        <td key={f.key}>
+                        <td key={f.key} data-label={`${f.label} (${f.unit})`}>
                           <input
                             type="number"
                             inputMode="decimal"
@@ -949,7 +949,7 @@ function StateTaxes({ onError }) {
                           />
                         </td>
                       ))}
-                      <td className="adm-tax-total">
+                      <td className="adm-tax-total" data-label="Total ($)">
                         {total !== null ? (
                           <strong>{usdTotal(total)}</strong>
                         ) : (
@@ -1108,22 +1108,22 @@ function Payments({ onError }) {
             <tbody>
               {result?.rows.map((row) => (
                 <tr key={row.id}>
-                  <td className="adm-small">{formatDate(row.paid_at || row.created_at)}</td>
-                  <td>
+                  <td data-label="Date" className="adm-small">{formatDate(row.paid_at || row.created_at)}</td>
+                  <td data-label="Learner">
                     <strong>{row.name}</strong>
                     <div className="adm-muted adm-small">{row.email}</div>
                   </td>
-                  <td>{row.enrolment?.course || "—"}</td>
-                  <td>{row.enrolment?.state || "—"}</td>
-                  <td>
+                  <td data-label="Course">{row.enrolment?.course || "—"}</td>
+                  <td data-label="State">{row.enrolment?.state || "—"}</td>
+                  <td data-label="Status">
                     <PaymentBadge row={{ ...row, amount_paid: null }} />
                   </td>
-                  <td className="adm-num">
+                  <td data-label="Amount" className="adm-num">
                     {row.amount_paid !== null && row.amount_paid !== undefined
                       ? formatMoney(row.amount_paid, row.payment_currency)
                       : "—"}
                   </td>
-                  <td>
+                  <td data-label="Stripe">
                     {row.stripe_session_id ? (
                       <a href={stripeLink(row.stripe_session_id)} target="_blank" rel="noopener noreferrer">
                         Open

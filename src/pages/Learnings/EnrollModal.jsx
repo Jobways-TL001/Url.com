@@ -389,9 +389,14 @@ const EnrollModal = ({ course, isOpen, onClose }) => {
                 <h2 id="enroll-title">Apply for {course.title}</h2>
                 <p className="enroll-facts">
                   {course.duration} · {course.mode}, Mon–Fri
-                  {stateFee !== null && <> · {formatFee(stateFee)}</>}
                 </p>
               </div>
+              {stateFee !== null && (
+                <p className="enroll-price">
+                  <span className="enroll-price-label">Course fee</span>
+                  <strong className="enroll-price-value">{formatFee(stateFee)}</strong>
+                </p>
+              )}
             </header>
             <p className="enroll-intro" id="enroll-desc">
               Tell us a little about yourself. It takes about a minute, and

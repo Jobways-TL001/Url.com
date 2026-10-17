@@ -1,7 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faArrowRight,
+  faBriefcase,
+  faCheck,
+  faClock,
+  faRotateLeft,
+  faSignal,
+  faVideo,
+} from "@fortawesome/free-solid-svg-icons";
 import { ROUTES } from "../../constants/routes";
 import { QUESTIONS, rankCourses, joinReasons } from "./scoring";
 import "./CourseFinder.css";
@@ -120,6 +129,9 @@ const CourseFinder = () => {
                       <span className="finder-option-label">{option.label}</span>
                       <span className="finder-option-detail">{option.detail}</span>
                     </span>
+                    <span className="finder-option-check" aria-hidden="true">
+                      <FontAwesomeIcon icon={faCheck} />
+                    </span>
                   </label>
                 );
               })}
@@ -174,6 +186,9 @@ const Results = ({ ranked, headingRef, onRestart }) => {
 
       <article className="finder-match">
         <div className="finder-match-media">
+          <span className="finder-match-badge" aria-hidden="true">
+            Best match
+          </span>
           <img
             src={course.image}
             alt=""
@@ -185,14 +200,30 @@ const Results = ({ ranked, headingRef, onRestart }) => {
         </div>
         <div className="finder-match-body">
           <h4>{course.title}</h4>
-          <p className="finder-match-meta">
-            {course.duration} · {course.level} · {course.mode}
-          </p>
+          <ul className="finder-match-meta">
+            <li>
+              <FontAwesomeIcon icon={faClock} aria-hidden="true" />
+              {course.duration}
+            </li>
+            <li>
+              <FontAwesomeIcon icon={faSignal} aria-hidden="true" />
+              {course.level}
+            </li>
+            <li>
+              <FontAwesomeIcon icon={faVideo} aria-hidden="true" />
+              {course.mode}
+            </li>
+          </ul>
           <p className="finder-why">
             {top.reasons.length > 0 && `You said ${joinReasons(top.reasons)}. `}
             {course.summary}
           </p>
-          <p className="finder-role">Prepares you for: {course.role}</p>
+          <p className="finder-role">
+            <FontAwesomeIcon icon={faBriefcase} aria-hidden="true" />
+            <span>
+              Prepares you for: <strong>{course.role}</strong>
+            </span>
+          </p>
           <Link to={ROUTES.course(course.id)} className="btn btn-primary">
             View course
             <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
@@ -221,6 +252,7 @@ const Results = ({ ranked, headingRef, onRestart }) => {
                       {alt.duration} · {alt.level}
                     </span>
                   </span>
+                  <FontAwesomeIcon icon={faArrowRight} className="finder-alt-arrow" aria-hidden="true" />
                 </Link>
               </li>
             ))}

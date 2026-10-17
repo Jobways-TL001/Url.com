@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 
 // Shared layout for the legal pages (Terms, Privacy Policy, Disclaimer):
-// a warm-grey header with the title and tabs between the three documents,
+// a mist header with the title, meta chips and tabs between the documents,
 // then the text in a readable column with an "On this page" list beside it
 // (sticky on wide screens, a collapsible panel on small ones).
 //
@@ -183,8 +183,16 @@ const LegalDocument = ({ title, updated, children }) => {
       <section className="legal-hero" id="main" tabIndex={-1}>
         <div className="container">
           <div className="legal-hero-inner">
+            <p className="eyebrow legal-eyebrow">Legal</p>
             <h1>{title}</h1>
-            {updated && <p className="legal-updated">Last updated {updated}</p>}
+            {(updated || toc.length > 1) && (
+              <div className="legal-meta">
+                {updated && <p className="legal-updated">Last updated {updated}</p>}
+                {toc.length > 1 && (
+                  <span className="legal-meta-chip">{toc.length} sections</span>
+                )}
+              </div>
+            )}
             <nav className="legal-switch" aria-label="Legal documents">
               {DOCUMENTS.map((doc) => (
                 <NavLink key={doc.to} to={doc.to} className="legal-switch-link">

@@ -1,13 +1,16 @@
 /* =================================================================
    Contact: "Book a free call"
-   Warm-grey hero · a white form card (three steps) with a sidebar
-   card on the right · offices (only when configured).
+   Mist hero · two columns on desktop — contact method cards and
+   "what happens next" on the left, a raised three-step form card on
+   the right · offices (only when configured).
+   DOM order is form → aside so mobile and keyboard users reach the
+   form first; the grid moves the aside to the left on wide screens.
    ================================================================= */
 
 /* ---------------- Hero ---------------- */
 
 .contact-hero {
-  padding: clamp(48px, 6vw, 80px) 0 clamp(40px, 5vw, 64px);
+  padding: clamp(56px, 7vw, 96px) 0 clamp(48px, 6vw, 80px);
 }
 
 .contact-hero h1 {
@@ -17,43 +20,72 @@
 /* ---------------- Layout ---------------- */
 
 .contact-flow-section {
-  padding-top: clamp(40px, 5vw, 64px);
+  padding-top: clamp(40px, 5vw, 72px);
 }
 
 .flow-layout {
   display: grid;
-  grid-template-columns: minmax(0, 880px) minmax(280px, 400px);
-  gap: clamp(24px, 3vw, 48px);
+  grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
+  gap: clamp(28px, 3.5vw, 56px);
   align-items: start;
+}
+
+.flow-layout > .flow-aside {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.flow-layout > .flow-panel {
+  grid-column: 2;
+  grid-row: 1;
 }
 
 /* ---------------- Form card ---------------- */
 
 .flow-panel {
-  padding: clamp(24px, 3.5vw, 44px);
+  position: relative;
+  padding: clamp(24px, 3.5vw, 48px);
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   background: var(--card);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   scroll-margin-top: calc(var(--header-h, 72px) + 16px);
+  overflow: hidden;
+  isolation: isolate;
 }
 
-/* Progress: "Step 1 of 3: Your interest" and a thin bar. */
+/* A soft brand glow in the top corner — texture, not decoration. */
+.flow-panel::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  z-index: -1;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(109, 76, 255, 0.08), transparent);
+  pointer-events: none;
+}
+
+/* Progress: "Step 1 of 3: Your interest" and a thin gradient bar. */
 .flow-progress {
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 .flow-step-count {
-  margin: 0 0 10px;
-  font-size: 0.92rem;
+  margin: 0 0 12px;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--ink-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
 }
 
 .flow-bar {
-  height: 4px;
+  height: 6px;
   border-radius: var(--radius-pill);
-  background: var(--paper-2);
+  background: var(--paper-3);
   overflow: hidden;
 }
 
@@ -61,17 +93,18 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
-  transition: width 0.3s var(--ease);
+  background: var(--gradient-brand);
+  transition: width 0.3s var(--ease-out);
 }
 
 .flow-step-head {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .flow-step-head h2 {
-  margin: 0 0 6px;
-  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  margin: 0 0 8px;
+  font-size: clamp(1.45rem, 2.2vw, 1.8rem);
+  letter-spacing: -0.025em;
 }
 
 .flow-step-head h2:focus {
@@ -80,11 +113,11 @@
 
 .flow-step-intro {
   margin: 0;
-  max-width: 62ch;
+  max-width: 60ch;
   color: var(--ink-3);
 }
 
-/* ---------------- Step 1: options ---------------- */
+/* ---------------- Step 1: interest options ---------------- */
 
 .flow-options {
   display: grid;
@@ -93,9 +126,11 @@
 
 .flow-group-label {
   margin: 0 0 10px;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--ink);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 
 .flow-group-options {
@@ -109,22 +144,25 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  min-height: 56px;
   padding: 14px 16px;
   border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   background: var(--card);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease),
-    box-shadow 0.15s var(--ease);
+    box-shadow 0.15s var(--ease), transform 0.15s var(--ease);
 }
 
 .flow-option:hover {
-  border-color: var(--ink-3);
+  border-color: var(--accent-soft-2);
+  background: var(--paper-2);
 }
 
 .flow-option.is-checked {
   border-color: var(--accent);
-  background: #fffaf6;
+  background: var(--accent-soft);
   box-shadow: inset 0 0 0 1px var(--accent);
 }
 
@@ -139,7 +177,7 @@
 }
 
 .flow-option:focus-within {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -152,19 +190,20 @@
   border: 1.5px solid var(--rule-strong);
   border-radius: 50%;
   background: var(--card);
-  transition: border-color 0.15s var(--ease);
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
 }
 
 .flow-option.is-checked .flow-option-radio {
-  border-color: var(--accent);
+  border-color: transparent;
+  background: var(--gradient-brand);
 }
 
 .flow-option.is-checked .flow-option-radio::after {
   content: "";
   position: absolute;
-  inset: 3px;
+  inset: 5px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--card);
 }
 
 .flow-option-text {
@@ -180,13 +219,13 @@
 }
 
 .flow-option-meta {
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: var(--ink-3);
   line-height: 1.45;
 }
 
 .flow-group-extra {
-  padding-top: 20px;
+  padding-top: 24px;
   border-top: 1px solid var(--rule);
 }
 
@@ -199,7 +238,7 @@
 .flow-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: 22px 20px;
 }
 
 .flow-fields-single {
@@ -237,17 +276,41 @@
   gap: 16px;
 }
 
-/* Review: a simple summary list. */
+.flow-hint-row > span[aria-hidden] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inline errors: an alert glyph so colour is never the only cue. */
+.flow-panel .field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.45;
+}
+
+.flow-panel .field-error::before {
+  content: "";
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23c42b1c'/%3E%3Cpath d='M8 4.4v4.3' stroke='%23fff' stroke-width='1.7' stroke-linecap='round'/%3E%3Ccircle cx='8' cy='11.3' r='1' fill='%23fff'/%3E%3C/svg%3E")
+    center / 16px 16px no-repeat;
+}
+
+/* Review: a compact summary of what will be sent. */
 .flow-review {
   margin-top: 4px;
   padding: 20px 22px;
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
   background: var(--paper-2);
 }
 
 .flow-review-title {
-  margin: 0 0 8px;
-  font-size: 1.05rem;
+  margin: 0 0 6px;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
 }
 
 .flow-review dl {
@@ -268,18 +331,26 @@
 }
 
 .flow-review-row dt {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: var(--ink-3);
 }
 
 .flow-review-row dd {
   margin: 0;
   color: var(--ink);
+  font-weight: 500;
   overflow-wrap: anywhere;
 }
 
 .flow-review-edit {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
+  min-height: 32px;
+}
+
+.flow-review-edit:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .flow-status {
@@ -294,31 +365,32 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 32px;
+  margin-top: 36px;
   padding-top: 24px;
   border-top: 1px solid var(--rule);
 }
 
 .flow-actions-note {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: var(--ink-3);
 }
 
 .flow-next-btn {
   margin-left: auto;
+  min-width: 168px;
 }
 
 .flow-shortcut {
   margin: 12px 0 0;
   text-align: right;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   color: var(--ink-3);
 }
 
 /* ---------------- Success ---------------- */
 
 .flow-success {
-  padding: clamp(8px, 2vw, 24px) 0;
+  padding: clamp(16px, 3vw, 40px) 0;
   text-align: center;
 }
 
@@ -326,18 +398,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  margin-bottom: 20px;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 24px;
   border-radius: 50%;
-  background: var(--success-bg);
-  color: var(--success);
-  font-size: 1.5rem;
+  background: var(--gradient-brand);
+  color: #fff;
+  font-size: 1.8rem;
+  box-shadow: var(--shadow-accent), 0 0 0 10px var(--accent-soft);
 }
 
 .flow-success-title {
   margin: 0 0 12px;
-  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  letter-spacing: -0.025em;
 }
 
 .flow-success-title:focus {
@@ -348,6 +422,11 @@
   max-width: 52ch;
   margin: 0 auto;
   color: var(--ink-3);
+  line-height: 1.7;
+}
+
+.flow-success-lead strong {
+  color: var(--ink);
 }
 
 .flow-success-actions {
@@ -355,26 +434,122 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
-  margin-top: 28px;
+  margin-top: 32px;
 }
 
-/* ---------------- Sidebar ---------------- */
+/* ---------------- Aside: contact methods + reassurance ---------------- */
 
 .flow-aside {
-  position: sticky;
-  top: calc(var(--header-h, 72px) + 24px);
+  display: grid;
+  gap: 20px;
 }
 
-.flow-aside-card {
-  padding: 28px;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: var(--paper-2);
+/* Sticky only where the whole aside fits on screen. */
+@media (min-width: 1025px) and (min-height: 860px) {
+  .flow-aside {
+    position: sticky;
+    top: calc(var(--header-h, 72px) + 24px);
+  }
 }
 
 .flow-aside-title {
-  margin: 0 0 16px;
-  font-size: 1.15rem;
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+}
+
+.contact-direct-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One card per channel. Link cards stretch the link over the card. */
+.contact-method {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+
+.contact-method.is-link:hover {
+  border-color: var(--accent-soft-2);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.contact-method.is-link:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(46, 91, 255, 0.14);
+}
+
+.contact-method-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+.contact-method-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.contact-method-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.contact-method a {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.contact-method a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.contact-method a:focus-visible {
+  outline: none;
+}
+
+.contact-method.is-link:hover a {
+  color: var(--accent-ink);
+}
+
+/* Reassurance card. */
+.flow-aside-card {
+  padding: 24px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-2);
 }
 
 .flow-aside-steps {
@@ -386,78 +561,64 @@
 }
 
 .flow-aside-steps li {
+  position: relative;
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr);
-  gap: 12px;
+  gap: 14px;
   align-items: start;
 }
 
+/* A hairline connecting the numbered steps. */
+.flow-aside-steps li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 36px;
+  bottom: -14px;
+  left: 15.5px;
+  width: 1px;
+  background: var(--accent-soft-2);
+}
+
 .flow-aside-steps .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 32px;
   height: 32px;
-  margin: 0;
-  font-size: 0.9rem;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  box-shadow: var(--shadow-accent);
 }
 
 .flow-aside-steps strong {
   display: block;
-  margin-top: 4px;
+  margin: 4px 0 2px;
   color: var(--ink);
-  line-height: 1.35;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .flow-aside-steps p {
-  margin: 4px 0 0;
-  font-size: 0.94rem;
-  line-height: 1.55;
-  color: var(--ink-3);
-}
-
-.contact-direct {
-  margin-top: 28px;
-  padding-top: 24px;
-  border-top: 1px solid var(--rule-strong);
-}
-
-.contact-direct .flow-aside-title {
-  margin-bottom: 12px;
-}
-
-.contact-direct-list {
-  display: grid;
-  gap: 10px;
   margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.contact-direct-list li {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  color: var(--ink-2);
-  overflow-wrap: anywhere;
-}
-
-.contact-direct-list svg {
-  flex-shrink: 0;
-  width: 1em;
+  font-size: 0.92rem;
   color: var(--ink-3);
-}
-
-.contact-direct-list a {
-  font-weight: 600;
+  line-height: 1.6;
 }
 
 /* ---------------- Offices ---------------- */
 
 .contact-offices {
-  margin-top: 72px;
+  margin-top: clamp(48px, 6vw, 80px);
 }
 
 .contact-offices-title {
-  margin-bottom: 20px;
-  font-size: 1.5rem;
+  margin: 0 0 20px;
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+  letter-spacing: -0.025em;
 }
 
 .contact-offices-list {
@@ -472,14 +633,25 @@
 .contact-offices-list li {
   display: grid;
   gap: 4px;
-  padding: 22px;
+  padding: 24px;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   background: var(--card);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink-3);
+  font-size: 0.95rem;
 }
 
 .contact-offices-list strong {
+  margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
   color: var(--ink);
+}
+
+.contact-offices-list a {
+  color: var(--accent-ink);
+  font-weight: 500;
 }
 
 /* ---------------- Responsive ---------------- */
@@ -489,12 +661,24 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .flow-layout > .flow-aside,
+  .flow-layout > .flow-panel {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
   .flow-aside {
-    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
   }
 }
 
 @media (max-width: 680px) {
+  .flow-panel {
+    border-radius: var(--radius);
+  }
+
+  .flow-aside,
   .flow-group-options,
   .flow-fields {
     grid-template-columns: minmax(0, 1fr);
@@ -508,18 +692,25 @@
     grid-column: 1 / -1;
   }
 
-  .flow-actions-note {
+  .flow-actions-note,
+  .flow-shortcut {
     display: none;
   }
 
-  .flow-shortcut {
-    display: none;
+  .flow-next-btn {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .flow-bar span,
-  .flow-option {
+  .flow-option,
+  .contact-method {
     transition: none;
+  }
+
+  .contact-method.is-link:hover {
+    transform: none;
   }
 }

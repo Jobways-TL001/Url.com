@@ -7,6 +7,7 @@ import {
   faInstagram,
   faLinkedinIn,
 } from "@fortawesome/free-brands-svg-icons";
+import { faClock, faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { COMPANY, telHref } from "../../constants/company";
 import { ROUTES } from "../../constants/routes";
 import { TRACK_GROUPS } from "../../components/ui/trackGroups";
@@ -82,7 +83,7 @@ const Footer = () => (
           </div>
         </nav>
 
-        <nav className="footer-col" aria-label="Company">
+        <nav className="footer-col footer-col-company" aria-label="Company">
           <h2 className="footer-heading">Company</h2>
           <ul className="footer-links">
             {COMPANY_LINKS.map((link) => (
@@ -93,39 +94,48 @@ const Footer = () => (
           </ul>
         </nav>
 
-        <div className="footer-col">
-          <nav aria-label="Legal">
-            <h2 className="footer-heading">Legal</h2>
-            <ul className="footer-links">
-              {LEGAL_LINKS.map((link) => (
-                <li key={link.to}>
-                  <Link to={link.to}>{link.label}</Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <h2 className="footer-heading footer-heading-contact">Get in touch</h2>
+        <div className="footer-col footer-col-contact">
+          <h2 className="footer-heading">Get in touch</h2>
           <ul className="footer-contact">
             {COMPANY.email && (
               <li>
+                <FontAwesomeIcon icon={faEnvelope} className="footer-contact-icon" />
                 <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
               </li>
             )}
             {COMPANY.phone && (
               <li>
+                <FontAwesomeIcon icon={faPhone} className="footer-contact-icon" />
                 <a href={telHref(COMPANY.phone)}>{COMPANY.phone}</a>
               </li>
             )}
-            {COMPANY.hours && <li>{COMPANY.hours}</li>}
+            {COMPANY.hours && (
+              <li>
+                <FontAwesomeIcon icon={faClock} className="footer-contact-icon" />
+                <span>{COMPANY.hours}</span>
+              </li>
+            )}
           </ul>
         </div>
       </div>
 
+      {/* Bottom bar: copyright on the left, legal links on the right. */}
       <div className="footer-bottom">
-        <p>
+        <p className="footer-copy">
           &copy; {new Date().getFullYear()} {COMPANY.legalName}. All rights reserved.
         </p>
+        <nav className="footer-legal" aria-labelledby="footer-legal-heading">
+          <h2 className="visually-hidden" id="footer-legal-heading">
+            Legal
+          </h2>
+          <ul>
+            {LEGAL_LINKS.map((link) => (
+              <li key={link.to}>
+                <Link to={link.to}>{link.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </div>
   </footer>

@@ -1,7 +1,8 @@
 /* =================================================================
    Courses page (/courses)
-   Page hero, a white filter toolbar, course cards (or a comparison
-   table), a help card and the FAQ. Uses the tokens in src/index.css.
+   Page hero, a raised filter toolbar (search, level, state, layout and
+   track pills), course cards (or a comparison table), a navy help card
+   and the FAQ. Uses only the tokens in src/index.css.
    ================================================================= */
 
 .cat {
@@ -12,27 +13,34 @@
 /* ---------------- Hero ---------------- */
 
 .cat-hero {
-  padding: 72px 0 64px;
+  padding: clamp(56px, 7vw, 96px) 0 clamp(72px, 8vw, 112px);
 }
 
 .cat-hero p {
   max-width: 62ch;
 }
 
-/* ---------------- Toolbar ---------------- */
+/* ---------------- Browse section ---------------- */
 
 .cat-browse {
-  padding: 48px 0 96px;
+  position: relative;
+  padding: 0 0 clamp(72px, 8vw, 112px);
 }
 
+/* ---------------- Toolbar ---------------- */
+
+/* Raised panel that overlaps the bottom edge of the hero. */
 .cat-toolbar {
+  position: relative;
+  z-index: 2;
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  margin-top: -44px;
+  padding: 16px;
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   background: var(--card);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
 }
 
 .cat-toolbar-row {
@@ -41,6 +49,7 @@
   gap: 12px;
 }
 
+/* Search with a leading icon and a clear button. */
 .cat-search {
   position: relative;
   flex: 1 1 auto;
@@ -49,17 +58,32 @@
 
 .cat-search-icon {
   position: absolute;
-  left: 16px;
   top: 50%;
-  transform: translateY(-50%);
+  left: 16px;
   color: var(--ink-3);
   font-size: 0.95rem;
   pointer-events: none;
+  transform: translateY(-50%);
+  transition: color 0.15s var(--ease);
+}
+
+.cat-search:focus-within .cat-search-icon {
+  color: var(--accent);
 }
 
 .cat-search .cat-search-input {
   padding-left: 44px;
-  padding-right: 44px;
+  padding-right: 48px;
+  background: var(--paper-2);
+  box-shadow: none;
+}
+
+.cat-search .cat-search-input:hover {
+  background: var(--card);
+}
+
+.cat-search .cat-search-input:focus {
+  background: var(--card);
 }
 
 .cat-search-input::-webkit-search-cancel-button {
@@ -69,38 +93,54 @@
 
 .cat-search-clear {
   position: absolute;
-  right: 6px;
   top: 50%;
-  transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
+  right: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--ink-3);
   cursor: pointer;
+  transform: translateY(-50%);
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
 }
 
 .cat-search-clear:hover {
-  background: var(--paper-2);
+  background: var(--paper-3);
   color: var(--ink);
 }
 
-.cat-level {
-  flex: 0 0 200px;
+.cat-search-clear:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
 }
 
+.cat-level {
+  flex: 0 0 190px;
+}
+
+.cat-level-select {
+  font-weight: 500;
+}
+
+/* State fee picker (StateFee.jsx) sits in the row. */
+.cat-state {
+  flex: 0 0 270px;
+}
+
+/* Grid / list segmented toggle. */
 .cat-view {
   display: inline-flex;
   flex: 0 0 auto;
-  padding: 4px;
   gap: 4px;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-sm);
-  background: var(--card);
+  padding: 4px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--paper-2);
 }
 
 .cat-view-btn {
@@ -110,14 +150,15 @@
   min-height: 40px;
   padding: 0 14px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 9px;
   background: transparent;
   color: var(--ink-3);
-  font: inherit;
-  font-size: 0.92rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
+  transition: background-color 0.18s var(--ease), color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease);
 }
 
 .cat-view-btn:hover {
@@ -125,14 +166,23 @@
 }
 
 .cat-view-btn.is-active {
-  background: var(--paper-2);
-  color: var(--ink);
+  background: var(--card);
+  color: var(--accent-ink);
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--rule);
 }
 
+.cat-view-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Track pills with counts. */
 .cat-tracks {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
 }
 
 .cat-track {
@@ -140,38 +190,61 @@
   align-items: center;
   gap: 8px;
   min-height: 40px;
-  padding: 0 16px;
-  border: 1px solid var(--rule-strong);
+  padding: 0 8px 0 16px;
+  border: 1px solid var(--rule);
   border-radius: var(--radius-pill);
   background: var(--card);
   color: var(--ink-2);
-  font: inherit;
-  font-size: 0.92rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease),
-    color 0.15s var(--ease);
+  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+    color 0.18s var(--ease), box-shadow 0.18s var(--ease);
 }
 
 .cat-track:hover {
-  border-color: var(--ink-3);
-  color: var(--ink);
+  border-color: var(--accent-soft-2);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 
 .cat-track.is-active {
-  border-color: var(--ink);
+  border-color: transparent;
   background: var(--ink);
   color: #fff;
+  box-shadow: var(--shadow);
+}
+
+.cat-track:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .cat-track-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  background: var(--paper-3);
   color: var(--ink-3);
-  font-weight: 500;
+  font-size: 0.78rem;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
+.cat-track:hover .cat-track-count {
+  background: var(--card);
+  color: var(--accent-ink);
+}
+
 .cat-track.is-active .cat-track-count {
-  color: rgba(255, 255, 255, 0.7);
+  background: rgba(241, 245, 255, 0.16);
+  color: #fff;
 }
 
 /* ---------------- Result line ---------------- */
@@ -181,22 +254,23 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 44px;
-  margin: 24px 0 20px;
+  min-height: 40px;
+  margin: 32px 0 20px;
 }
 
 .cat-count {
   margin: 0;
   color: var(--ink-3);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 500;
 }
 
 .cat-clear {
-  min-height: 0;
-  padding: 0;
+  min-height: 40px;
+  font-size: 0.92rem;
 }
 
-/* ---------------- Course cards ---------------- */
+/* ---------------- Card grid ---------------- */
 
 .cat-grid {
   display: grid;
@@ -219,6 +293,7 @@
 }
 
 .cat-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -227,21 +302,32 @@
   border-radius: var(--radius);
   background: var(--card);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s var(--ease), border-color 0.2s var(--ease);
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease),
+    border-color 0.25s var(--ease);
 }
 
-.cat-card:hover {
-  border-color: var(--rule-strong);
-  box-shadow: var(--shadow);
+.cat-card:hover,
+.cat-card:focus-within {
+  border-color: var(--accent-soft-2);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
 }
 
 .cat-card-media {
+  position: relative;
   display: block;
-  margin: 12px 12px 0;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: calc(var(--radius) - 4px);
-  background: var(--paper-2);
+  background: var(--paper-3);
+}
+
+/* Soft navy fade at the foot of the photo. */
+.cat-card-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(7, 13, 31, 0.18) 100%);
+  pointer-events: none;
 }
 
 .cat-card-media img {
@@ -249,31 +335,46 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s var(--ease);
+  transition: transform 0.5s var(--ease-out);
 }
 
 .cat-card:hover .cat-card-media img {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 
 .cat-card-body {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  flex: 1;
-  gap: 10px;
-  padding: 20px 22px 4px;
+  padding: 20px 22px 0;
 }
 
 .cat-card-meta {
-  margin: 0;
-  color: var(--ink-3);
-  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+/* Category chip. */
+.cat-card-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border: 1px solid var(--accent-soft-2);
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
 }
 
 .cat-card-title {
-  margin: 0;
-  font-size: 1.25rem;
+  margin: 0 0 8px;
+  font-size: 1.2rem;
   line-height: 1.3;
+  letter-spacing: -0.015em;
 }
 
 .cat-card-title a {
@@ -281,41 +382,129 @@
   text-decoration: none;
 }
 
+/* The whole card is the link target; the title keeps the focus ring. */
+.cat-card-title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
 .cat-card-title a:hover {
   color: var(--accent-ink);
 }
 
+.cat-card-title a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .cat-card-summary {
-  margin: 0;
+  display: -webkit-box;
+  margin: 0 0 16px;
+  overflow: hidden;
   color: var(--ink-3);
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   line-height: 1.6;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .cat-card-tools {
-  margin-top: 4px;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.cat-card-tools .chip {
+  padding: 3px 10px;
+  font-size: 0.8rem;
 }
 
 .cat-card-more {
   color: var(--ink-3);
 }
 
+/* Duration / level / mode with icons. */
 .cat-card-facts {
-  margin: auto 0 0;
-  padding-top: 8px;
-  color: var(--ink-2);
-  font-size: 0.92rem;
-  font-weight: 600;
-}
-
-.cat-card-foot {
   display: flex;
-  gap: 10px;
-  padding: 16px 22px 22px;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: auto 0 0;
+  padding: 14px 0 18px;
+  border-top: 1px solid var(--rule);
+  list-style: none;
 }
 
-.cat-card-foot .btn {
-  flex: 1;
+.cat-card-facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-2);
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.cat-card-facts svg {
+  color: var(--accent);
+  font-size: 0.82rem;
+}
+
+/* Fee + actions. Buttons sit above the stretched title link. */
+.cat-card-foot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  padding: 16px 22px 22px;
+  border-top: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+
+.cat-card-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+}
+
+.cat-card-price-label {
+  color: var(--ink-3);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cat-card-price-value {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.cat-card-price.is-pending .cat-card-price-value {
+  color: var(--accent-ink);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.cat-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cat-card-actions .btn {
+  min-height: 42px;
+  padding: 0 12px;
 }
 
 /* ---------------- Comparison table ---------------- */
@@ -330,18 +519,20 @@
 
 .cat-table {
   width: 100%;
+  min-width: 760px;
   border-collapse: collapse;
-  font-size: 0.96rem;
 }
 
 .cat-table thead th {
   padding: 14px 20px;
-  background: var(--paper-2);
   border-bottom: 1px solid var(--rule);
-  color: var(--ink-2);
-  font-size: 0.9rem;
-  font-weight: 600;
+  background: var(--paper-2);
+  color: var(--ink-3);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-align: left;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -350,7 +541,7 @@
   padding: 18px 20px;
   border-bottom: 1px solid var(--rule);
   color: var(--ink-2);
-  font-weight: 400;
+  font-size: 0.94rem;
   text-align: left;
   vertical-align: middle;
 }
@@ -360,36 +551,50 @@
   border-bottom: 0;
 }
 
+.cat-table tbody tr {
+  transition: background-color 0.15s var(--ease);
+}
+
 .cat-table tbody tr:hover {
-  background: #fcfbf9;
+  background: var(--paper-2);
 }
 
 .cat-row-course {
   min-width: 260px;
+  font-weight: 400;
 }
 
 .cat-row-title {
   display: block;
   color: var(--ink);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
   text-decoration: none;
 }
 
 .cat-row-title:hover {
   color: var(--accent-ink);
-  text-decoration: underline;
 }
 
 .cat-row-role {
   display: block;
   margin-top: 2px;
   color: var(--ink-3);
-  font-size: 0.88rem;
+  font-size: 0.86rem;
 }
 
-.cat-table td[data-label="Duration"],
 .cat-row-fee {
+  color: var(--ink);
+  font-weight: 700;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.cat-row-fee.is-pending {
+  color: var(--ink-3);
+  font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .cat-table .cat-row-actions {
@@ -404,22 +609,31 @@
 /* ---------------- Empty state ---------------- */
 
 .cat-empty {
-  max-width: 560px;
-  margin: 24px auto;
-  padding: 48px 32px;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: var(--card);
+  display: grid;
+  justify-items: center;
+  padding: 64px 24px;
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius-lg);
+  background: var(--paper-2);
   text-align: center;
 }
 
+.cat-empty-icon {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 18px;
+  border-radius: var(--radius);
+  font-size: 1.2rem;
+}
+
 .cat-empty h3 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 1.3rem;
 }
 
 .cat-empty p {
-  margin: 0 auto;
+  max-width: 48ch;
+  margin: 0;
   color: var(--ink-3);
 }
 
@@ -431,37 +645,48 @@
   margin-top: 24px;
 }
 
-/* ---------------- Help card ---------------- */
+/* ---------------- Help card (navy) ---------------- */
 
 .cat-help {
-  padding: 0 0 96px;
+  padding: 0 0 clamp(72px, 8vw, 112px);
 }
 
 .cat-help-card {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-  gap: 40px;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 48px;
   align-items: center;
-  padding: 40px;
+  padding: clamp(28px, 4vw, 48px);
+  overflow: hidden;
+  isolation: isolate;
   border-radius: var(--radius-lg);
-  background: var(--paper-2);
+  background:
+    radial-gradient(50% 80% at 100% 0%, rgba(109, 76, 255, 0.28), transparent 70%),
+    radial-gradient(45% 70% at 0% 100%, rgba(46, 91, 255, 0.24), transparent 70%),
+    var(--night);
+  color: var(--ink-on-dark-2);
+  box-shadow: var(--shadow-lg);
 }
 
 .cat-help-copy h2 {
   margin: 0 0 10px;
-  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  color: var(--ink-on-dark);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  letter-spacing: -0.025em;
 }
 
 .cat-help-copy p {
-  max-width: 48ch;
+  max-width: 44ch;
   margin: 0;
-  color: var(--ink-3);
+  color: var(--ink-on-dark-2);
+  font-size: 1.02rem;
 }
 
 .cat-help-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 14px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -472,49 +697,65 @@
 }
 
 .cat-help-option {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 14px;
+  align-items: start;
   width: 100%;
   padding: 20px;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--rule-dark);
   border-radius: var(--radius);
-  background: var(--card);
-  color: var(--ink-2);
+  background: rgba(241, 245, 255, 0.05);
+  color: var(--ink-on-dark);
   text-decoration: none;
-  transition: box-shadow 0.2s var(--ease), border-color 0.2s var(--ease);
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease),
+    transform 0.2s var(--ease-out);
 }
 
 .cat-help-option .icon-tile {
+  width: 44px;
+  height: 44px;
   margin: 0;
+  border-color: rgba(142, 168, 255, 0.3);
+  background: rgba(142, 168, 255, 0.12);
+  color: var(--accent-on-dark);
+  box-shadow: none;
 }
 
 .cat-help-option:hover {
-  border-color: var(--rule-strong);
-  box-shadow: var(--shadow);
+  border-color: rgba(142, 168, 255, 0.45);
+  background: rgba(241, 245, 255, 0.09);
+  color: var(--ink-on-dark);
   text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.cat-help-option:focus-visible {
+  outline: 2px solid var(--accent-on-dark);
+  outline-offset: 3px;
 }
 
 .cat-help-text {
   display: grid;
   gap: 4px;
-  flex: 1;
 }
 
 .cat-help-text strong {
-  color: var(--ink);
-  font-size: 1.05rem;
+  color: var(--ink-on-dark);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
 }
 
 .cat-help-text span {
-  color: var(--ink-3);
-  font-size: 0.94rem;
+  color: var(--ink-on-dark-2);
+  font-size: 0.9rem;
   line-height: 1.5;
 }
 
 .cat-help-arrow {
-  margin-top: 6px;
-  color: var(--accent);
+  margin-top: 4px;
+  color: var(--accent-on-dark);
   transition: transform 0.2s var(--ease);
 }
 
@@ -525,20 +766,27 @@
 /* ---------------- FAQ ---------------- */
 
 .cat-faq {
-  padding: 88px 0 104px;
+  padding: clamp(72px, 8vw, 112px) 0;
+  border-top: 1px solid var(--rule);
   background: var(--paper-2);
 }
 
 .cat-faq-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
   gap: 64px;
   align-items: start;
 }
 
+.cat-faq-intro {
+  position: sticky;
+  top: calc(var(--header-h, 72px) + 32px);
+}
+
 .cat-faq-intro h2 {
   margin: 0 0 12px;
-  font-size: clamp(1.7rem, 2.8vw, 2.2rem);
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  letter-spacing: -0.03em;
 }
 
 .cat-faq-intro p {
@@ -552,7 +800,7 @@
 }
 
 .cat-faq .faq-list {
-  max-width: 880px;
+  margin: 0;
 }
 
 /* ---------------- Responsive ---------------- */
@@ -560,6 +808,7 @@
 @media (max-width: 1080px) {
   .cat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
   }
 
   .cat-help-card,
@@ -568,25 +817,17 @@
     gap: 28px;
   }
 
+  .cat-faq-intro {
+    position: static;
+  }
+
   .cat-table th:nth-child(2),
   .cat-table td:nth-child(2) {
     display: none;
   }
 }
 
-@media (max-width: 760px) {
-  .cat-hero {
-    padding: 48px 0 40px;
-  }
-
-  .cat-browse {
-    padding: 28px 0 72px;
-  }
-
-  .cat-toolbar {
-    padding: 16px;
-  }
-
+@media (max-width: 900px) {
   .cat-toolbar-row {
     flex-wrap: wrap;
   }
@@ -600,11 +841,28 @@
     min-width: 0;
   }
 
+  .cat-state {
+    flex: 1 1 100%;
+    order: 3;
+  }
+}
+
+@media (max-width: 760px) {
+  .cat-hero {
+    padding: 44px 0 64px;
+  }
+
+  .cat-toolbar {
+    margin-top: -32px;
+    padding: 12px;
+    border-radius: var(--radius);
+  }
+
   .cat-tracks {
     flex-wrap: nowrap;
+    margin: 0 -12px;
+    padding: 12px 12px 2px;
     overflow-x: auto;
-    margin: 0 -16px;
-    padding: 0 16px 2px;
     scrollbar-width: none;
   }
 
@@ -616,13 +874,22 @@
     flex: 0 0 auto;
   }
 
+  .cat-status {
+    margin: 24px 0 16px;
+  }
+
   .cat-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
   }
 
-  .cat-help {
-    padding-bottom: 72px;
+  .cat-card:hover,
+  .cat-card:focus-within {
+    transform: none;
+  }
+
+  .cat-empty {
+    padding: 44px 20px;
   }
 
   .cat-help-card {
@@ -643,6 +910,10 @@
     border: 0;
     background: transparent;
     box-shadow: none;
+  }
+
+  .cat-table {
+    min-width: 0;
   }
 
   .cat-table,
@@ -667,6 +938,7 @@
     border: 1px solid var(--rule);
     border-radius: var(--radius);
     background: var(--card);
+    box-shadow: var(--shadow-sm);
   }
 
   .cat-table tbody tr:hover {
@@ -675,7 +947,7 @@
 
   .cat-table tbody th,
   .cat-table tbody td {
-    padding: 4px 0;
+    padding: 5px 0;
     border: 0;
   }
 
@@ -686,7 +958,9 @@
 
   .cat-table .cat-row-course {
     min-width: 0;
-    padding-bottom: 10px;
+    margin-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
   }
 
   .cat-table td[data-label] {
@@ -699,38 +973,21 @@
   .cat-table td[data-label]::before {
     content: attr(data-label);
     color: var(--ink-3);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .cat-table .cat-row-actions {
-    display: flex;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
     padding-top: 14px;
     text-align: left;
   }
 
-  .cat-row-actions .btn {
-    flex: 1;
-  }
-
   .cat-row-actions .btn + .btn {
     margin-left: 0;
-  }
-}
-
-/* ---------- State fee picker in the toolbar ---------- */
-.cat-state {
-  flex: 0 0 270px;
-}
-
-.cat-row-fee.is-pending {
-  color: var(--ink-3);
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-@media (max-width: 900px) {
-  .cat-state {
-    flex: 1 1 100%;
-    order: 3;
   }
 }

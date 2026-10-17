@@ -5,7 +5,7 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { ROUTES } from "../../constants/routes";
 import "./ui.css";
 
-// The closing call to action shared by every page: a warm-black (--night)
+// The closing call to action shared by every page: a deep-navy (--night)
 // panel with a heading and short line on the left, buttons on the right.
 const CtaBand = ({
   title = "Talk to an advisor",

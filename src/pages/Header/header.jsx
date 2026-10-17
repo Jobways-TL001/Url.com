@@ -4,9 +4,15 @@ import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
+  faBrain,
+  faChartLine,
   faChevronDown,
+  faCompass,
+  faGraduationCap,
+  faLayerGroup,
   faPlus,
   faMinus,
+  faWandMagicSparkles,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../../components/ui/Logo";
@@ -16,6 +22,15 @@ import { ROUTES } from "../../constants/routes";
 import { TRACK_GROUPS } from "../../components/ui/trackGroups";
 
 const FINDER_LINK = { pathname: ROUTES.home, hash: "#finder" };
+
+// Decorative icon per track in the mega menu (any new track falls back to
+// the cap).
+const TRACK_ICONS = {
+  foundations: faLayerGroup,
+  core: faBrain,
+  genai: faWandMagicSparkles,
+  data: faChartLine,
+};
 
 // "Courses" comes first and opens the mega menu on desktop (an accordion in
 // the mobile drawer); the rest are plain links.
@@ -298,10 +313,17 @@ const Header = () => {
                     <div className="mega-tracks">
                       {TRACK_GROUPS.map((group) => (
                         <div key={group.value} className="mega-track">
-                          <p className="mega-track-name" id={`mega-track-${group.value}`}>
-                            {group.label}
-                          </p>
-                          {group.blurb && <p className="mega-track-blurb">{group.blurb}</p>}
+                          <div className="mega-track-head">
+                            <span className="mega-track-icon" aria-hidden="true">
+                              <FontAwesomeIcon icon={TRACK_ICONS[group.value] || faGraduationCap} />
+                            </span>
+                            <div className="mega-track-text">
+                              <p className="mega-track-name" id={`mega-track-${group.value}`}>
+                                {group.label}
+                              </p>
+                              {group.blurb && <p className="mega-track-blurb">{group.blurb}</p>}
+                            </div>
+                          </div>
                           <ul aria-labelledby={`mega-track-${group.value}`}>
                             {group.courses.map((course) => (
                               <li key={course.id}>
@@ -321,6 +343,9 @@ const Header = () => {
                     </div>
 
                     <div className="mega-feature">
+                      <span className="mega-feature-icon" aria-hidden="true">
+                        <FontAwesomeIcon icon={faCompass} />
+                      </span>
                       <p className="mega-feature-title">Not sure which course is right for you?</p>
                       <p className="mega-feature-text">
                         Answer three quick questions and we&rsquo;ll suggest a course that fits

@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { COUNTRIES, flagOf } from "../../constants/countries";
 import "./CountrySelect.css";
 
@@ -162,18 +164,28 @@ const CountrySelect = ({ value, onChange, disabled, id, label = "Country diallin
 
       {open && (
         <div className="country-select-panel">
-          <input
-            ref={inputRef}
-            type="text"
-            className="input country-select-search"
-            placeholder="Search country or code"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={onKeyDown}
-            aria-label="Search for a country"
-            aria-controls="country-select-list"
-            autoComplete="off"
-          />
+          <div className="country-select-search-wrap">
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="country-select-search-icon"
+              aria-hidden="true"
+            />
+            <input
+              ref={inputRef}
+              type="text"
+              className="input country-select-search"
+              placeholder="Search country or code"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={onKeyDown}
+              aria-label="Search for a country"
+              aria-controls="country-select-list"
+              aria-activedescendant={
+                results[active] ? `country-select-opt-${results[active].code}` : undefined
+              }
+              autoComplete="off"
+            />
+          </div>
           <ul
             className="country-select-list"
             id="country-select-list"
@@ -184,6 +196,7 @@ const CountrySelect = ({ value, onChange, disabled, id, label = "Country diallin
             {results.map((c, i) => (
               <li
                 key={c.code}
+                id={`country-select-opt-${c.code}`}
                 role="option"
                 aria-selected={c.code === value}
                 className={

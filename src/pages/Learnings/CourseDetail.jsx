@@ -28,6 +28,7 @@ import {
   LEVELS,
   findCourse,
   levelsOf,
+  pad2,
   relatedCourses,
   sentenceCase,
   trackLabel,
@@ -321,6 +322,10 @@ function CourseView({ course }) {
                 </ol>
               </nav>
 
+              <p className="cd-hero-track">
+                <span className="chip chip-accent">{trackLabel(course.track)}</span>
+              </p>
+
               <h1 className="cd-title" ref={titleRef} tabIndex={-1}>
                 {course.title}
               </h1>
@@ -498,8 +503,15 @@ function CourseView({ course }) {
                           aria-controls={`module-${i}-panel`}
                           onClick={() => toggleModule(i)}
                         >
+                          <span className="cd-module-num" aria-hidden="true">
+                            {pad2(i + 1)}
+                          </span>
                           <span className="cd-module-title">
-                            Module {i + 1}: {mod.title}
+                            <span className="cd-module-kicker">
+                              Module {i + 1}
+                              <span className="visually-hidden">:</span>
+                            </span>{" "}
+                            <span className="cd-module-name">{mod.title}</span>
                           </span>
                           <span className="cd-module-sign" aria-hidden="true" />
                         </button>

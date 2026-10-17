@@ -1,63 +1,92 @@
 /* =================================================================
-   Course finder: a white rounded card holding three radio questions,
+   Course finder: a friendly three-question wizard in a raised card,
    then a suggested course and two smaller alternatives.
    ================================================================= */
 
 .finder {
-  padding: 36px;
+  position: relative;
+  padding: clamp(24px, 3.4vw, 40px);
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--rule);
   border-radius: var(--radius-lg);
   background: var(--card);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   scroll-margin-top: calc(var(--header-h, 72px) + 16px);
+}
+
+/* Soft brand glow in the top corner. */
+.finder::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  z-index: -1;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(109, 76, 255, 0.1), transparent);
+  pointer-events: none;
 }
 
 /* ---------------- Progress ---------------- */
 
 .finder-top {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .finder-step {
-  margin: 0 0 10px;
-  color: var(--ink-3);
-  font-size: 0.92rem;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 12px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .finder-bar {
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--paper-2);
+  height: 8px;
   overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--paper-3);
 }
 
 .finder-bar span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
+  background: var(--accent) var(--gradient-brand);
+  box-shadow: 0 0 12px rgba(46, 91, 255, 0.45);
   transform-origin: left;
-  transition: transform 0.3s var(--ease);
+  transition: transform 0.4s var(--ease-out);
 }
 
 /* ---------------- Question ---------------- */
 
 .finder-q {
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  min-width: 0;
+  animation: fade-up 0.35s var(--ease) both;
 }
 
 .finder-legend {
   display: block;
   width: 100%;
-  margin: 0 0 18px;
+  margin: 0 0 20px;
   padding: 0;
   color: var(--ink);
-  font-size: 1.3rem;
-  font-weight: 700;
-  line-height: 1.3;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
 }
 
 .finder-legend:focus {
@@ -67,59 +96,115 @@
 .finder-legend:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 4px;
+  border-radius: 4px;
 }
 
 .finder-options {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
+/* Large selectable card. The native radio stays in the DOM (keyboard and
+   screen readers use it) but is visually replaced by the check badge. */
 .finder-option {
+  position: relative;
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 14px;
-  padding: 14px 16px;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-sm);
+  min-height: 88px;
+  padding: 18px 18px 18px 20px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius);
   background: var(--card);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+  transition: border-color 0.18s var(--ease), background-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease), transform 0.18s var(--ease);
 }
 
 .finder-option:hover {
-  border-color: var(--ink-3);
+  border-color: var(--accent-soft-2);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
 }
 
 .finder-option.is-checked {
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent-soft) 40%, var(--card));
+  background: linear-gradient(180deg, var(--accent-soft) 0%, var(--card) 100%);
+  box-shadow: 0 0 0 3px rgba(46, 91, 255, 0.12), var(--shadow-sm);
+}
+
+/* Keyboard focus: ring on the check badge (fallback) and on the whole card. */
+.finder-option input:focus-visible ~ .finder-option-check {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.finder-option:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 .finder-option input {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  margin: 3px 0 0;
-  accent-color: var(--accent);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
   cursor: pointer;
 }
 
 .finder-option-body {
   display: grid;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 
 .finder-option-label {
   color: var(--ink);
-  font-weight: 600;
-  line-height: 1.4;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
 }
 
 .finder-option-detail {
   color: var(--ink-3);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.5;
+}
+
+/* Check badge: an empty ring at rest, a gradient tick when chosen. */
+.finder-option-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--card);
+  color: transparent;
+  font-size: 0.7rem;
+  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+    color 0.18s var(--ease), transform 0.18s var(--ease);
+}
+
+.finder-option:hover .finder-option-check {
+  border-color: var(--accent);
+}
+
+.finder-option.is-checked .finder-option-check {
+  border-color: transparent;
+  background: var(--accent) var(--gradient-brand);
+  color: #fff;
+  box-shadow: var(--shadow-accent);
+  transform: scale(1.06);
 }
 
 /* ---------------- Navigation ---------------- */
@@ -129,7 +214,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 24px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
 }
 
 .finder-hint {
@@ -137,12 +224,30 @@
   font-size: 0.92rem;
 }
 
+.finder-nav .btn-primary {
+  margin-left: auto;
+  min-width: 148px;
+}
+
+.finder-nav .btn-primary:disabled {
+  opacity: 1;
+  background: var(--paper-3);
+  color: var(--ink-3);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* ---------------- Results ---------------- */
 
+.finder-results {
+  animation: fade-up 0.4s var(--ease) both;
+}
+
 .finder-results-title {
-  margin: 0 0 18px;
-  font-size: 1.3rem;
-  font-weight: 700;
+  margin: 0 0 20px;
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  letter-spacing: -0.02em;
 }
 
 .finder-results-title:focus {
@@ -152,62 +257,137 @@
 .finder-results-title:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 4px;
+  border-radius: 4px;
 }
 
+/* Top match: gradient-bordered card. */
 .finder-match {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
   overflow: hidden;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    var(--gradient-brand) border-box;
+  box-shadow: var(--shadow);
 }
 
 .finder-match-media {
+  position: relative;
   min-height: 220px;
-  background: var(--paper-2);
+  background: var(--paper-3);
 }
 
 .finder-match-media img {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+.finder-match-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  background: var(--accent) var(--gradient-brand);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-accent);
+}
+
 .finder-match-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   padding: 24px;
 }
 
 .finder-match-body h4 {
-  margin: 0 0 6px;
+  margin: 0 0 12px;
   font-size: 1.25rem;
-  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
 }
 
 .finder-match-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   margin: 0 0 14px;
-  color: var(--ink-3);
-  font-size: 0.9rem;
+  padding: 0;
+  list-style: none;
+}
+
+.finder-match-meta li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.finder-match-meta svg {
+  color: var(--accent-ink);
+  font-size: 0.72rem;
 }
 
 .finder-why {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   color: var(--ink-2);
-  font-size: 0.97rem;
+  font-size: 0.95rem;
   line-height: 1.6;
 }
 
 .finder-role {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
   margin: 0 0 20px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--olive-soft);
   color: var(--ink-2);
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.finder-role svg {
+  color: var(--olive);
+  flex-shrink: 0;
+}
+
+.finder-role strong {
+  color: var(--ink);
+}
+
+.finder-match-body .btn {
+  margin-top: auto;
 }
 
 .finder-alts-title {
   margin: 28px 0 12px;
-  font-size: 1rem;
-  font-weight: 700;
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .finder-alts {
@@ -224,38 +404,52 @@
   align-items: center;
   gap: 14px;
   height: 100%;
-  padding: 10px;
+  padding: 10px 14px 10px 10px;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
+  background: var(--card);
   color: inherit;
   text-decoration: none;
-  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease),
+    transform 0.2s var(--ease);
 }
 
 .finder-alt:hover {
-  border-color: var(--rule-strong);
+  border-color: var(--accent-soft-2);
   box-shadow: var(--shadow);
+  transform: translateY(-2px);
   text-decoration: none;
+}
+
+.finder-alt:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .finder-alt img {
   flex-shrink: 0;
-  width: 88px;
-  height: 64px;
+  width: 72px;
+  height: 56px;
   border-radius: var(--radius-sm);
   object-fit: cover;
+  background: var(--paper-3);
 }
 
 .finder-alt-body {
   display: grid;
+  flex: 1;
   gap: 2px;
   min-width: 0;
 }
 
 .finder-alt-title {
   color: var(--ink);
-  font-weight: 600;
-  line-height: 1.35;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
+  transition: color 0.2s var(--ease);
 }
 
 .finder-alt:hover .finder-alt-title {
@@ -264,40 +458,73 @@
 
 .finder-alt-meta {
   color: var(--ink-3);
+  font-size: 0.82rem;
+}
+
+.finder-alt-arrow {
+  flex-shrink: 0;
+  color: var(--ink-4);
   font-size: 0.85rem;
+  transition: transform 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.finder-alt:hover .finder-alt-arrow {
+  color: var(--accent-ink);
+  transform: translateX(3px);
 }
 
 .finder-results-foot {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px 24px;
+  gap: 12px 20px;
   margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
 }
 
 .finder-how {
-  margin-top: 20px;
-  color: var(--ink-3);
-  font-size: 0.92rem;
+  margin-top: 16px;
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
 }
 
 .finder-how summary {
+  padding: 12px 16px;
   color: var(--ink-2);
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.finder-how summary:hover {
+  color: var(--accent-ink);
+}
+
+.finder-how summary:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .finder-how p {
-  margin: 10px 0 0;
-  max-width: 64ch;
+  margin: 0;
+  padding: 0 16px 14px;
+  color: var(--ink-3);
+  font-size: 0.9rem;
   line-height: 1.6;
 }
 
 /* ---------------- Responsive ---------------- */
 
 @media (max-width: 760px) {
-  .finder {
-    padding: 24px 20px;
+  .finder-options,
+  .finder-alts {
+    grid-template-columns: 1fr;
+  }
+
+  .finder-option {
+    min-height: 0;
   }
 
   .finder-match {
@@ -312,18 +539,26 @@
   .finder-match-body {
     padding: 20px;
   }
-
-  .finder-alts {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 420px) {
-  .finder-nav .btn {
-    padding: 0 16px;
+  .finder {
+    border-radius: var(--radius);
+  }
+
+  .finder-nav {
+    flex-wrap: wrap;
   }
 
   .finder-hint {
-    font-size: 0.85rem;
+    flex: 1 1 100%;
+  }
+
+  .finder-nav .btn {
+    flex: 1 1 0;
+  }
+
+  .finder-results-foot .btn {
+    flex: 1 1 100%;
   }
 }

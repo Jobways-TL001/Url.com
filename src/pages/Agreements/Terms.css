@@ -1,89 +1,155 @@
 /* =================================================================
    Legal documents (Terms, Privacy Policy, Disclaimer)
-   A plain document layout: warm-grey hero with the title and tabs
-   between the three documents, a sticky "On this page" list on wide
-   screens (collapsible on small ones), and the text in a readable
-   column with ordinary bold headings.
+   Mist hero with a fine grid, the title, meta chips and a segmented
+   switch between the three documents · a sticky "On this page" rail
+   on wide screens (collapsible card on small ones) · the text in a
+   ~72ch reading column with a clear heading hierarchy.
    ================================================================= */
 
 /* ---------------- Hero ---------------- */
 
 .legal-hero {
-  padding: clamp(48px, 6vw, 80px) 0 0;
-  background: var(--paper-2);
+  position: relative;
+  padding: clamp(56px, 7vw, 96px) 0 clamp(32px, 4vw, 48px);
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(40% 70% at 95% 0%, rgba(109, 76, 255, 0.08), transparent 70%),
+    radial-gradient(45% 80% at 0% 0%, rgba(46, 91, 255, 0.08), transparent 70%),
+    linear-gradient(180deg, var(--paper-2) 0%, var(--paper) 100%);
   border-bottom: 1px solid var(--rule);
+  outline: none;
+}
+
+.legal-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 80% at 30% 0%, #000 15%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 80% at 30% 0%, #000 15%, transparent 75%);
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .legal-hero-inner {
   max-width: 880px;
 }
 
+.legal-eyebrow {
+  margin-bottom: 16px;
+}
+
 .legal-hero h1 {
-  margin: 0 0 12px;
-  font-size: clamp(2.2rem, 4.4vw, 3.4rem);
-  line-height: 1.1;
+  margin: 0 0 18px;
+  font-size: clamp(2.2rem, 4.6vw, 3.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
 }
 
-.legal-hero .legal-updated {
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--ink-3);
-}
-
-/* Document tabs, sitting on the hero's bottom edge. */
-.legal-switch {
+/* Meta chips: "Last updated …" and the section count. */
+.legal-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 28px;
+  gap: 8px;
+}
+
+.legal-hero .legal-updated,
+.legal-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A small calendar mark before the date. */
+.legal-hero .legal-updated::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='%231f45d6' stroke-width='1.4' stroke-linecap='round'%3E%3Crect x='1.7' y='2.7' width='10.6' height='9.6' rx='2'/%3E%3Cpath d='M1.7 5.8h10.6M4.6 1.3v2.6M9.4 1.3v2.6'/%3E%3C/svg%3E")
+    center / 14px 14px no-repeat;
+}
+
+/* Document switch: a segmented control. */
+.legal-switch {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
   margin-top: clamp(28px, 4vw, 40px);
+  padding: 4px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--paper-3);
 }
 
 .legal-switch-link {
-  display: inline-block;
-  padding: 0 2px 14px;
-  margin-bottom: -1px;
-  border-bottom: 3px solid transparent;
-  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 0.94rem;
   font-weight: 600;
   color: var(--ink-3);
   text-decoration: none;
-  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+  transition: color 0.15s var(--ease), background-color 0.15s var(--ease),
+    box-shadow 0.15s var(--ease);
 }
 
 .legal-switch-link:hover {
   color: var(--ink);
   text-decoration: none;
-  border-bottom-color: var(--rule-strong);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .legal-switch-link.active {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
+  color: var(--accent-ink);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+
+.legal-switch-link:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* ---------------- Body ---------------- */
 
 .legal-body {
-  padding: clamp(40px, 5vw, 64px) 0 clamp(72px, 9vw, 112px);
+  padding: clamp(40px, 5vw, 72px) 0 clamp(72px, 9vw, 120px);
 }
 
 .legal-layout {
   display: grid;
-  grid-template-columns: 260px minmax(0, 740px);
-  gap: clamp(40px, 5vw, 80px);
+  grid-template-columns: 260px minmax(0, 72ch);
+  gap: clamp(40px, 5vw, 88px);
   align-items: start;
 }
 
 .legal-layout > .legal-main:only-child {
   grid-column: 1 / -1;
-  max-width: 740px;
+  max-width: 72ch;
 }
 
 .legal-main {
   min-width: 0;
 }
 
-/* ---------------- On this page ---------------- */
+/* ---------------- On this page (desktop rail) ---------------- */
 
 .legal-toc {
   position: sticky;
@@ -91,66 +157,85 @@
 }
 
 .legal-toc-title {
-  margin: 0 0 10px;
-  font-size: 0.95rem;
+  margin: 0 0 12px;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--ink);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 
 .legal-toc-scroll {
-  max-height: calc(100vh - var(--header-h, 72px) - 120px);
+  position: relative;
+  max-height: calc(100vh - var(--header-h, 72px) - 96px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--rule-strong) transparent;
+  padding: 2px 4px 2px 2px;
 }
 
 .legal-toc-list {
+  display: grid;
+  gap: 2px;
   margin: 0;
   padding: 0;
   list-style: none;
+  border-left: 1px solid var(--rule);
 }
 
 .legal-toc-list a {
+  position: relative;
   display: block;
-  padding: 6px 12px;
-  border-left: 2px solid var(--rule);
-  font-size: 0.92rem;
-  line-height: 1.4;
+  margin-left: -1px;
+  padding: 7px 12px 7px 14px;
+  border-left: 2px solid transparent;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
   color: var(--ink-3);
   text-decoration: none;
-  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+  transition: color 0.15s var(--ease), background-color 0.15s var(--ease),
+    border-color 0.15s var(--ease);
 }
 
 .legal-toc-list a:hover {
   color: var(--ink);
+  background: var(--paper-2);
+  border-left-color: var(--rule-strong);
   text-decoration: none;
 }
 
 .legal-toc-list a.is-active {
-  border-left-color: var(--accent);
-  color: var(--ink);
+  color: var(--accent-ink);
   font-weight: 600;
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
 }
 
 .legal-toc-list a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
 }
 
-/* Collapsible list on small screens. */
+/* ---------------- On this page (small screens) ---------------- */
+
 .legal-toc-mobile {
   display: none;
   margin-bottom: 36px;
   border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   background: var(--card);
+  box-shadow: var(--shadow-sm);
 }
 
 .legal-toc-mobile summary {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 16px;
+  min-height: 52px;
+  padding: 12px 18px;
+  border-radius: var(--radius);
   cursor: pointer;
   list-style: none;
   font-weight: 600;
@@ -159,6 +244,11 @@
 
 .legal-toc-mobile summary::-webkit-details-marker {
   display: none;
+}
+
+.legal-toc-mobile summary:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* A small chevron drawn with two borders. */
@@ -178,44 +268,64 @@
 }
 
 .legal-toc-count {
-  font-weight: 400;
-  font-size: 0.9rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--paper-3);
+  font-weight: 500;
+  font-size: 0.8rem;
   color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
 }
 
 .legal-toc-mobile .legal-toc-list {
-  padding: 4px 16px 14px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin: 0 18px 14px;
+  padding-top: 10px;
   border-top: 1px solid var(--rule);
+  border-left: 0;
 }
 
-.legal-toc-mobile .legal-toc-list li:first-child {
-  margin-top: 10px;
+.legal-toc-mobile .legal-toc-list a {
+  margin-left: 0;
+  border-radius: 8px;
+  border-left: 0;
 }
 
 /* ---------------- The document ---------------- */
 
 .legal-prose {
-  max-width: 740px;
-  font-size: 1.02rem;
-  line-height: 1.75;
+  max-width: 72ch;
+  font-size: 1.03rem;
+  line-height: 1.8;
   color: var(--ink-2);
-}
-
-.legal-prose h2 {
-  margin: 48px 0 16px;
-  font-size: clamp(1.3rem, 2vw, 1.55rem);
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--ink);
 }
 
 .legal-prose > :first-child {
   margin-top: 0;
 }
 
-/* Headings written in capitals: a step smaller so they don't shout. */
+/* Section headings: a hairline above each, generous space before. */
+.legal-prose h2 {
+  margin: 56px 0 18px;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+  font-size: clamp(1.35rem, 2vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.legal-prose > h2:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* Headings written in capitals: smaller and tracked so they don't shout. */
 .legal-prose h2.legal-h2-caps {
-  font-size: clamp(1.1rem, 1.6vw, 1.25rem);
+  font-size: clamp(1.05rem, 1.5vw, 1.18rem);
+  letter-spacing: 0.02em;
 }
 
 .legal-prose h2 b,
@@ -224,47 +334,133 @@
 }
 
 .legal-prose h3 {
-  margin: 28px 0 10px;
-  font-size: 1.12rem;
+  margin: 32px 0 10px;
+  font-size: 1.15rem;
+  letter-spacing: -0.015em;
   color: var(--ink);
 }
 
-.legal-prose p,
-.legal-prose li {
-  margin: 0 0 1em;
-}
-
-.legal-prose ul,
-.legal-prose ol {
-  margin: 0 0 1.2em;
-  padding-left: 1.4em;
-}
-
-/* Paragraph clause numbers (1.1, 1.2.1 …) in plain bold. */
-.legal-prose p > b:first-child,
-.legal-prose p > strong:first-child {
-  margin-right: 4px;
+.legal-prose h4 {
+  margin: 24px 0 8px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
   font-weight: 700;
   color: var(--ink);
 }
 
-.legal-prose a {
-  color: var(--accent-ink);
-  text-decoration: underline;
-  text-decoration-color: currentColor;
+.legal-prose p {
+  margin: 0 0 1.1em;
 }
 
-.legal-prose a:hover {
+/* Paragraph clause numbers (1.1, 1.2.1 …): accent ink, even figures. */
+.legal-prose p > b:first-child,
+.legal-prose p > strong:first-child {
+  margin-right: 6px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lists */
+.legal-prose ul,
+.legal-prose ol {
+  margin: 0 0 1.3em;
+  padding-left: 1.5em;
+}
+
+.legal-prose li {
+  margin: 0 0 0.55em;
+  padding-left: 0.25em;
+}
+
+.legal-prose ul > li::marker {
+  color: var(--accent);
+}
+
+.legal-prose ol > li::marker {
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tables */
+.legal-prose table {
+  width: 100%;
+  margin: 0 0 1.5em;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.legal-prose th,
+.legal-prose td {
+  padding: 12px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+
+.legal-prose th {
+  background: var(--paper-2);
+  font-weight: 600;
   color: var(--ink);
 }
 
-/* Long clauses written in capitals: slightly smaller. */
+.legal-prose tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Callouts */
+.legal-prose blockquote,
+.legal-prose .legal-callout {
+  margin: 0 0 1.5em;
+  padding: 16px 20px;
+  border: 1px solid var(--accent-soft-2);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--ink-2);
+}
+
+.legal-prose blockquote > :last-child,
+.legal-prose .legal-callout > :last-child {
+  margin-bottom: 0;
+}
+
+/* Links */
+.legal-prose a {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-soft-2);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s var(--ease);
+}
+
+.legal-prose a:hover {
+  text-decoration-color: currentColor;
+}
+
+.legal-prose a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Long clauses written in capitals: slightly smaller, a touch more air. */
 .legal-prose .legal-caps {
-  font-size: 0.94rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  line-height: 1.75;
 }
 
 .legal-prose .legal-contact-line {
   margin: 0 0 6px;
+  font-weight: 500;
   color: var(--ink);
 }
 
@@ -289,20 +485,33 @@
 
   .legal-main,
   .legal-prose {
-    max-width: 740px;
+    max-width: 72ch;
   }
 }
 
 @media (max-width: 680px) {
   .legal-switch {
-    gap: 0 20px;
+    display: flex;
+  }
+
+  .legal-switch-link {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 0 12px;
   }
 
   .legal-prose {
     font-size: 1rem;
+    line-height: 1.75;
   }
 
   .legal-prose h2 {
     margin-top: 40px;
+    padding-top: 22px;
+  }
+
+  .legal-prose table {
+    display: block;
+    overflow-x: auto;
   }
 }

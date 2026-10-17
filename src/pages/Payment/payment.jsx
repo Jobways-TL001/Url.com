@@ -221,7 +221,7 @@ function OrderSummary({ course, enrolment, fee }) {
         )}
       </dl>
 
-      <div className="pay-total">
+      <div className={`pay-total${/\d/.test(fee) ? " is-amount" : ""}`}>
         <span>Course fee</span>
         <strong>{fee}</strong>
       </div>

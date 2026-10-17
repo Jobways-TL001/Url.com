@@ -7,6 +7,7 @@ import {
   faCheck,
   faClock,
   faEnvelope,
+  faLocationDot,
   faPaperPlane,
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
@@ -746,6 +747,61 @@ const ContactUsPage = () => {
           </div>
 
           <aside className="flow-aside" aria-label="About your request">
+            {/* Contact methods: one card per channel, the whole card is the link. */}
+            <div className="contact-direct">
+              <h2 className="flow-aside-title">Prefer email?</h2>
+              <ul className="contact-direct-list">
+                {COMPANY.email && (
+                  <li className="contact-method is-link">
+                    <span className="icon-tile contact-method-icon" aria-hidden="true">
+                      <FontAwesomeIcon icon={faEnvelope} />
+                    </span>
+                    <span className="contact-method-text">
+                      <span className="contact-method-label">Email</span>
+                      <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
+                    </span>
+                  </li>
+                )}
+                {phoneHref && (
+                  <li className="contact-method is-link">
+                    <span className="icon-tile contact-method-icon" aria-hidden="true">
+                      <FontAwesomeIcon icon={faPhone} />
+                    </span>
+                    <span className="contact-method-text">
+                      <span className="contact-method-label">Phone</span>
+                      <a href={phoneHref}>{COMPANY.phone}</a>
+                    </span>
+                  </li>
+                )}
+                {locations[0]?.address && (
+                  <li className="contact-method">
+                    <span className="icon-tile contact-method-icon" aria-hidden="true">
+                      <FontAwesomeIcon icon={faLocationDot} />
+                    </span>
+                    <span className="contact-method-text">
+                      <span className="contact-method-label">Address</span>
+                      <span>{locations[0].address}</span>
+                    </span>
+                  </li>
+                )}
+                {COMPANY.hours && (
+                  <li className="contact-method">
+                    <span
+                      className="icon-tile icon-tile-teal contact-method-icon"
+                      aria-hidden="true"
+                    >
+                      <FontAwesomeIcon icon={faClock} />
+                    </span>
+                    <span className="contact-method-text">
+                      <span className="contact-method-label">Hours</span>
+                      <span>{COMPANY.hours}</span>
+                    </span>
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            {/* Reassurance: what happens after the form is sent. */}
             <div className="flow-aside-card">
               <h2 className="flow-aside-title">What happens next</h2>
               <ol className="flow-aside-steps">
@@ -761,33 +817,6 @@ const ContactUsPage = () => {
                   </li>
                 ))}
               </ol>
-
-              <div className="contact-direct">
-                <h2 className="flow-aside-title">Prefer email?</h2>
-                <ul className="contact-direct-list">
-                  {COMPANY.email && (
-                    <li>
-                      <FontAwesomeIcon icon={faEnvelope} aria-hidden="true" />
-                      <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
-                    </li>
-                  )}
-                  {phoneHref && (
-                    <li>
-                      <FontAwesomeIcon icon={faPhone} aria-hidden="true" />
-                      <a href={phoneHref}>{COMPANY.phone}</a>
-                    </li>
-                  )}
-                  {COMPANY.hours && (
-                    <li>
-                      <FontAwesomeIcon icon={faClock} aria-hidden="true" />
-                      <span>
-                        <span className="visually-hidden">Hours: </span>
-                        {COMPANY.hours}
-                      </span>
-                    </li>
-                  )}
-                </ul>
-              </div>
             </div>
           </aside>
         </div>

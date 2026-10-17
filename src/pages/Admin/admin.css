@@ -1,4 +1,11 @@
-/* Admin dashboard. Uses the design tokens and .btn classes from index.css. */
+/* =================================================================
+   Admin dashboard (/admin)
+   -----------------------------------------------------------------
+   Dense but calm SaaS console on the "Meridian" system: a cool mist
+   app background, a navy top bar, white 16px panels with hairline
+   borders. Colours come from the admin-scoped tokens defined at the
+   end of index.css (.adm / .adm-login) and the global tokens.
+   ================================================================= */
 
 .adm,
 .adm-login,
@@ -8,6 +15,20 @@
   color: var(--text);
   font-family: var(--font-sans);
 }
+
+.adm {
+  font-size: 0.9375rem;
+}
+
+/* Every figure in the console lines up in columns. */
+.adm-stat-value,
+.adm-table td,
+.adm-pager,
+.adm-tax-input {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Utilities ---------- */
 
 .adm-muted {
   color: var(--muted);
@@ -28,6 +49,34 @@
   white-space: nowrap;
 }
 
+.adm-ok-text {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.adm-error-text {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* index.css colours every admin link blue; buttons that are links keep
+   their own button colours. */
+.adm a.btn-primary,
+.adm a.btn-primary:hover {
+  color: #fff;
+}
+
+.adm a.btn-secondary,
+.adm a.btn-secondary:hover {
+  color: var(--ink);
+}
+
+/* Small buttons meet the 40px hit target. */
+.adm .btn-sm,
+.adm-login .btn-sm {
+  min-height: 40px;
+}
+
 /* ---------- Loading ---------- */
 
 .adm-center {
@@ -35,12 +84,17 @@
   place-items: center;
 }
 
+.adm-inline-center {
+  min-height: 240px;
+  background: none;
+}
+
 .adm-spinner {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 3px solid var(--emerald-100);
-  border-top-color: var(--emerald-600);
+  border-top-color: var(--emerald-500);
   animation: adm-spin 0.8s linear infinite;
 }
 
@@ -50,42 +104,7 @@
   }
 }
 
-/* ---------- Login ---------- */
-
-.adm-login {
-  display: grid;
-  place-items: center;
-  padding: 24px 16px;
-  background: radial-gradient(900px 500px at 100% 0%, rgba(139, 92, 246, 0.35), transparent 70%),
-    var(--forest-900);
-}
-
-.adm-login-card {
-  width: 100%;
-  max-width: 400px;
-  padding: 36px 32px;
-  border-radius: var(--radius);
-  background: var(--white);
-  box-shadow: var(--shadow-lg);
-}
-
-.adm-login-logo {
-  display: flex;
-  width: max-content;
-  font-size: 36px;
-  margin-bottom: 24px;
-}
-
-.adm-login-card h1 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  color: var(--ink);
-}
-
-.adm-login-card > p {
-  margin: 6px 0 24px;
-}
+/* ---------- Form controls ---------- */
 
 .adm-field {
   display: block;
@@ -95,7 +114,7 @@
 .adm-field span {
   display: block;
   margin-bottom: 6px;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--ink);
 }
@@ -105,14 +124,33 @@
 .adm-select,
 .adm-status {
   width: 100%;
-  min-height: 42px;
-  padding: 9px 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--white);
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
   font: inherit;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   color: var(--ink);
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease),
+    background-color 0.15s var(--ease);
+}
+
+.adm-field input {
+  min-height: 44px;
+  font-size: 0.9375rem;
+}
+
+.adm-field input::placeholder,
+.adm-search::placeholder {
+  color: var(--ink-4);
+}
+
+.adm-field input:hover,
+.adm-search:hover,
+.adm-select:hover {
+  border-color: var(--ink-4);
 }
 
 .adm-field input:focus,
@@ -121,21 +159,114 @@
 .adm-status:focus {
   outline: none;
   border-color: var(--emerald-500);
-  box-shadow: 0 0 0 3px var(--emerald-100);
+  box-shadow: 0 0 0 3px rgba(46, 91, 255, 0.18);
 }
 
-.adm-login-card .btn {
-  margin-top: 8px;
+/* Custom chevron drawn in the control's own text colour. */
+.adm-select,
+.adm-status {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 32px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  cursor: pointer;
 }
 
 .adm-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   margin: 0 0 16px;
   padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  background: #fdecec;
-  border: 1px solid #f7c6c6;
-  color: #9b1c1c;
+  border: 1px solid rgba(196, 43, 28, 0.22);
+  border-radius: 10px;
+  background: var(--danger-bg);
+  color: var(--danger);
   font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.adm-alert::before {
+  content: "!";
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+/* ---------- Login ---------- */
+
+.adm-login {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+  overflow: hidden;
+  background: radial-gradient(720px 420px at 85% -5%, rgba(109, 76, 255, 0.32), transparent 70%),
+    radial-gradient(640px 420px at 5% 105%, rgba(46, 91, 255, 0.28), transparent 70%),
+    var(--forest-900);
+}
+
+/* Fine grid, faded out towards the edges. */
+.adm-login::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(241, 245, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(241, 245, 255, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 70%);
+  mask-image: radial-gradient(ellipse at center, #000 20%, transparent 70%);
+  pointer-events: none;
+}
+
+.adm-login-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 36px 36px;
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-lg), 0 0 0 6px rgba(241, 245, 255, 0.06);
+}
+
+.adm-login-logo {
+  display: flex;
+  width: max-content;
+  margin: 0 auto 24px;
+  font-size: 36px;
+}
+
+.adm-login-card h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--ink);
+}
+
+.adm-login-card > p {
+  margin: 6px 0 28px;
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+.adm-login-card .btn {
+  min-height: 46px;
+  margin-top: 8px;
 }
 
 /* ---------- Top bar ---------- */
@@ -146,32 +277,100 @@
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
-  padding: 12px clamp(16px, 3vw, 32px);
-  background: var(--white);
-  border-bottom: 1px solid var(--line);
+  min-height: 64px;
+  padding: 10px clamp(16px, 3vw, 32px);
+  background: var(--forest-900);
+  border-bottom: 1px solid var(--rule-dark);
+  box-shadow: 0 1px 0 rgba(7, 13, 31, 0.2), 0 8px 24px -16px rgba(7, 13, 31, 0.6);
+}
+
+.adm-topbar :focus-visible {
+  outline-color: var(--accent-on-dark);
 }
 
 .adm-brand {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: none;
 }
 
 .adm-brand-logo {
-  font-size: 30px;
+  font-size: 28px;
+}
+
+/* index.css sets the admin wordmark to dark ink; the bar is navy. */
+.adm .adm-topbar .brand-logo-word {
+  color: var(--ink-on-dark);
 }
 
 .adm-brand-tag {
-  padding: 3px 10px;
+  padding: 3px 9px;
+  border: 1px solid rgba(142, 168, 255, 0.28);
   border-radius: 999px;
-  background: var(--emerald-50);
-  color: var(--emerald-700);
-  font-size: 0.75rem;
+  background: rgba(142, 168, 255, 0.12);
+  color: var(--accent-on-dark);
+  font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* Section nav */
+.adm-tabs {
+  display: flex;
+  gap: 2px;
+  margin-right: auto;
+  margin-left: 20px;
+  padding-left: 20px;
+  border-left: 1px solid var(--rule-dark);
+}
+
+.adm-tabs button,
+.adm-tabs a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-on-dark-2);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+
+.adm-tabs button:hover,
+.adm-tabs a:hover {
+  color: var(--ink-on-dark);
+  background: rgba(241, 245, 255, 0.06);
+  text-decoration: none;
+}
+
+.adm-tabs button.is-active,
+.adm-tabs a.is-active {
+  color: #fff;
+  background: rgba(142, 168, 255, 0.14);
+}
+
+/* Accent underline marks the current section (not colour alone). */
+.adm-tabs button.is-active::after,
+.adm-tabs a.is-active::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: -11px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-brand);
 }
 
 .adm-user {
@@ -179,22 +378,36 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
+  margin-left: auto;
 }
 
 .adm-user-email {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.875rem;
-  color: var(--muted);
+  font-size: 0.8125rem;
+  color: var(--ink-on-dark-2);
 }
 
-/* ---------- Main ---------- */
+.adm-topbar .btn-secondary {
+  background: rgba(241, 245, 255, 0.04);
+  border-color: rgba(241, 245, 255, 0.2);
+  color: var(--ink-on-dark);
+  box-shadow: none;
+}
+
+.adm-topbar .btn-secondary:hover {
+  background: rgba(241, 245, 255, 0.1);
+  border-color: rgba(241, 245, 255, 0.4);
+  color: #fff;
+}
+
+/* ---------- Page ---------- */
 
 .adm-main {
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: clamp(20px, 3vw, 36px) clamp(16px, 3vw, 32px) 48px;
+  padding: clamp(20px, 3vw, 32px) clamp(16px, 3vw, 32px) 56px;
 }
 
 .adm-heading {
@@ -209,12 +422,16 @@
 .adm-heading h1 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
   color: var(--ink);
 }
 
 .adm-heading p {
   margin: 4px 0 0;
+  font-size: 0.9375rem;
 }
 
 .adm-actions {
@@ -222,66 +439,94 @@
   gap: 8px;
 }
 
-/* ---------- Stats ---------- */
+/* ---------- KPI cards ---------- */
 
 .adm-stats {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
 .adm-stat {
+  --adm-tone: var(--ink-4);
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 18px 20px;
+  gap: 8px;
+  padding: 16px 18px 18px;
   border: 1px solid var(--line);
-  border-left: 4px solid var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   background: var(--white);
   box-shadow: var(--shadow-sm);
   font: inherit;
   text-align: left;
+  color: inherit;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease),
+    border-color 0.18s var(--ease);
 }
 
 .adm-stat:hover {
-  transform: translateY(-2px);
+  border-color: var(--accent-soft-2);
   box-shadow: var(--shadow);
+  transform: translateY(-2px);
 }
 
 .adm-stat-blue {
-  border-left-color: var(--emerald-600);
+  --adm-tone: var(--accent);
 }
 
 .adm-stat-teal {
-  border-left-color: var(--success-600);
+  --adm-tone: var(--olive);
 }
 
 .adm-stat-red {
-  border-left-color: #dc2626;
+  --adm-tone: var(--danger);
+  border-color: rgba(196, 43, 28, 0.28);
+  background: linear-gradient(180deg, var(--danger-bg), var(--white) 70%);
+}
+
+/* Label sits above the value; a tone dot keys the card. */
+.adm-stat-label {
+  order: -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.adm-stat-label::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--adm-tone);
+  box-shadow: 0 0 0 3px var(--paper-3);
 }
 
 .adm-stat-value {
   font-family: var(--font-display);
   font-size: 1.75rem;
   font-weight: 800;
+  letter-spacing: -0.02em;
   line-height: 1.1;
   color: var(--ink);
 }
 
-.adm-stat-label {
-  font-size: 0.8125rem;
-  color: var(--muted);
+.adm-stat-red .adm-stat-value {
+  color: var(--danger);
 }
 
-/* ---------- Table panel ---------- */
+/* ---------- Panels and filters ---------- */
 
 .adm-panel {
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   background: var(--white);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -295,9 +540,10 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  padding: 16px 20px;
+  gap: 8px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--line);
+  background: var(--white);
 }
 
 .adm-search {
@@ -305,18 +551,49 @@
 }
 
 .adm-filters .adm-select {
-  flex: 0 1 180px;
+  flex: 0 1 170px;
   width: auto;
 }
 
 .adm-clear {
+  padding: 0 6px;
+  min-height: 40px;
   font-size: 0.875rem;
 }
 
+/* Payment status chips */
+.adm-chip {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease),
+    background-color 0.15s var(--ease);
+}
+
+.adm-chip:hover {
+  border-color: var(--rule-strong);
+  color: var(--ink);
+}
+
+.adm-chip.is-active {
+  border-color: var(--accent-soft-2);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+/* ---------- Tables ---------- */
+
 .adm-table-wrap {
   position: relative;
-  overflow-x: auto;
-  transition: opacity 0.15s;
+  overflow: auto;
+  transition: opacity 0.15s var(--ease);
 }
 
 .adm-table-wrap.is-loading {
@@ -326,15 +603,20 @@
 
 .adm-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
 }
 
-.adm-table th {
-  padding: 12px 16px;
-  background: var(--surface);
+/* Header row stays pinned while the panel scrolls. */
+.adm-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 10px 16px;
+  background: var(--paper-2);
   border-bottom: 1px solid var(--line);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -347,14 +629,39 @@
   padding: 12px 16px;
   border-bottom: 1px solid var(--line);
   vertical-align: middle;
+  color: var(--text);
+}
+
+.adm-table td strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.adm-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.adm-table tbody tr {
+  transition: background-color 0.12s var(--ease);
+}
+
+.adm-table tbody tr:hover > td,
+.adm-table tbody tr:hover > th {
+  background: var(--emerald-50);
+}
+
+.adm-table .adm-num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.adm-table td.adm-num {
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .adm-row {
   cursor: pointer;
-}
-
-.adm-row:hover td {
-  background: var(--emerald-50);
 }
 
 .adm-name {
@@ -369,85 +676,112 @@
 }
 
 .adm-name:hover {
-  color: var(--emerald-600);
+  color: var(--accent-ink);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .adm-empty {
-  padding: 48px 20px;
+  padding: 56px 20px;
   text-align: center;
   color: var(--muted);
 }
 
-/* ---------- Badges and status ---------- */
+.adm-table td.adm-empty {
+  padding: 56px 20px;
+  color: var(--muted);
+}
+
+/* ---------- Status pills ---------- */
 
 .adm-badge {
-  display: inline-block;
-  padding: 3px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border: 1px solid transparent;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
+  line-height: 1.4;
   white-space: nowrap;
 }
 
+.adm-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
 .adm-badge-ok {
-  background: var(--success-50);
-  color: var(--success-600);
+  background: var(--success-bg);
+  border-color: rgba(21, 128, 61, 0.18);
+  color: var(--success);
 }
 
 .adm-badge-warn {
-  background: #fff7e6;
-  color: #92400e;
+  background: var(--warning-bg);
+  border-color: rgba(154, 98, 0, 0.18);
+  color: var(--warning);
 }
 
 .adm-badge-muted {
-  background: #eef4f1;
-  color: var(--muted);
+  background: var(--paper-3);
+  border-color: var(--line);
+  color: var(--ink-3);
 }
 
 .adm-badge-bad {
-  background: #fdecec;
-  color: #b91c1c;
+  background: var(--danger-bg);
+  border-color: rgba(196, 43, 28, 0.18);
+  color: var(--danger);
 }
 
+/* Status as an editable pill */
 .adm-status {
   width: auto;
-  min-height: 34px;
-  padding: 5px 30px 5px 12px;
+  min-height: 32px;
+  padding: 4px 30px 4px 12px;
   border-radius: 999px;
+  box-shadow: none;
   font-size: 0.8125rem;
   font-weight: 600;
-  cursor: pointer;
+}
+
+.adm-drawer-actions .adm-status {
+  min-height: 40px;
 }
 
 .adm-status-new {
-  background-color: var(--emerald-50);
-  border-color: var(--emerald-100);
-  color: var(--emerald-700);
+  background-color: var(--accent-soft);
+  border-color: var(--accent-soft-2);
+  color: var(--accent-ink);
 }
 
 .adm-status-contacted {
-  background-color: #fff7e6;
-  border-color: #fde3a7;
-  color: #92400e;
+  background-color: var(--warning-bg);
+  border-color: rgba(154, 98, 0, 0.22);
+  color: var(--warning);
 }
 
 .adm-status-paid {
-  background-color: #e8f8ee;
-  border-color: #b7e8c8;
-  color: #15803d;
+  background-color: var(--success-bg);
+  border-color: rgba(21, 128, 61, 0.22);
+  color: var(--success);
 }
 
 .adm-status-enrolled {
-  background-color: var(--success-50);
-  border-color: #fde68a;
-  color: var(--success-600);
+  background-color: var(--olive-soft);
+  border-color: rgba(15, 118, 110, 0.22);
+  color: var(--olive);
 }
 
 .adm-status-closed {
-  background-color: #eef4f1;
+  background-color: var(--paper-3);
   border-color: var(--line);
-  color: var(--muted);
+  color: var(--ink-3);
 }
 
 /* ---------- Pager ---------- */
@@ -458,8 +792,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 20px;
-  font-size: 0.875rem;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--paper-2);
+  font-size: 0.8125rem;
 }
 
 .adm-pager-buttons {
@@ -475,18 +811,21 @@
   z-index: 50;
   display: flex;
   justify-content: flex-end;
-  background: rgba(2, 26, 23, 0.45);
-  animation: adm-fade 0.15s ease-out;
+  background: rgba(7, 13, 31, 0.45);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  animation: adm-fade 0.18s var(--ease-out);
 }
 
 .adm-drawer {
-  width: min(520px, 100%);
+  width: min(540px, 100%);
   height: 100%;
   overflow-y: auto;
   padding: 24px 28px 40px;
+  border-left: 1px solid var(--line);
   background: var(--white);
   box-shadow: var(--shadow-lg);
-  animation: adm-slide 0.2s ease-out;
+  animation: adm-slide 0.24s var(--ease-out);
 }
 
 @keyframes adm-fade {
@@ -507,32 +846,39 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
 }
 
 .adm-drawer-head h2 {
   margin: 4px 0 0;
   font-family: var(--font-display);
   font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--ink);
   overflow-wrap: anywhere;
 }
 
 .adm-close {
   flex: none;
-  width: 38px;
-  height: 38px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--line);
-  border-radius: 50%;
+  border-radius: 10px;
   background: var(--white);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   line-height: 1;
   color: var(--muted);
   cursor: pointer;
+  transition: color 0.15s var(--ease), background-color 0.15s var(--ease);
 }
 
 .adm-close:hover {
   color: var(--ink);
-  background: var(--surface);
+  background: var(--paper-3);
 }
 
 .adm-drawer-actions {
@@ -544,20 +890,21 @@
 }
 
 .adm-section-title {
-  margin: 24px 0 8px;
-  font-size: 0.75rem;
+  margin: 28px 0 8px;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--muted);
 }
 
 .adm-message {
   margin: 0;
   padding: 14px 16px;
-  border-radius: var(--radius-sm);
-  background: var(--surface);
   border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  color: var(--ink-2);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   line-height: 1.6;
@@ -569,10 +916,14 @@
 
 .adm-dl-row {
   display: grid;
-  grid-template-columns: 170px 1fr;
+  grid-template-columns: 160px 1fr;
   gap: 12px;
   padding: 10px 0;
   border-bottom: 1px solid var(--line);
+}
+
+.adm-dl-row:last-child {
+  border-bottom: 0;
 }
 
 .adm-dl dt {
@@ -587,214 +938,11 @@
   overflow-wrap: anywhere;
 }
 
-/* ---------- Responsive ---------- */
-
-@media (max-width: 1100px) {
-  .adm-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-/* Phones: the table becomes a list of cards, one per enquiry, each cell
-   labelled from its data-label. */
-@media (max-width: 760px) {
-  .adm-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .adm-stat {
-    padding: 14px 16px;
-  }
-
-  .adm-stat-value {
-    font-size: 1.4rem;
-  }
-
-  .adm-user-email {
-    display: none;
-  }
-
-  .adm-heading {
-    align-items: stretch;
-  }
-
-  .adm-actions {
-    width: 100%;
-  }
-
-  .adm-actions .btn {
-    flex: 1;
-  }
-
-  .adm-filters {
-    padding: 14px;
-  }
-
-  .adm-filters .adm-select {
-    flex: 1 1 calc(50% - 5px);
-  }
-
-  .adm-table thead {
-    display: none;
-  }
-
-  .adm-table,
-  .adm-table tbody {
-    display: block;
-  }
-
-  .adm-table tr {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 12px;
-    padding: 14px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .adm-table td {
-    display: block;
-    padding: 0;
-    border: 0;
-    min-width: 0;
-  }
-
-  .adm-row:hover td {
-    background: none;
-  }
-
-  .adm-table td::before {
-    content: attr(data-label);
-    display: block;
-    margin-bottom: 2px;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  /* Name and contact span the card; the rest pair up two per line. */
-  .adm-table td[data-label="Name"],
-  .adm-table td[data-label="Contact"] {
-    grid-column: 1 / -1;
-  }
-
-  .adm-table td[data-label="Name"]::before {
-    display: none;
-  }
-
-  .adm-table td[data-label="Name"] .adm-name {
-    font-size: 1.05rem;
-  }
-
-  .adm-table td[data-label="Received"] {
-    order: -1;
-    grid-column: 1 / -1;
-    white-space: normal;
-  }
-
-  .adm-table td[data-label="Received"]::before {
-    display: none;
-  }
-
-  .adm-table td[data-label="Received"] {
-    font-size: 0.8125rem;
-    color: var(--muted);
-  }
-
-  .adm-ellipsis {
-    max-width: 100%;
-  }
-
-  .adm-pager {
-    padding: 14px;
-  }
-
-  .adm-drawer {
-    padding: 20px 18px 32px;
-  }
-
-  .adm-dl-row {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-}
-
-/* ---------- Section tabs ---------- */
-
-.adm-tabs {
-  display: flex;
-  gap: 4px;
-  margin-right: auto;
-  margin-left: 24px;
-}
-
-.adm-tabs button,
-.adm-tabs a {
-  padding: 8px 14px;
-  border: 0;
-  border-radius: 999px;
-  background: none;
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.adm-tabs button:hover,
-.adm-tabs a:hover {
-  color: var(--ink);
-  background: var(--surface);
-}
-
-.adm-tabs button.is-active,
-.adm-tabs a.is-active {
-  color: var(--emerald-700);
-  background: var(--emerald-50);
-}
-
-/* ---------- Shared: inline loading, save status ---------- */
-
-.adm-inline-center {
-  min-height: 200px;
-  background: none;
-}
-
-.adm-ok-text {
-  color: var(--success-600);
-}
-
-.adm-error-text {
-  color: #b91c1c;
-}
-
-@media (max-width: 760px) {
-  .adm-topbar {
-    flex-wrap: wrap;
-  }
-
-  .adm-tabs {
-    order: 3;
-    width: 100%;
-    margin: 4px 0 0;
-  }
-
-  .adm-tabs button,
-  .adm-tabs a {
-    text-align: center;
-    flex: 1;
-  }
-
-}
-
 /* ---------- State tax ---------- */
 
 .adm-tax-table th,
 .adm-tax-table td {
-  padding: 10px 12px;
+  padding: 8px 12px;
 }
 
 .adm-tax-unit {
@@ -804,113 +952,72 @@
 }
 
 .adm-tax-table tbody th.adm-tax-state {
-  display: table-cell;
-  padding: 10px 16px;
-  background: none;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding: 8px 16px;
+  background: var(--white);
   border-bottom: 1px solid var(--line);
-  text-transform: none;
+  box-shadow: 1px 0 0 var(--line);
+  font-size: 0.875rem;
+  font-weight: 400;
   letter-spacing: 0;
-  font-size: 0.9rem;
+  text-transform: none;
   white-space: nowrap;
 }
 
 .adm-tax-state strong {
   display: block;
+  font-weight: 600;
   color: var(--ink);
+}
+
+/* Header corner stays above both sticky axes. */
+.adm-tax-table thead th:first-child {
+  left: 0;
+  z-index: 3;
+  box-shadow: 1px 0 0 var(--line);
 }
 
 .adm-tax-input {
   width: 120px;
-  min-height: 38px;
-  padding: 7px 10px;
+  min-height: 36px;
+  padding: 6px 10px;
+  box-shadow: none;
   text-align: right;
-}
-
-.adm-tax-actions {
-  white-space: nowrap;
-}
-
-.adm-tax-actions [role="status"] {
-  margin-left: 10px;
-}
-
-.adm-tax-table tbody tr:hover td,
-.adm-tax-table tbody tr:hover th {
-  background: var(--emerald-50);
-}
-
-/* Keep the state name in view while scrolling across the wide table. */
-.adm-tax-table thead th:first-child,
-.adm-tax-table tbody th.adm-tax-state {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  background: var(--white);
-  box-shadow: 1px 0 0 var(--line);
-}
-
-.adm-tax-table thead th:first-child {
-  background: var(--surface);
-  z-index: 2;
-}
-
-.adm-tax-table tbody tr:hover th.adm-tax-state {
-  background: var(--emerald-50);
 }
 
 /* What the customer pays, worked out from the inputs on the row. */
 .adm-tax-table .adm-tax-total {
   text-align: right;
   white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  border-left: 2px solid var(--line);
+  border-left: 1px solid var(--line);
+  background-color: var(--emerald-50);
 }
 
 .adm-tax-table td.adm-tax-total strong {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 700;
   color: var(--ink);
-  font-size: 0.95rem;
 }
 
 .adm-tax-unsaved {
   display: block;
   margin-top: 2px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: #b45309;
+  white-space: normal;
+  color: var(--warning);
 }
 
 .adm-tax-table td.adm-tax-actions {
   min-width: 150px;
-}
-
-/* ---------- Payments ---------- */
-
-.adm-chip {
-  padding: 6px 14px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--white);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.adm-chip:hover {
-  color: var(--ink);
-}
-
-.adm-chip.is-active {
-  border-color: var(--emerald-600);
-  background: var(--emerald-50);
-  color: var(--emerald-700);
-}
-
-.adm-table .adm-num {
-  text-align: right;
   white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+}
+
+.adm-tax-actions [role="status"] {
+  margin-left: 10px;
 }
 
 /* ---------- Email templates ---------- */
@@ -925,35 +1032,39 @@
 .adm-mail-list {
   display: flex;
   flex-direction: column;
+  padding: 6px;
 }
 
 .adm-mail-item {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
-  padding: 14px 16px;
+  gap: 6px;
+  min-height: 44px;
+  padding: 12px 14px;
   border: 0;
-  border-bottom: 1px solid var(--line);
+  border-radius: 10px;
   background: none;
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   text-align: left;
   color: var(--ink);
   cursor: pointer;
+  transition: background-color 0.15s var(--ease);
 }
 
-.adm-mail-item:last-child {
-  border-bottom: 0;
+.adm-mail-item + .adm-mail-item {
+  margin-top: 2px;
 }
 
 .adm-mail-item:hover {
-  background: var(--surface);
+  background: var(--paper-2);
 }
 
 .adm-mail-item.is-active {
-  background: var(--emerald-50);
-  box-shadow: inset 3px 0 0 var(--emerald-600);
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .adm-mail-preview {
@@ -967,6 +1078,7 @@
   margin: 0;
   padding: 16px 20px;
   border-bottom: 1px solid var(--line);
+  background: var(--paper-2);
   font-size: 0.875rem;
 }
 
@@ -982,6 +1094,7 @@
 
 .adm-mail-meta dd {
   margin: 0;
+  font-weight: 500;
   color: var(--ink);
   overflow-wrap: anywhere;
 }
@@ -990,7 +1103,7 @@
   width: 100%;
   height: 760px;
   border: 0;
-  background: #f5f7fb;
+  background: var(--paper-2);
 }
 
 .adm-mail-text {
@@ -998,9 +1111,32 @@
   padding: 20px;
   white-space: pre-wrap;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   line-height: 1.6;
-  color: var(--ink);
+  color: var(--ink-2);
+}
+
+/* =================================================================
+   Responsive
+   ================================================================= */
+
+/* Desktop: long tables scroll inside the panel so the column header
+   stays pinned. */
+@media (min-width: 761px) {
+  .adm-table-wrap {
+    max-height: max(420px, calc(100vh - 260px));
+  }
+}
+
+@media (max-width: 1100px) {
+  .adm-tabs {
+    margin-left: 8px;
+    padding-left: 8px;
+  }
+
+  .adm-user-email {
+    max-width: 180px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1010,5 +1146,217 @@
 
   .adm-mail-frame {
     height: 640px;
+  }
+}
+
+/* Phones: tables become a list of cards, one per row, each cell
+   labelled from its data-label. */
+@media (max-width: 760px) {
+  .adm-topbar {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding-bottom: 0;
+  }
+
+  .adm-tabs {
+    order: 3;
+    width: calc(100% + 2 * clamp(16px, 3vw, 32px));
+    margin: 2px calc(-1 * clamp(16px, 3vw, 32px)) 0;
+    padding: 0 clamp(16px, 3vw, 32px) 8px;
+    border-left: 0;
+    border-top: 1px solid var(--rule-dark);
+    padding-top: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .adm-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .adm-tabs button.is-active::after,
+  .adm-tabs a.is-active::after {
+    bottom: 4px;
+  }
+
+  .adm-user-email {
+    display: none;
+  }
+
+  .adm-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .adm-stat {
+    padding: 14px;
+  }
+
+  .adm-stat-value {
+    font-size: 1.4rem;
+  }
+
+  .adm-heading {
+    align-items: stretch;
+  }
+
+  .adm-actions {
+    width: 100%;
+  }
+
+  .adm-actions .btn {
+    flex: 1;
+  }
+
+  .adm-filters {
+    padding: 12px;
+  }
+
+  .adm-filters .adm-select {
+    flex: 1 1 calc(50% - 4px);
+  }
+
+  .adm-table thead {
+    display: none;
+  }
+
+  .adm-table,
+  .adm-table tbody {
+    display: block;
+  }
+
+  .adm-table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .adm-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .adm-table td,
+  .adm-table tbody th {
+    display: block;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .adm-table tbody tr:hover > td,
+  .adm-table tbody tr:hover > th {
+    background: none;
+  }
+
+  .adm-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .adm-table td:not([data-label])::before {
+    display: none;
+  }
+
+  .adm-table td.adm-num {
+    text-align: left;
+  }
+
+  /* Name and contact span the card; the rest pair up two per line. */
+  .adm-table td[data-label="Name"],
+  .adm-table td[data-label="Contact"],
+  .adm-table td[data-label="Learner"],
+  .adm-table td.adm-empty {
+    grid-column: 1 / -1;
+  }
+
+  .adm-table td[data-label="Name"]::before,
+  .adm-table td[data-label="Learner"]::before {
+    display: none;
+  }
+
+  .adm-table td[data-label="Name"] .adm-name {
+    font-size: 1.05rem;
+  }
+
+  .adm-table td[data-label="Received"] {
+    order: -1;
+    grid-column: 1 / -1;
+    white-space: normal;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .adm-table td[data-label="Received"]::before {
+    display: none;
+  }
+
+  .adm-ellipsis {
+    max-width: 100%;
+  }
+
+  /* State tax rows: state name, then labelled inputs two per line. */
+  .adm-tax-table tbody th.adm-tax-state {
+    position: static;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background: none;
+    font-size: 1rem;
+  }
+
+  .adm-tax-input {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .adm-tax-table .adm-tax-total {
+    grid-column: 1 / -1;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .adm-tax-table td.adm-tax-actions {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .adm-tax-table td.adm-tax-actions:empty {
+    display: none;
+  }
+
+  .adm-tax-actions [role="status"] {
+    margin-left: 0;
+  }
+
+  .adm-pager {
+    padding: 12px;
+  }
+
+  .adm-drawer {
+    padding: 20px 18px 32px;
+  }
+
+  .adm-dl-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .adm-login-card {
+    padding: 32px 22px 28px;
   }
 }

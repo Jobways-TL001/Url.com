@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faClock, faSignal, faVideo } from "@fortawesome/free-solid-svg-icons";
 import SectionHead from "../../components/ui/SectionHead";
 import { COURSES, TRACKS } from "../../constants/courses";
 import { ROUTES } from "../../constants/routes";
@@ -22,6 +22,7 @@ const FeaturedCourses = ({ titleId }) => {
   return (
     <>
       <SectionHead
+        eyebrow="Courses"
         title={`Choose from ${COURSES.length} AI courses`}
         id={titleId}
         aside={
@@ -64,22 +65,38 @@ const FeaturedCourses = ({ titleId }) => {
                 loading="lazy"
                 decoding="async"
               />
+              <span className="course-card-badges">
+                <span className="course-card-track">{trackLabel(course.track)}</span>
+                {course.tagline && <span className="course-card-tag">{course.tagline}</span>}
+              </span>
             </div>
             <div className="course-card-body">
-              <p className="course-card-track">{trackLabel(course.track)}</p>
               <h3>
                 <Link to={ROUTES.course(course.id)} className="course-card-link">
                   {course.title}
                 </Link>
               </h3>
               <p className="course-card-summary">{course.summary}</p>
-              <p className="course-card-meta">
-                {course.duration} · {course.level}
-              </p>
-              <span className="course-card-cta" aria-hidden="true">
-                View course
-                <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
-              </span>
+              <ul className="course-card-meta">
+                <li>
+                  <FontAwesomeIcon icon={faClock} aria-hidden="true" />
+                  {course.duration}
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faSignal} aria-hidden="true" />
+                  {course.level}
+                </li>
+              </ul>
+              <div className="course-card-foot">
+                <span className="course-card-mode">
+                  <FontAwesomeIcon icon={faVideo} aria-hidden="true" />
+                  {course.mode}
+                </span>
+                <span className="course-card-cta" aria-hidden="true">
+                  View course
+                  <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
+                </span>
+              </div>
             </div>
           </li>
         ))}

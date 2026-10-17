@@ -3,10 +3,14 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
+  faBrain,
   faBriefcase,
+  faCode,
+  faDatabase,
   faLaptopCode,
   faUserTie,
   faVideo,
+  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../Header/header";
 import Footer from "../Footer/footer";
@@ -78,6 +82,22 @@ const PATHS = TRACKS.filter((t) => t.value !== "all")
   }))
   .filter((path) => path.courses.length > 0);
 
+// Decorative icon per track (presentation only).
+const PATH_ICONS = {
+  foundations: faCode,
+  core: faBrain,
+  genai: faWandMagicSparkles,
+  data: faDatabase,
+};
+
+// Headline figures, each one already stated in the copy on this page.
+const STATS = [
+  { value: String(COURSES.length), label: "courses" },
+  { value: String(PATHS.length), label: "learning paths" },
+  { value: "6 months", label: "per course" },
+  { value: "100%", label: "placement support" },
+];
+
 const AboutUsPage = () => (
   <>
     <Header />
@@ -86,8 +106,11 @@ const AboutUsPage = () => (
     <section className="page-hero about-hero" id="main" tabIndex={-1}>
       <div className="container about-hero-grid">
         <div className="about-hero-text">
-          <h1>About {COMPANY.name}</h1>
-          <p>
+          <span className="eyebrow">Our mission</span>
+          <h1>
+            About <span className="text-gradient">{COMPANY.name}</span>
+          </h1>
+          <p className="about-hero-lead">
             {COMPANY.name} runs live online courses in artificial intelligence, machine
             learning and data. Each course lasts six months, with classes Monday to
             Friday, and is open to complete beginners as well as people already working
@@ -99,30 +122,55 @@ const AboutUsPage = () => (
             and get career advice and job support when you start applying.
           </p>
           <div className="page-hero-actions">
-            <Link to={ROUTES.contact} className="btn btn-primary">
+            <Link to={ROUTES.contact} className="btn btn-primary btn-lg">
               Book a free call
+              <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
             </Link>
-            <Link to={ROUTES.courses} className="btn btn-secondary">
+            <Link to={ROUTES.courses} className="btn btn-secondary btn-lg">
               Browse courses
             </Link>
           </div>
         </div>
         <div className="about-hero-media">
-          <img
-            src="/images/learn-online.webp"
-            alt="A learner taking part in a live online class on a laptop"
-            width="1400"
-            height="1050"
-            decoding="async"
-          />
+          <div className="about-hero-frame">
+            <img
+              src="/images/learn-online.webp"
+              alt="A learner taking part in a live online class on a laptop"
+              width="1400"
+              height="1050"
+              decoding="async"
+            />
+          </div>
+          {/* Decorative badge repeating facts stated in the copy. */}
+          <div className="glass about-hero-badge" aria-hidden="true">
+            <span className="icon-tile">
+              <FontAwesomeIcon icon={faVideo} />
+            </span>
+            <span className="about-hero-badge-text">
+              <strong>Live online</strong>
+              <span>Monday to Friday</span>
+            </span>
+          </div>
         </div>
+      </div>
+
+      <div className="container">
+        <dl className="about-stats">
+          {STATS.map((stat) => (
+            <div key={stat.label} className="about-stat">
+              <dt>{stat.label}</dt>
+              <dd className="text-gradient">{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
 
     {/* ---------------- How we teach ---------------- */}
-    <section className="section about-teach" aria-labelledby="about-teach-title">
+    <section className="section section-alt about-teach" aria-labelledby="about-teach-title">
       <div className="container">
         <div className="section-head" data-reveal>
+          <span className="eyebrow">Our approach</span>
           <h2 id="about-teach-title">How we teach</h2>
           <p>
             All of our courses follow the same format, whichever subject you choose.
@@ -144,7 +192,7 @@ const AboutUsPage = () => (
     </section>
 
     {/* ---------------- The six months ---------------- */}
-    <section className="section section-alt about-months" aria-labelledby="about-months-title">
+    <section className="section section-dark about-months" aria-labelledby="about-months-title">
       <div className="container about-months-grid">
         <div className="about-months-media" data-reveal>
           <img
@@ -159,6 +207,7 @@ const AboutUsPage = () => (
 
         <div className="about-months-body">
           <div data-reveal>
+            <span className="eyebrow">The journey</span>
             <h2 id="about-months-title">What to expect in your 6 months</h2>
             <p className="about-months-intro">
               Here is how a course runs, from your first call with us to your job search.
@@ -185,6 +234,7 @@ const AboutUsPage = () => (
     <section className="section about-paths" aria-labelledby="about-paths-title">
       <div className="container">
         <div className="section-head" data-reveal>
+          <span className="eyebrow">Learning paths</span>
           <h2 id="about-paths-title">Our learning paths</h2>
           <p>
             We offer {COURSES.length} courses in {PATHS.length} areas. Every course is six
@@ -200,6 +250,9 @@ const AboutUsPage = () => (
               aria-labelledby={`about-path-${path.value}`}
               data-reveal
             >
+              <span className="icon-tile" aria-hidden="true">
+                <FontAwesomeIcon icon={PATH_ICONS[path.value] || faBrain} />
+              </span>
               <h3 id={`about-path-${path.value}`}>{path.label}</h3>
               <p className="about-path-count">
                 {path.courses.length} {path.courses.length === 1 ? "course" : "courses"}

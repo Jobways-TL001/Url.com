@@ -1,68 +1,136 @@
 /* =================================================================
    Enrolment dialog (EnrollModal.jsx). Builds on the shared dialog
-   rules in src/pages/Modal/Modal.css.
+   rules in src/pages/Modal/Modal.css (navy blurred overlay, 24px
+   dialog, close button, form grid, success mark). This file adds the
+   step indicator, the course + price summary, error affordances and
+   the confirmation countdown. Uses only the tokens in src/index.css.
    ================================================================= */
 
 .enroll-dialog {
-  max-width: 660px;
+  max-width: 680px;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(60% 140px at 100% 0%, rgba(109, 76, 255, 0.07), transparent 70%),
+    radial-gradient(60% 140px at 0% 0%, rgba(46, 91, 255, 0.07), transparent 70%),
+    var(--card);
+  box-shadow: var(--shadow-lg);
 }
 
-/* ---------------- "Step 1 of 2" and progress bar ---------------- */
+/* ---------------- Step indicator ---------------- */
 
 .enroll-steps {
-  padding: 28px 36px 0;
-  padding-right: 76px;
+  padding: 28px 76px 0 36px;
 }
 
 .enroll-step-count {
-  margin: 0 0 8px;
-  color: var(--ink-3);
-  font-size: 0.88rem;
+  margin: 0 0 12px;
+  color: var(--accent-ink);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .enroll-progress {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
+  counter-reset: enroll-step;
 }
 
 .enroll-progress li {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  counter-increment: enroll-step;
 }
 
+.enroll-progress li:last-child {
+  flex: 0 0 auto;
+}
+
+/* Numbered dot. */
 .enroll-progress li::before {
+  content: counter(enroll-step);
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink-3);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+
+/* Connector between steps. */
+.enroll-progress li:not(:last-child)::after {
   content: "";
-  height: 4px;
+  flex: 1 1 auto;
+  height: 2px;
+  min-width: 16px;
   border-radius: var(--radius-pill);
   background: var(--rule);
 }
 
-.enroll-progress li.is-current::before,
+.enroll-progress li.is-current::before {
+  border-color: transparent;
+  background: var(--accent) var(--gradient-brand);
+  color: #fff;
+  box-shadow: var(--shadow-accent);
+}
+
 .enroll-progress li.is-done::before {
-  background: var(--accent);
+  content: "";
+  border-color: transparent;
+  background:
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M1.5 5.2l3 3 6-6.4'/%3E%3C/svg%3E")
+      center / 12px 10px no-repeat,
+    var(--success);
+}
+
+.enroll-progress li.is-done::after {
+  background: var(--accent) var(--gradient-brand);
 }
 
 .enroll-progress-label {
   color: var(--ink-3);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .enroll-progress li.is-current .enroll-progress-label {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
-/* ---------------- Course summary header ---------------- */
+.enroll-progress li.is-done .enroll-progress-label {
+  color: var(--ink-2);
+}
 
-.enroll-head {
+/* ---------------- Course + price summary ---------------- */
+
+.enroll-dialog .enroll-head {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding-top: 24px;
+  margin: 22px 36px 0;
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-2);
 }
 
 .enroll-thumb {
@@ -70,8 +138,9 @@
   width: 64px;
   height: 64px;
   overflow: hidden;
-  border-radius: var(--radius-sm);
-  background: var(--paper-2);
+  border-radius: 12px;
+  background: var(--paper-3);
+  box-shadow: var(--shadow-sm);
 }
 
 .enroll-thumb img {
@@ -82,26 +151,105 @@
 }
 
 .enroll-head-text {
+  flex: 1 1 auto;
   min-width: 0;
 }
 
-.enroll-head h2 {
+.enroll-dialog .enroll-head h2 {
   margin: 0 0 4px;
   padding-right: 0;
-  font-size: 1.45rem;
+  color: var(--ink);
+  font-size: 1.2rem;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
 }
 
-.enroll-head .enroll-facts {
+.enroll-dialog .enroll-head .enroll-facts {
+  max-width: none;
   margin: 0;
   color: var(--ink-3);
-  font-size: 0.92rem;
+  font-size: 0.88rem;
+}
+
+.enroll-dialog .enroll-head .enroll-price {
+  display: grid;
+  flex-shrink: 0;
+  gap: 2px;
+  max-width: none;
+  margin: 0;
+  padding-left: 16px;
+  border-left: 1px solid var(--rule);
+  text-align: right;
+}
+
+.enroll-price-label {
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.enroll-price-value {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink);
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .enroll-intro {
+  max-width: 58ch;
   margin: 16px 36px 0;
   color: var(--ink-3);
-  font-size: 1rem;
+  font-size: 0.98rem;
   line-height: 1.6;
+}
+
+/* ---------------- Fields ---------------- */
+
+.enroll-dialog .modal-select-placeholder {
+  color: var(--ink-3);
+}
+
+.enroll-dialog .field-hint strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Errors: an alert glyph so colour is never the only cue. */
+.enroll-dialog .field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.enroll-dialog .field-error::before {
+  content: "!";
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.enroll-dialog .notice-error a {
+  color: var(--danger);
+  font-weight: 600;
 }
 
 .enroll-secure {
@@ -122,18 +270,19 @@
 }
 
 .enroll-countdown {
-  width: 160px;
+  width: 180px;
   height: 4px;
-  margin-top: 12px;
+  margin-top: 14px;
   overflow: hidden;
   border-radius: var(--radius-pill);
-  background: var(--rule);
+  background: var(--paper-3);
 }
 
 .enroll-countdown span {
   display: block;
   height: 100%;
-  background: var(--accent);
+  border-radius: inherit;
+  background: var(--accent) var(--gradient-brand);
   transform-origin: left;
   animation: enroll-countdown linear both;
 }
@@ -142,6 +291,7 @@
   from {
     transform: scaleX(0);
   }
+
   to {
     transform: scaleX(1);
   }
@@ -149,19 +299,26 @@
 
 .enroll-done .enroll-pay-note {
   margin: 10px 0 0;
+  color: var(--ink-3);
   font-size: 0.88rem;
 }
 
 /* ---------------- Small screens ---------------- */
 
 @media (max-width: 600px) {
+  .enroll-dialog {
+    border-radius: 20px;
+  }
+
   .enroll-steps {
     padding: 22px 64px 0 22px;
   }
 
-  .enroll-head {
-    align-items: flex-start;
-    padding-top: 20px;
+  .enroll-dialog .enroll-head {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 18px 22px 0;
+    padding: 12px;
   }
 
   .enroll-thumb {
@@ -169,8 +326,24 @@
     height: 52px;
   }
 
-  .enroll-head h2 {
-    font-size: 1.25rem;
+  .enroll-head-text {
+    flex-basis: calc(100% - 64px);
+  }
+
+  .enroll-dialog .enroll-head h2 {
+    font-size: 1.08rem;
+  }
+
+  /* Price drops to its own row under the course. */
+  .enroll-dialog .enroll-head .enroll-price {
+    display: flex;
+    flex-basis: 100%;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 10px 0 0;
+    border-top: 1px solid var(--rule);
+    border-left: 0;
+    text-align: left;
   }
 
   .enroll-intro {

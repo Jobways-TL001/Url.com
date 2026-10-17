@@ -2,13 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBriefcase,
-  faCalendarDays,
+  faArrowRight,
   faComments,
   faHandshake,
   faLaptopCode,
   faUserTie,
-  faVideo,
 } from "@fortawesome/free-solid-svg-icons";
 import Footer from "../Footer/footer";
 import Header from "../Header/header";
@@ -26,9 +24,9 @@ const FINDER_LINK = { pathname: ROUTES.home, hash: "#finder" };
 // courses.js): live online Mon to Fri, 6 months, a dedicated industry
 // mentor, projects and a capstone, career advice, interview and job support.
 const HERO_FACTS = [
-  { icon: faCalendarDays, text: "6-month courses" },
-  { icon: faVideo, text: "Live classes Monday to Friday" },
-  { icon: faBriefcase, text: "100% placement support" },
+  { value: String(COURSES.length), label: "AI courses" },
+  { value: "6 months", label: "per course" },
+  { value: "100%", label: "placement support" },
 ];
 
 const INCLUDED = [
@@ -132,9 +130,17 @@ const Home = () => (
 
     {/* ---------------- Hero ---------------- */}
     <section className="home-hero" id="main" tabIndex={-1} aria-labelledby="home-hero-title">
+      <div className="home-hero-bg" aria-hidden="true" />
       <div className="container home-hero-grid">
         <div className="home-hero-copy">
-          <h1 id="home-hero-title">Live online AI courses, taught by industry mentors</h1>
+          <p className="eyebrow home-hero-eyebrow">
+            <span className="home-hero-live" aria-hidden="true" />
+            Live classes Monday to Friday
+          </p>
+          <h1 id="home-hero-title">
+            Live online AI courses, taught by{" "}
+            <span className="text-gradient">industry mentors</span>
+          </h1>
           <p className="home-hero-lead">
             Choose from {COURSES.length} six-month courses in machine learning, generative AI,
             data science and MLOps. You join live classes Monday to Friday, build projects with
@@ -143,6 +149,7 @@ const Home = () => (
           <div className="home-hero-actions">
             <Link to={FINDER_LINK} className="btn btn-primary btn-lg">
               Find the right course
+              <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
             </Link>
             <Link to={ROUTES.courses} className="btn btn-secondary btn-lg">
               Browse all courses
@@ -150,36 +157,60 @@ const Home = () => (
           </div>
           <ul className="home-hero-facts">
             {HERO_FACTS.map((fact) => (
-              <li key={fact.text}>
-                <FontAwesomeIcon icon={fact.icon} className="home-hero-fact-icon" />
-                {fact.text}
+              <li key={fact.label}>
+                <span className="home-hero-fact-value text-gradient">{fact.value}</span>
+                <span className="home-hero-fact-label">{fact.label}</span>
               </li>
             ))}
           </ul>
         </div>
 
         <div className="home-hero-media">
-          <img
-            src="/images/courses/home-hero.webp"
-            alt="Three people talking around a table with their laptops in a shared workspace."
-            width="1600"
-            height="900"
-            fetchpriority="high"
-            decoding="async"
-          />
+          <div className="home-hero-frame">
+            <img
+              src="/images/courses/home-hero.webp"
+              alt="Three people talking around a table with their laptops in a shared workspace."
+              width="1600"
+              height="900"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </div>
+          {/* Floating badges repeat facts stated elsewhere on the page. */}
+          <div className="glass home-hero-badge home-hero-badge-a" aria-hidden="true">
+            <span className="icon-tile">
+              <FontAwesomeIcon icon={faUserTie} />
+            </span>
+            <span className="home-hero-badge-text">
+              <strong>{INCLUDED[0].title}</strong>
+              <span>For the whole course</span>
+            </span>
+          </div>
+          <div className="glass home-hero-badge home-hero-badge-b" aria-hidden="true">
+            <span className="icon-tile icon-tile-teal">
+              <FontAwesomeIcon icon={faLaptopCode} />
+            </span>
+            <span className="home-hero-badge-text">
+              <strong>Hands-on projects</strong>
+              <span>Finish with a capstone</span>
+            </span>
+          </div>
         </div>
       </div>
     </section>
 
     {/* ---------------- What's included ---------------- */}
-    <section className="home-included" aria-labelledby="included-title">
+    <section className="section section-alt home-included" aria-labelledby="included-title">
       <div className="container">
-        <h2 id="included-title" className="home-included-title">
-          Included in every course
-        </h2>
+        <div className="home-included-head">
+          <span className="eyebrow">What you get</span>
+          <h2 id="included-title" className="home-included-title">
+            Included in every course
+          </h2>
+        </div>
         <ul className="home-included-list">
           {INCLUDED.map((item) => (
-            <li key={item.title}>
+            <li key={item.title} className="card card-hover">
               <span className="icon-tile" aria-hidden="true">
                 <FontAwesomeIcon icon={item.icon} />
               </span>
@@ -209,7 +240,7 @@ const Home = () => (
     >
       <div className="container home-finder-grid">
         <div className="home-finder-intro">
-          <SectionHead title="Not sure where to start?" left id="finder-title">
+          <SectionHead eyebrow="Course finder" title="Not sure where to start?" left id="finder-title">
             Answer three quick questions about your experience and goals, and we'll suggest a
             course to start with, plus two others worth a look.
           </SectionHead>
@@ -223,9 +254,10 @@ const Home = () => (
     </section>
 
     {/* ---------------- How it works ---------------- */}
-    <section className="section home-how" aria-labelledby="how-title">
+    <section className="section section-dark home-how" aria-labelledby="how-title">
+      <div className="home-how-glow" aria-hidden="true" />
       <div className="container">
-        <SectionHead title="How it works" left id="how-title">
+        <SectionHead eyebrow="Getting started" title="How it works" left dark id="how-title">
           From your first call to your first interview, this is what to expect.
         </SectionHead>
         <ol className="steps" data-reveal>
@@ -240,8 +272,9 @@ const Home = () => (
           ))}
         </ol>
         <div className="home-how-actions">
-          <Link to={ROUTES.contact} className="btn btn-primary">
+          <Link to={ROUTES.contact} className="btn btn-primary btn-lg">
             Book a free call
+            <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
           </Link>
         </div>
       </div>
@@ -250,7 +283,7 @@ const Home = () => (
     {/* ---------------- An example week ---------------- */}
     <section className="section section-alt home-week" aria-labelledby="week-title">
       <div className="container">
-        <SectionHead title="A typical week" left id="week-title">
+        <SectionHead eyebrow="Your schedule" title="A typical week" left id="week-title">
           Classes are live online, Monday to Friday. Here's an example week. Your batch's
           exact timetable is shared with you when you join.
         </SectionHead>
@@ -269,7 +302,7 @@ const Home = () => (
     {/* ---------------- FAQ ---------------- */}
     <section className="section home-faq" aria-labelledby="faq-title">
       <div className="container home-faq-grid">
-        <SectionHead title="Frequently asked questions" left id="faq-title">
+        <SectionHead eyebrow="FAQ" title="Frequently asked questions" left id="faq-title">
           Can't find your answer here? <Link to={ROUTES.contact}>Contact us</Link> and an
           advisor will get back to you.
         </SectionHead>
