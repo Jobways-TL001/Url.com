@@ -1124,6 +1124,9 @@ a:hover > .btn-arrow {
 .field {
   display: grid;
   gap: 8px;
+  /* Keep label + input at the top when a neighbouring field in the same
+     row is taller (e.g. it has a hint), instead of stretching the input. */
+  align-content: start;
 }
 
 .field-label {

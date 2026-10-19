@@ -51,6 +51,9 @@
   box-shadow: var(--shadow-lg);
   scroll-margin-top: calc(var(--header-h, 72px) + 16px);
   overflow: hidden;
+  /* clip, not just hide: a hidden box can still be scrolled sideways when
+     a field inside it is focused, which slid the glow into view. */
+  overflow: clip;
   isolation: isolate;
 }
 
