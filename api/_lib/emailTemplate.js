@@ -1,7 +1,7 @@
 // HTML layout for the confirmation emails, styled to match the website:
-// near-black hero with the white logo, a violet-to-cyan accent
-// rule, rounded white cards on a pale page, Figtree type, and the
-// same violet buttons.
+// deep-navy hero with the white logo, a blue-to-violet accent rule,
+// rounded white cards on a pale mist page, Inter / Plus Jakarta Sans
+// type, and the same blue gradient buttons.
 //
 // Built with tables and inline styles, because that is still the only thing
 // every mail client agrees on. Outlook ignores border-radius, gradients and
@@ -14,9 +14,9 @@ const SITE_URL = COMPANY.siteUrl;
 const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
 
 const FONT_BODY =
-  "'Figtree',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+  "'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 const FONT_HEAD =
-  "'Figtree',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+  "'Plus Jakarta Sans','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
 // Everything the visitor typed is escaped before it reaches the HTML, so
 // their input cannot inject markup into their own inbox.
@@ -49,7 +49,7 @@ function stepRows(steps) {
     .map(
       ([title, text], i) => `<tr>
                   <td style="width:44px;padding:0 0 18px;vertical-align:top">
-                    <div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${BRAND.blueSoft};color:${BRAND.blue};font-family:${FONT_HEAD};font-size:14px;font-weight:700;text-align:center">${i + 1}</div>
+                    <div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${BRAND.blueSoft};color:${BRAND.accentDark};font-family:${FONT_HEAD};font-size:14px;font-weight:700;text-align:center">${i + 1}</div>
                   </td>
                   <td style="padding:4px 0 18px;vertical-align:top;font-family:${FONT_BODY}">
                     <div style="font-size:15px;font-weight:600;color:${BRAND.textDark}">${escapeHtml(title)}</div>
@@ -80,7 +80,7 @@ function renderConfirmation(m) {
     <title>${escapeHtml(m.title)}</title>
     <!-- Honoured by Apple Mail and some others; everyone else falls back to
          the system font stack in the inline styles. -->
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
     <!-- Desktop is the inline-styled default: a 600px card. The layout is
          fluid (width:100%; max-width:600px), so it already shrinks on a
          phone; this query, honoured by Gmail, Apple Mail, iOS and Android
@@ -121,15 +121,15 @@ function renderConfirmation(m) {
               <td class="em-pad em-hero" style="background:${BRAND.navy};border-radius:16px 16px 0 0;padding:32px 40px 36px">
                 <img src="cid:${LOGO.cid}" width="${LOGO.width}" height="${LOGO.height}" alt="URL" style="display:block;border:0;outline:none;text-decoration:none" />
                 <div style="margin-top:32px">
-                  <span style="display:inline-block;padding:5px 12px;border-radius:999px;background:rgba(255,138,80,.14);color:${BRAND.accent};font-family:${FONT_BODY};font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">${escapeHtml(m.eyebrow)}</span>
+                  <span style="display:inline-block;padding:5px 12px;border-radius:999px;background:rgba(142,168,255,.14);color:${BRAND.accent};font-family:${FONT_BODY};font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">${escapeHtml(m.eyebrow)}</span>
                 </div>
                 <h1 class="em-title" style="margin:16px 0 0;font-family:${FONT_HEAD};font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.02em;color:${BRAND.white}">${escapeHtml(m.title)}</h1>
                 <p class="em-intro" style="margin:12px 0 0;font-family:${FONT_BODY};font-size:15px;line-height:1.65;color:${BRAND.textOnDark}">${escapeHtml(m.intro)}</p>
               </td>
             </tr>
-            <!-- Accent rule: solid teal where gradients are not supported. -->
+            <!-- Accent rule: solid blue where gradients are not supported. -->
             <tr>
-              <td style="height:4px;line-height:4px;font-size:0;background:${BRAND.accent};">&nbsp;</td>
+              <td style="height:4px;line-height:4px;font-size:0;background:${BRAND.blue};background-image:linear-gradient(90deg,#2e5bff,#6d4cff);">&nbsp;</td>
             </tr>
 
             <!-- Body -->
@@ -157,7 +157,7 @@ function renderConfirmation(m) {
                 <!-- Button: a table cell so it keeps its padding in Outlook. -->
                 <table class="em-btn-table" role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 32px">
                   <tr>
-                    <td style="border-radius:12px;background:${BRAND.blue}">
+                    <td style="border-radius:12px;background:${BRAND.blue};background-image:linear-gradient(135deg,#2e5bff,#6d4cff)">
                       <a class="em-btn" href="${escapeHtml(m.cta.href)}" style="display:inline-block;padding:14px 26px;font-family:${FONT_BODY};font-size:15px;font-weight:600;color:${BRAND.white};text-decoration:none;border-radius:12px">${escapeHtml(m.cta.label)} &rarr;</a>
                     </td>
                   </tr>
@@ -175,7 +175,7 @@ function renderConfirmation(m) {
                 <span class="em-sep">&nbsp;&middot;&nbsp;</span>
                 <span class="em-nowrap" style="white-space:nowrap"><a href="${SITE_URL}" style="color:${BRAND.accent};text-decoration:none">${escapeHtml(SITE_HOST)}</a></span>${COMPANY.phone ? `<br class="em-sep" />
                 <span class="em-nowrap" style="white-space:nowrap"><a href="tel:${escapeHtml(COMPANY.phone.replace(/[^\d+]/g, ""))}" style="color:${BRAND.textOnDark};text-decoration:none">${escapeHtml(COMPANY.phone)}</a></span>` : ""}
-                <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:#8a8178">
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:#8a93a6">
                   ${escapeHtml(m.footerNote)}<br />
                   &copy; ${new Date().getFullYear()} ${escapeHtml(COMPANY.legalName)}. All rights reserved.
                 </div>
