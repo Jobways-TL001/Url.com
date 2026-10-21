@@ -11,7 +11,8 @@ Supabase, and an `/admin` dashboard lets the team review and follow them up.
   on the site rather than shown as placeholders. The email templates keep a
   copy in `COMPANY` in `api/_lib/brand.js`; keep the two in step.
 - **Colours and type** are design tokens at the top of `src/index.css`
-  (forest / emerald / amber palette, Sora + Manrope).
+  (the "Meridian" system: navy, electric blue and a blue → violet gradient;
+  Plus Jakarta Sans for display, Inter for body text).
 - **Logo**: `src/components/ui/Logo.jsx` (inline SVG). Static copies are in
   `public/brand/`, plus `public/favicon.svg`, `favicon.ico`, `logo192.png`
   and `logo512.png`.
@@ -69,8 +70,8 @@ The contact page and the homepage modal both POST this JSON to
    alternative, and marked `Auto-Submitted: auto-replied` so a visitor's
    out-of-office or ticketing system does not reply and start a mail loop.
 
-The acknowledgement uses the site's own palette (`src/pages/Home/home.css`
-`:root`), mirrored in `api/_lib/brand.js`, and carries the real URL logo.
+The acknowledgement uses the site's own palette (the design tokens in
+`src/index.css`), mirrored in `api/_lib/brand.js`, and carries the real URL logo.
 The logo is embedded as base64 in that module and attached with a `cid:`
 reference rather than linked from the site, so it renders before the domain
 is live, without the recipient having to allow remote images, and without
@@ -95,8 +96,12 @@ succeeds (`{"acknowledged": false}` in the response) rather than prompting a
 resubmit, which would deliver the same lead twice. A failed acknowledgement is
 only visible in the function logs.
 
-Nothing is persisted, so a failed notification is a lost enquiry — watch the
-function logs in Vercel.
+Each enquiry is saved to Supabase (`contact_submissions`) before any mail is
+sent, and the delivery outcome is recorded against it afterwards, so a failed
+notification still shows up in `/admin` under the "failed delivery" filter.
+Saving is best effort: if Supabase is unset or the insert fails, the mail
+still goes out. An enquiry is lost only when both the save and the
+notification fail, so watch the function logs in Vercel.
 
 Both are sent **as** the authenticated mailbox, never as the visitor. Sending
 as `visitor@gmail.com` from our SMTP server fails SPF and DMARC and gets
